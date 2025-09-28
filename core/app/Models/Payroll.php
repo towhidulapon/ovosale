@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\GlobalStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Payroll extends Model
+{
+    use GlobalStatus, SoftDeletes;
+
+    protected $guarded  = ['id'];
+    public function exportColumns(): array
+    {
+        return  [
+            'employee_id' => [
+                'name' => "employee",
+                'callback' => function ($item) {
+                    return @$item->employee->name;
+                }
+            ],
+            'amount' => [
+                'callback' => function ($item) {
+                    return showAmount($item->amount);
+                }
+            ],
+            'payment_method_id' => [
+                'name' => "payment_method",
+                'callback' => function ($item) {
+                    return @$item->paymentMethod->name;
+                }
+            ],
+            'payment_account_id' => [
+                'name' => "payment_account",
+                'callback' => function ($item) {
+                    return @$item->PaymentAccount->account_name;
+                }
+            ],
+            'date',
+        ];
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentType::class);
+    }
+    public function PaymentAccount()
+    {
+        return $this->belongsTo(PaymentAccount::class);
+    }
+}
