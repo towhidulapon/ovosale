@@ -32,7 +32,7 @@
                                 <tr>
                                     <td>
                                         <a
-                                            href="{{ route('admin.purchase.view', $purchase->id) }}">{{ $purchase->invoice_number }}</a>
+                                            href="{{ route('user.purchase.view', $purchase->id) }}">{{ $purchase->invoice_number }}</a>
                                     </td>
                                     <td>
                                         <div>

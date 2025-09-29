@@ -1,4 +1,4 @@
-<nav class="navbar text-white bg-primary navbar-expand-lg bg-body-tertiary">
+{{-- <nav class="navbar text-white bg-primary navbar-expand-lg bg-body-tertiary">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <h1 class="text-white">@lang('Logo')</h1>
@@ -62,4 +62,4 @@
             </div>
         @endif
     </div>
-</nav>
+</nav> --}}

@@ -350,20 +350,7 @@ Route::middleware('admin')->group(function () {
         });
     });
 
-    //purchase
-    Route::controller('PurchaseController')->name('purchase.')->prefix('purchase')->group(function () {
-        Route::get('list', 'list')->name('list')->middleware('permission:view purchase,admin');
-        Route::get('add', 'add')->name('add')->middleware('permission:add purchase,admin');
-        Route::post('store', 'store')->name('store')->middleware('permission:add purchase,admin');
-        Route::get('edit/{id}', 'edit')->name('edit')->middleware('permission:edit purchase,admin');
-        Route::post('update/{id}', 'update')->name('update')->middleware('permission:edit purchase,admin');
-        Route::post('ad/payment/{id}', 'addPayment')->name('ad.payment')->middleware('permission:add purchase payment,admin');
-        Route::get('view/{id}', 'view')->name('view')->middleware('permission:view purchase,admin');
-        Route::get('pdf/{id}', 'pdf')->name('pdf')->middleware('permission:download purchase invoice,admin');
-        Route::get('print/{id}', 'print')->name('print');
-        Route::post('update-status/{id}', 'updateStatus')->name('update.status')->middleware('permission:update purchase status,admin');
-        Route::post('remove/single/item/{id}', 'removeSingleItem')->name('remove.single.item');
-    });
+
 
     //sale
     Route::controller('SaleController')->name('sale.')->prefix('sale')->group(function () {

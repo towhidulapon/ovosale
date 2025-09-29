@@ -7,15 +7,15 @@
     <a href="{{ route('admin.product.create') }}" class="pos-search__add-btn" target="_blank">
         <i class="fas fa-plus"></i>
     </a>
-    <x-admin.other.product_search />
+    <x-user.other.product_search />
 </dialog>
 <div class="pos-filter">
     <button class="pos-filter__btn category-btn" type="button">
-        <x-admin.svg.category />
+        <x-user.svg.category />
         <span>@lang('Category')</span>
     </button>
     <button class="pos-filter__btn brand-btn" type="button">
-        <x-admin.svg.brand />
+        <x-user.svg.brand />
         <span>@lang('Brand')</span>
     </button>
 </div>
@@ -117,7 +117,7 @@
                     categoryId.push($(selectedCategory).data('id'));
                 });
 
-                
+
                 window.category_id = categoryId;
                 catCanBas.hide();
                 window.product_page = 1;
@@ -132,7 +132,7 @@
                 $.each($selectedBrands, function(i, selectedBrand) {
                     brandId.push($(selectedBrand).data('id'));
                 });
-                
+
                 window.brand_id = brandId;
                 brandCanBas.hide();
                 window.product_page = 1;

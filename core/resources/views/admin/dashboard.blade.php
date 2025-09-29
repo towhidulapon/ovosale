@@ -34,27 +34,27 @@
                 </x-permission_check>
                 <x-permission_check permission="view purchase">
                     <div class="col-xxl-3 col-sm-6">
-                        <x-admin.ui.widget.four url="{{ route('admin.purchase.list') }}?date={{ $today }}"
+                        <x-admin.ui.widget.four url="{{ route('user.purchase.list') }}?date={{ $today }}"
                             variant="danger" title="Today Purchase" :value="$widget['today_purchase']" icon="las la-calendar" />
                     </div>
                 </x-permission_check>
                 <x-permission_check permission="view purchase">
                     <div class="col-xxl-3 col-sm-6">
                         <x-admin.ui.widget.four
-                            url="{{ route('admin.purchase.list') }}?date={{ now()->startOfWeek()->format('Y-m-d') }}to{{ $today }}"
+                            url="{{ route('user.purchase.list') }}?date={{ now()->startOfWeek()->format('Y-m-d') }}to{{ $today }}"
                             variant="danger" title="This Week Purchase" :value="$widget['this_week_purchase']" icon="las la-calendar" />
                     </div>
                 </x-permission_check>
                 <x-permission_check permission="view purchase">
                     <div class="col-xxl-3 col-sm-6">
                         <x-admin.ui.widget.four
-                            url="{{ route('admin.purchase.list') }}?date={{ now()->startOfMonth()->format('Y-m-d') }}to{{ $today }}"
+                            url="{{ route('user.purchase.list') }}?date={{ now()->startOfMonth()->format('Y-m-d') }}to{{ $today }}"
                             variant="danger" title="This Month Purchase" :value="$widget['this_month_purchase']" icon="las la-calendar" />
                     </div>
                 </x-permission_check>
                 <x-permission_check permission="view purchase">
                     <div class="col-xxl-3 col-sm-6">
-                        <x-admin.ui.widget.four url="{{ route('admin.purchase.list') }}" variant="danger"
+                        <x-admin.ui.widget.four url="{{ route('user.purchase.list') }}" variant="danger"
                             title="All Purchase" :value="$widget['all_purchase']" icon="las la-calendar" />
                     </div>
                 </x-permission_check>
@@ -231,7 +231,7 @@
                             <x-admin.ui.card.header>
                                 <h4 class="card-title">@lang('Recent Purchases')
                                     <x-permission_check permission="view purchase">
-                                        <x-admin.ui.btn.list href="{{ route('admin.purchase.list') }}"
+                                        <x-admin.ui.btn.list href="{{ route('user.purchase.list') }}"
                                             text="View More" />
                                     </x-permission_check>
                                 </h4>
@@ -252,7 +252,7 @@
                                                 <td>
                                                     <div>
                                                         <a
-                                                            href="{{ route('admin.purchase.view', $recentPurchase->id) }}">{{ __($recentPurchase->invoice_number) }}</a><br>
+                                                            href="{{ route('user.purchase.view', $recentPurchase->id) }}">{{ __($recentPurchase->invoice_number) }}</a><br>
                                                         <span>{{ $recentPurchase->created_at->diffForHumans() }}</span>
                                                     </div>
                                                 </td>
@@ -318,7 +318,7 @@
             </a>
         </x-permission_check>
         <x-permission_check permission="add purchase">
-            <a class="btn btn--warning" href="{{ route('admin.purchase.add') }}">
+            <a class="btn btn--warning" href="{{ route('user.purchase.add') }}">
                 <i class="las la-th-list"></i> @lang('New Purchase')
             </a>
         </x-permission_check>

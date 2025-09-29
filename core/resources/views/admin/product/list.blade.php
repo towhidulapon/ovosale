@@ -80,7 +80,7 @@
                                                     </x-permission_check>
                                                     <x-permission_check permission="add purchase">
                                                         <a class="dropdown-list d-block"
-                                                            href="{{ route('admin.purchase.add') }}?product_code={{ $product->product_code }}">
+                                                            href="{{ route('user.purchase.add') }}?product_code={{ $product->product_code }}">
                                                             <span class="me-2">
                                                                 <i class="las la-plus text--info"></i>
                                                             </span>

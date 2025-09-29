@@ -1,4 +1,4 @@
-@extends('admin.layouts.master')
+{{-- @extends('admin.layouts.master')
 @section('content')
     <main class="pos">
         @include('pos.partials.header')
@@ -18,20 +18,42 @@
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('assets/admin/css/pos.css') }}?v=1000">
+@endpush --}}
+
+@extends($activeTemplate . 'layouts.app')
+@section('app-content')
+        <main class="pos">
+            @include('pos.partials.header')
+            <section class="pos-section">
+                @include('pos.partials.left_side')
+                @include('pos.partials.right_side')
+            </section>
+            @include('pos.partials.footer')
+        </main>
+
+        <div class="pos-loader d-none">
+            <span class="loader-spin"></span>
+        </div>
+        @include('pos.partials.audio')
+        @include('pos.partials.shortcut')
+@endsection
+
+@push('style')
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/pos.css') }}?v=1000">
 @endpush
 
 @push('script')
     <script>
         "use strict";
-        (function($) {
+        (function ($) {
             /* ==================== Pos Sidebar JS Start ======================== */
-            $('[data-toggle="pos-sidebar"]').each(function(index, toggler) {
+            $('[data-toggle="pos-sidebar"]').each(function (index, toggler) {
                 let id = $(toggler).data('target');
                 let sidebar = $(id);
                 let sidebarClose = sidebar.find('.btn--close');
                 let sidebarOverlay = $('.sidebar-overlay');
 
-                let hideSidebar = function() {
+                let hideSidebar = function () {
                     sidebar.removeClass('show');
                     sidebarOverlay.removeClass('show');
                     $(toggler).removeClass('active');
@@ -39,13 +61,13 @@
                     $(document).unbind('keydown', EscSidbear);
                 }
 
-                let EscSidbear = function(e) {
+                let EscSidbear = function (e) {
                     if (e.keyCode === 27) {
                         hideSidebar();
                     }
                 }
 
-                let showSidebar = function() {
+                let showSidebar = function () {
                     $(toggler).addClass('active');
                     sidebar.addClass('show');
                     sidebarOverlay.addClass('show');

@@ -222,7 +222,7 @@
             "title": "Manage Purchase",
             "icon": "las la-th-list",
             "menu_active": [
-                "admin.purchase.*"
+                "user.purchase.*"
             ],
             "permission": [
                 "view purchase",
@@ -238,14 +238,14 @@
             "submenu": [
                 {
                     "title": "Add Purchase",
-                    "route_name": "admin.purchase.add",
+                    "route_name": "user.purchase.add",
                     "permission": [
                         "add purchase"
                     ]
                 },
                 {
                     "title": "Purchase List",
-                    "route_name": "admin.purchase.list",
+                    "route_name": "user.purchase.list",
                     "permission": [
                         "view purchase"
                     ]

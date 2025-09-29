@@ -20,16 +20,15 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-trait PurchaseOperation
-{
-    public function list()
-    {
+trait PurchaseOperation {
+    public function list() {
         $pageTitle      = "Purchase List";
-        $view           = "admin.purchase.list";
+        $view           = "Template::user.purchase.list";
         $paymentMethods = PaymentType::active()->with("paymentAccounts", function ($q) {
             $q->active();
         })->get();
 
+        // $baseQuery      = Purchase::where('user_id', auth()->id())->latest('id');
         $baseQuery      = Purchase::latest('id');
 
         if (request()->export) {
@@ -59,28 +58,25 @@ trait PurchaseOperation
         return responseManager("purchase", $pageTitle, 'success', compact('pageTitle', 'purchases', 'paymentMethods', 'view', 'widget'), ['paymentMethods']);
     }
 
-    public function add()
-    {
+    public function add() {
         $pageTitle = "Add Purchase";
-        $view      = "admin.purchase.add";
+        $view      = "Template::user.purchase.add";
         extract($this->basicDataForPurchase());
         return responseManager("add_purchase", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'taxes', 'paymentMethods', 'suppliers', 'view'));
     }
 
-    public function edit($id)
-    {
+    public function edit($id) {
         $pageTitle = "Edit Purchase";
-        $purchase  = Purchase::where("id", $id)->with('purchaseDetails.product', "purchaseDetails.productDetail.attribute", "purchaseDetails.productDetail.variant")->firstOrFailWithApi("purchase");
-        $view      = "admin.purchase.edit";
+        $purchase  = Purchase::where("id", $id)->where("id", $id)->with('purchaseDetails.product', "purchaseDetails.productDetail.attribute", "purchaseDetails.productDetail.variant")->firstOrFailWithApi("purchase");
+        $view      = "Template::user.purchase.edit";
 
         extract($this->basicDataForPurchase());
         return responseManager("edit_purchase", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'taxes', 'paymentMethods', 'suppliers', 'view', 'purchase'));
     }
 
-    public function view($id)
-    {
+    public function view($id) {
         $pageTitle = "Purchase Invoice";
-        $view      = "admin.purchase.view";
+        $view      = "Template::user.purchase.view";
 
         $purchase = Purchase::withSum('supplierPayments', 'amount')
             ->where("id", $id)
@@ -91,8 +87,7 @@ trait PurchaseOperation
     }
 
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $validator = $this->validation($request);
         if ($validator->fails()) {
             return jsonResponse('validation_error', 'error', $validator->errors()->all());
@@ -134,6 +129,7 @@ trait PurchaseOperation
             DB::beginTransaction();
 
             $purchase                   = new Purchase();
+            $purchase->user_id = auth()->id();
             $purchase->invoice_number   = $this->invoiceNumber();
             $purchase->supplier_id      = $supplier->id;
             $purchase->warehouse_id     = $request->warehouse_id;
@@ -188,7 +184,7 @@ trait PurchaseOperation
 
             PurchaseDetails::insert($purchaseDetails);
 
-            //supplier payment 
+            //supplier payment
             if ($request->paid_amount > 0) {
                 $this->purchasePayment($purchase, $request);
             }
@@ -206,8 +202,7 @@ trait PurchaseOperation
         return jsonResponse('purchase', 'success', $message);
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $validator = $this->validation($request, $id);
 
         if ($validator->fails()) {
@@ -332,7 +327,7 @@ trait PurchaseOperation
 
             PurchaseDetails::insert($purchaseDetails);
 
-            //supplier payment 
+            //supplier payment
             if ($request->paid_amount > 0) {
                 $this->purchasePayment($purchase, $request);
             }
@@ -349,8 +344,7 @@ trait PurchaseOperation
         return jsonResponse('purchase', 'success', $message);
     }
 
-    public function addPayment(Request $request, $purchaseId)
-    {
+    public function addPayment(Request $request, $purchaseId) {
         $request->validate([
             'paid_amount'     => 'required|numeric|gt:0',
             'paid_date'       => 'required',
@@ -378,8 +372,7 @@ trait PurchaseOperation
     }
 
 
-    public function updateStatus(Request $request, $id)
-    {
+    public function updateStatus(Request $request, $id) {
         $request->validate([
             'status' => ['required', Rule::in(Status::PURCHASE_ORDERED, Status::PURCHASE_RECEIVED, Status::PURCHASE_PENDING)]
         ]);
@@ -426,8 +419,7 @@ trait PurchaseOperation
         }
     }
 
-    public function pdf($id)
-    {
+    public function pdf($id) {
         $pageTitle = "Purchase Invoice";
         $purchase  = Purchase::with("warehouse", "supplier")
             ->withSum('supplierPayments', 'amount')
@@ -435,14 +427,13 @@ trait PurchaseOperation
             ->firstOrFailWithApi("purchase");
 
 
-        $pdf      = Pdf::loadView('admin.purchase.pdf', compact('purchase', 'pageTitle'));
+        $pdf      = Pdf::loadView('Template::user.purchase.pdf', compact('purchase', 'pageTitle'));
         $fileName = "Purchase Invoice - " . $purchase->invoice_number . ".pdf";
         return $pdf->download($fileName);
     }
 
 
-    public function removeSingleItem($id)
-    {
+    public function removeSingleItem($id) {
         $purchaseItem = PurchaseDetails::where("id", $id)->firstOrFailWithApi("PurchaseDetails");
         $purchase     = Purchase::where('id', $purchaseItem->purchase_id)->first();
 
@@ -464,8 +455,7 @@ trait PurchaseOperation
         return responseManager("success", "Purchase Item deleted successfully.", 'success');
     }
 
-    private function basicDataForPurchase()
-    {
+    private function basicDataForPurchase() {
         return [
             'warehouses'     => Warehouse::active()->get(),
             'taxes'          => Tax::active()->get(),
@@ -476,8 +466,7 @@ trait PurchaseOperation
         ];
     }
 
-    private function validation($request, $id = 0)
-    {
+    private function validation($request, $id = 0) {
         $isRequired = $id ? 'nullable' : 'required';
 
         $validator = Validator::make($request->all(), [
@@ -516,8 +505,7 @@ trait PurchaseOperation
         return $validator;
     }
 
-    private function purchasePayment($purchase, $request)
-    {
+    private function purchasePayment($purchase, $request) {
         $paymentNote                         = "Paid to supplier paid amount on purchase - " . $purchase->reference_number;
         $supplierPayment                     = new SupplierPayment();
         $supplierPayment->purchase_id        = $purchase->id;
@@ -538,8 +526,7 @@ trait PurchaseOperation
         }
     }
 
-    private function updateStock($purchase, $productDetail, $qty, $updateType = "+")
-    {
+    private function updateStock($purchase, $productDetail, $qty, $updateType = "+") {
         $stock = ProductStock::where('product_details_id', $productDetail->id)
             ->where('product_id', $productDetail->product_id)
             ->where('warehouse_id', $purchase->warehouse_id)
@@ -560,16 +547,14 @@ trait PurchaseOperation
         $stock->save();
     }
 
-    private function invoiceNumber()
-    {
+    private function invoiceNumber() {
         $purchaseId = Purchase::max('id') + 1;
         $prefix     = gs('prefix_setting');
         return $prefix->purchase_invoice_prefix . (1000 + $purchaseId);
     }
 
 
-    public function downloadAttachment($id)
-    {
+    public function downloadAttachment($id) {
         $pageTitle = "Purchase Attachment";
         $purchase  = Purchase::where("id", $id)->firstOrFailWithApi('Purchase');
 

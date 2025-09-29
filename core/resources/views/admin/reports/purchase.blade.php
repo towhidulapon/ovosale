@@ -22,7 +22,7 @@
                                         <td>
                                             <div>
                                                 <span class="d-block"><a
-                                                        href="{{ route('admin.purchase.view', $purchase->id) }}">{{ __($purchase->invoice_number) }}</a></span>
+                                                        href="{{ route('user.purchase.view', $purchase->id) }}">{{ __($purchase->invoice_number) }}</a></span>
                                                 <span>{{ __($purchase->reference_number ?? 'N/A') }}</span>
                                             </div>
                                         </td>

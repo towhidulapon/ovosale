@@ -43,7 +43,7 @@ class GlobalVariablesServiceProvider extends ServiceProvider
             ]);
         });
 
-        view()->composer(['Template::partials.sidenav'], function ($view) {
+        view()->composer(['Template::partials.sidenav', 'Template::partials.topnav'], function ($view) {
             $view->with([
                 'menus' => json_decode(file_get_contents(resource_path('views/templates/basic/partials/menu.json'))),
             ]);

@@ -159,7 +159,7 @@ trait SaleOperation
         $saleDiscountAmount = $this->calculateSaleDiscount($request, $subtotal);
         $shippingAmount     = $request->shipping_amount ?? 0;
 
-        
+
         if ($saleDiscountAmount > $subtotal) {
             $message[] = "Maximum discount amount is " . showAmount($subtotal);
             return jsonResponse('limit', 'error', $message);
@@ -521,13 +521,13 @@ trait SaleOperation
     private function calculateSaleDiscount($request, $subtotal)
     {
 
-        
+
         $discountTypePercent = Status::DISCOUNT_PERCENT;
         $saleDiscountAmount  = 0;
         $saleDiscountType    = $request->discount_type ?? 0;
         $saleDiscountValue   = $request->discount_value ?? 0;
 
-        
+
 
         if ($saleDiscountType == $discountTypePercent && $saleDiscountValue > 0) {
             $saleDiscountAmount = $subtotal / 100 * $saleDiscountValue;

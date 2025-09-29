@@ -7,9 +7,9 @@ Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
-Route::name('pos.')->prefix('pos')->middleware('admin')->group(function () {
+Route::name('pos.')->prefix('pos')->group(function () {
     Route::controller('Pos\PosController')->group(function () {
-        Route::get('', 'index')->name('index')->middleware('permission:add sale,admin');
+        Route::get('', 'index')->name('index');
         Route::get('category', 'category')->name('category');
         Route::get('brand', 'brand')->name('brand');
         Route::get('product', 'product')->name('product');

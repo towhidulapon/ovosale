@@ -80,7 +80,36 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('change-password', 'submitPassword');
             });
 
+            //sale
+            Route::controller('SaleController')->name('sale.')->prefix('sale')->group(function () {
+                Route::get('list', 'list')->name('list');
+                Route::get('add', 'add')->name('add');
+                Route::post('store', 'store')->name('store');
+                Route::get('edit/{id}', 'edit')->name('edit');
+                Route::post('update/{id}', 'update')->name('update');
+                Route::get('view/{id}', 'view')->name('view');
+                Route::get('pdf/{id}', 'pdf')->name('pdf');
+                Route::get('print/{id}', 'print')->name('print');
+                Route::post('remove/single/item/{id}', 'removeSingleItem')->name('remove.single.item');
+                Route::post('apply/coupon', 'applyCoupon')->name('apply.coupon');
+                Route::get('top-selling-product', 'topSellingProduct')->name('top.selling.product');
+            });
 
+
+            //purchase
+            Route::controller('PurchaseController')->name('purchase.')->prefix('purchase')->group(function () {
+                Route::get('list', 'list')->name('list')->middleware('permission:view purchase,admin');
+                Route::get('add', 'add')->name('add')->middleware('permission:add purchase,admin');
+                Route::post('store', 'store')->name('store')->middleware('permission:add purchase,admin');
+                Route::get('edit/{id}', 'edit')->name('edit')->middleware('permission:edit purchase,admin');
+                Route::post('update/{id}', 'update')->name('update')->middleware('permission:edit purchase,admin');
+                Route::post('ad/payment/{id}', 'addPayment')->name('ad.payment')->middleware('permission:add purchase payment,admin');
+                Route::get('view/{id}', 'view')->name('view')->middleware('permission:view purchase,admin');
+                Route::get('pdf/{id}', 'pdf')->name('pdf')->middleware('permission:download purchase invoice,admin');
+                Route::get('print/{id}', 'print')->name('print');
+                Route::post('update-status/{id}', 'updateStatus')->name('update.status')->middleware('permission:update purchase status,admin');
+                Route::post('remove/single/item/{id}', 'removeSingleItem')->name('remove.single.item');
+            });
             // Withdraw
             Route::controller('WithdrawController')->prefix('withdraw')->name('withdraw')->group(function () {
                 Route::middleware('kyc')->group(function () {

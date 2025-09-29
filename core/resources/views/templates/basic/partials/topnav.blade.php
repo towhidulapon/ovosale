@@ -1,8 +1,8 @@
 @php
-    $admin = auth()->user();
+    $user = auth()->user();
 @endphp
 
-{{-- <x-admin.other.header_search :menus=$menus /> --}}
+<x-user.other.header_search :menus=$menus />
 
 <header class="dashboard__header">
     <div class="dashboard__header-left">
@@ -22,14 +22,14 @@
     </div>
 
     <div class="dashboard__header-right">
-        <x-permission_check permission="add sale">
+        {{-- <x-permission_check permission="add sale"> --}}
             <a class="btn btn--primary btn--pos" href="{{ route('pos.index') }}" role="button">
                 <i class="las la-qrcode"></i>
                 @lang('POS')
             </a>
-        </x-permission_check>
+            {{-- </x-permission_check> --}}
         <div class="dashboard-info flex-align gap-sm-2 gap-1">
-            {{-- <div class="language-dropdown header-dropdown">
+            <div class="language-dropdown header-dropdown">
                 <button class="header-dropdown__icon dropdown-toggle " data-bs-toggle="dropdown">
                     <span data-bs-toggle="tooltip" title="@lang('Language')">
                         <i class="las la-language"></i>
@@ -37,17 +37,20 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     @php
+                        $language = App\Models\Language::all();
                         $appLocal = strtoupper(config('app.locale')) ?? 'en';
                     @endphp
-                    @foreach ($languages as $language)
-                        <li class="dropdown-menu__item  align-items-center gap-2 justify-content-between langSel" data-code="{{ $language->code }}">
-                            <div class=" d-flex flex-wrap align-items-center gap-2">
-                                <span class="language-dropdown__icon">
-                                    <img src="{{ @$language->image_src }}">
-                                </span>
-                                {{ ucfirst($language->name) }}
-                            </div>
-                            @if ($appLocal == strtoupper($language->code))
+                    @foreach ($language as $item)
+                        <li class="dropdown-menu__item  align-items-center gap-2 justify-content-between langSel">
+                            <a href="{{ route('lang', $item->code) }}" class="lang-box-link">
+                                <div class=" d-flex flex-wrap align-items-center gap-2">
+                                    <span class="language-dropdown__icon">
+                                        <img src="{{ @$item->image_src }}">
+                                    </span>
+                                    {{ ucfirst($item->name) }}
+                                </div>
+                            </a>
+                            @if ($appLocal == strtoupper($item->code))
                                 <span class="text--success">
                                     <i class="las la-check-double"></i>
                                 </span>
@@ -55,7 +58,7 @@
                         </li>
                     @endforeach
                 </ul>
-            </div> --}}
+            </div>
             <div class="header-dropdown">
                 <button class=" dropdown-toggle header-dropdown__icon" type='button' data-bs-toggle="tooltip" title="@lang('Theme')" id="switch-theme">
                     <span class=" dark-show">
@@ -66,81 +69,7 @@
                     </span>
                 </button>
             </div>
-            {{-- <div class="notification header-dropdown">
-                <button class="dropdown-toggle header-dropdown__icon" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                    <span data-bs-toggle="tooltip" title="@lang('Notification')">
-                        <i class="las la-bell  @if ($adminNotificationCount) icon-left-right @endif"></i>
-                    </span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end notification__area">
-                    <div class="notification__header p-3">
-                        <h4 class="notification__header-text">@lang('Notifications')</h4>
-                        @if ($adminNotificationCount)
-                            <div class="notification__header-info">
-                                <span class="notification__header-info-count badge--primary badge">
-                                    {{ $adminNotificationCount }}
-                                    @lang('New notifications')
-                                </span>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="top-notification__body">
-                        <ul class="notification__items">
-                            @forelse ($adminNotifications as $notification)
-                                <li class="notification__list">
-                                    <a href="{{ route('admin.notification.read', $notification->id) }}" class="notification__link px-3">
-                                        <div class="notification__list-thumb">
-                                            @if ($notification->user)
-                                                @if ($notification->user->image)
-                                                    <img class="fit-image" src="{{ getImage(getFilePath('user') . '/' . @$notification->user->image, getFileSize('user')) }}">
-                                                @else
-                                                    <span class="name-short-form">
-                                                        {{ __(@$user->full_name_short_form ?? 'N/A') }}
-                                                    </span>
-                                                @endif
-                                            @else
-                                                <img class="fit-image" src="{{ siteFavicon() }}">
-                                            @endif
-                                        </div>
-                                        <div class="notification__list-content">
-                                            <p class="notification__list-title">
-                                                @if (@$notification->user)
-                                                    {{ @$notification->$user->full_name }}
-                                                @else
-                                                    @lang('Anonymous')
-                                                @endif
-                                            </p>
-                                            <p class="notification__list-desc">
-                                                {{ __($notification->title) }}
-                                            </p>
-                                        </div>
-                                        <div class="notification__list-status">
-                                            <span class="notification__list-time">
-                                                {{ diffForHumans($notification->created_at) }}
-                                            </span>
-                                        </div>
-                                    </a>
-                                </li>
-                            @empty
-                                <li class="p-3">
-                                    <div class="p-5 text-center">
-                                        <img src="{{ asset('assets/images/empty_box.png') }}" class="empty-message">
-                                        <span class="d-block">@lang('No unread notifications were found')</span>
-                                        <span class="d-block fs-13 text-muted">@lang('There is no available data to display here at the moment')</span>
-                                    </div>
-                                <li>
-                            @endforelse
-                        </ul>
-                    </div>
-                    @if ($hasNotification)
-                        <div class="notification__footer p-3">
-                            <a href="{{ route('admin.notifications') }}" class="btn btn--primary btn-large  w-100">
-                                @lang('View All Notification')
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div> --}}
+
             <div class="dashboard-header-user">
                 <button class="header-dropdown__icon" data-bs-toggle="dropdown" aria-expanded="false">
                     <span data-bs-toggle="tooltip" title="@lang('Profile')">
@@ -151,11 +80,11 @@
                     <div class="user__header">
                         <a href="{{ route('admin.profile') }}" class="user__info">
                             <div class="user__thumb">
-                                <img src="{{ $admin->image_src }}">
+                                <img src="{{ @$user->image_src }}">
                             </div>
                             <div class="user__details">
-                                <h6 class="user__name">{{ @$admin->name }}</h6>
-                                <p class="user__roll">@lang('Admin')</p>
+                                <h6 class="user__name">{{ @$user->username }}</h6>
+                                {{-- <p class="user__roll">@lang('Admin')</p> --}}
                             </div>
                         </a>
                     </div>
