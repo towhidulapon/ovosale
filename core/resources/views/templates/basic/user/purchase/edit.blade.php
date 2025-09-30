@@ -4,9 +4,9 @@
         @csrf
         <div class="row  responsive-row">
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.body>
-                        <form action="{{ route('admin.product.create') }}" method="POST" enctype="multipart/form-data">
+                <x-user.ui.card>
+                    <x-user.ui.card.body>
+                        <form action="{{ route('user.product.create') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-lg-4 form-group">
@@ -63,15 +63,15 @@
                                 </div>
                             </div>
                         </form>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Search Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group position-relative">
                             <div class="input-group input--group">
                                 <input type="text" class="form-control product-search-input"
@@ -80,17 +80,17 @@
                                     <i class="las la-barcode"></i>
                                 </span>
                             </div>
-                            <x-admin.other.product_search />
+                            <x-user.other.product_search />
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Selected Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body class="p-0">
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body class="p-0">
                         <div class="table-responsive--md  table-responsive">
                             <table class="product-table table">
                                 <thead>
@@ -267,15 +267,15 @@
                                 </tbody>
                             </table>
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Purchase Summary')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group">
                             <label>@lang('Purchase Discount')</label>
                             <div class="input-group input--group">
@@ -354,10 +354,10 @@
                                 </span>
                             </li>
                         </ul>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
-            <x-admin.ui.btn.submit />
+            <x-user.ui.btn.submit />
         </div>
     </form>
     <x-confirmation-modal />

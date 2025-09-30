@@ -15,7 +15,7 @@ trait ExpenseOperation
     {
         $baseQuery = Expense::orderBy('id', getOrderBy())->with('paymentType', 'paymentAccount');
         $pageTitle = 'Manage Expense';
-        $view      = "admin.expense.list";
+        $view      = "Template::user.expense.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Expense");

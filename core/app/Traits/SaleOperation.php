@@ -24,12 +24,11 @@ use Exception;
 
 trait SaleOperation
 {
-
-    public function list()
-    {
+    public function list() {
         $pageTitle = "Sale List";
-        $view      = "admin.sale.list";
+        $view      = "Template::user.sale.list";
         $baseQuery = Sale::latest('id');
+        // $baseQuery      = Sale::where('user_id', auth()->id())->latest('id');
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Sale");
@@ -58,16 +57,14 @@ trait SaleOperation
         return responseManager("sale", $pageTitle, 'success', compact('pageTitle', 'sales', 'view', 'widget'), ['paymentMethods']);
     }
 
-    public function add()
-    {
+    public function add() {
         $pageTitle = "New Sale";
-        $view      = "admin.sale.add";
+        $view      = "Template::user.sale.add";
         extract($this->basicDataForSale());
         return responseManager("add_sale", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'paymentMethods', 'view'));
     }
 
-    public function edit($id)
-    {
+    public function edit($id) {
         $pageTitle = "Edit Sale";
         $sale      = Sale::where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
         $view      = "admin.sale.edit";
@@ -75,8 +72,7 @@ trait SaleOperation
         return responseManager("edit_sale", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'paymentMethods', 'view', 'sale'));
     }
 
-    public function view($id)
-    {
+    public function view($id) {
         $pageTitle          = "Sale Invoice";
         $view               = "admin.sale.view";
         $sale               = Sale::where("id", $id)->with("warehouse", "customer", 'payments', 'saleDetails.productDetail.product')->firstOrFailWithApi("sale");
@@ -84,16 +80,14 @@ trait SaleOperation
         return responseManager("view_sale", $pageTitle, 'success', compact('pageTitle', 'sale', 'view', 'companyInformation'));
     }
 
-    public function pdf($id)
-    {
+    public function pdf($id) {
         $pageTitle = "Sale Invoice";
         $sale      = Sale::where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
         $pdf       = Pdf::loadView('admin.sale.pdf', compact('sale', 'pageTitle'));
         $fileName  = "Sale Invoice - " . $sale->invoice_number . ".pdf";
         return $pdf->download($fileName);
     }
-    public function removeSingleItem($id)
-    {
+    public function removeSingleItem($id) {
         $saleItem = SaleDetails::where("id", $id)->with("sale")->firstOrFailWithApi("SaleDetails");
         $sale     = $saleItem->sale;
 
@@ -114,8 +108,7 @@ trait SaleOperation
     }
 
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         $validator = $this->validation($request);
 
@@ -251,8 +244,7 @@ trait SaleOperation
             'companyInformation' => gs('company_information')
         ]);
     }
-    public function update(Request $request, $id = 0)
-    {
+    public function update(Request $request, $id = 0) {
 
 
         $validator = $this->validation($request, $id);
@@ -413,8 +405,7 @@ trait SaleOperation
         ]);
     }
 
-    private function validation($request, $id = 0)
-    {
+    private function validation($request, $id = 0) {
         $isRequired         = $id ?  'nullable' : "required";
         $isRequiredOnUpdate = $id ?  'required' : "nullable";
 
@@ -453,14 +444,12 @@ trait SaleOperation
         ]);
     }
 
-    private function invoiceNumber($saleId)
-    {
+    private function invoiceNumber($saleId) {
         $prefix = gs('prefix_setting');
         return $prefix->sale_invoice_prefix . (1000 + $saleId);
     }
 
-    private function makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId): array
-    {
+    private function makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId): array {
         $discountTypePercent = Status::DISCOUNT_PERCENT;
 
         // Calculate the discount amount based on the discount type
@@ -506,8 +495,7 @@ trait SaleOperation
         ];
     }
 
-    private function findProductAndProductDetailsAndProductStock($requestSaleDetails, $warehouseId)
-    {
+    private function findProductAndProductDetailsAndProductStock($requestSaleDetails, $warehouseId) {
         $product        = Product::find($requestSaleDetails['product_id']);
         $productDetails = ProductDetail::find($requestSaleDetails['product_detail_id']);
         $findStock      = ProductStock::where('product_id', $product->id)
@@ -518,8 +506,7 @@ trait SaleOperation
         return compact('product', 'productDetails', 'findStock');
     }
 
-    private function calculateSaleDiscount($request, $subtotal)
-    {
+    private function calculateSaleDiscount($request, $subtotal) {
 
 
         $discountTypePercent = Status::DISCOUNT_PERCENT;
@@ -538,8 +525,7 @@ trait SaleOperation
         return $saleDiscountAmount;
     }
 
-    private function basicDataForSale()
-    {
+    private function basicDataForSale() {
         return [
             'warehouses'     => Warehouse::active()->get(),
             'paymentMethods' => PaymentType::active()->with('paymentAccounts', function ($q) {
@@ -550,8 +536,7 @@ trait SaleOperation
 
     // Coupon
 
-    public function applyCoupon(Request $request)
-    {
+    public function applyCoupon(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'coupon_code' => 'required',
@@ -601,8 +586,7 @@ trait SaleOperation
         ]);
     }
 
-    public function topSellingProduct()
-    {
+    public function topSellingProduct() {
         $pageTitle = 'Top Selling Product';
         $view      = 'admin.sale.top_selling_product';
 
@@ -616,16 +600,14 @@ trait SaleOperation
         return responseManager("top_selling_product", $pageTitle, 'success', compact('pageTitle', 'topSellingProducts', 'view'));
     }
 
-    private function addBalanceToPaymentAccount($payments, $sale, $trx, $amount)
-    {
+    private function addBalanceToPaymentAccount($payments, $sale, $trx, $amount) {
 
         $details        = "Sale amount added to the payment account: invoice number#" . $sale->invoice_number;
         $paymentAccount = PaymentAccount::where('id', $payments['payment_account_id'])->first();
         createTransaction($paymentAccount, '+', $amount, 'balance_added', $details, $trx);
     }
 
-    private function updateSalePaymentAndAdjustBalance($payments, $sale)
-    {
+    private function updateSalePaymentAndAdjustBalance($payments, $sale) {
         foreach ($payments as  $payment) {
             $salePayment = SalePayment::where('id', $payment['id'])->first();
 
@@ -665,8 +647,7 @@ trait SaleOperation
         }
     }
 
-    private function insertSalePayment($request, $sale, $changesAmount)
-    {
+    private function insertSalePayment($request, $sale, $changesAmount) {
         $salePayments      = [];
         $now               = now();
         $totalPaymentTypes = count($request->payment);

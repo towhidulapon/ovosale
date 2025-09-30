@@ -3,11 +3,11 @@
     @include('Template::user.purchase.widget')
     <div class="row">
         <div class="col-12">
-            <x-admin.ui.card>
-                <x-admin.ui.card.body :paddingZero=true>
-                    <x-admin.ui.table.layout  :hasRecycleBin="false">
-                        <x-admin.ui.table>
-                            <x-admin.ui.table.header>
+            <x-user.ui.card>
+                <x-user.ui.card.body :paddingZero=true>
+                    <x-user.ui.table.layout  :hasRecycleBin="false">
+                        <x-user.ui.table>
+                            <x-user.ui.table.header>
                                 <tr>
                                     <th>@lang('Invoice Number') | @lang('Reference')</th>
                                     <th>@lang('Purchase Date') | @lang('Created At')</th>
@@ -17,8 +17,8 @@
                                     <th>@lang('Add By')</th>
                                     <th>@lang('Action')</th>
                                 </tr>
-                            </x-admin.ui.table.header>
-                            <x-admin.ui.table.body>
+                            </x-user.ui.table.header>
+                            <x-user.ui.table.body>
                                 @forelse($purchases as $purchase)
                                     <tr>
                                         <td>
@@ -158,29 +158,29 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-admin.ui.table.empty_message />
+                                    <x-user.ui.table.empty_message />
                                 @endforelse
-                            </x-admin.ui.table.body>
-                        </x-admin.ui.table>
+                            </x-user.ui.table.body>
+                        </x-user.ui.table>
                         @if ($purchases->hasPages())
-                            <x-admin.ui.table.footer>
+                            <x-user.ui.table.footer>
                                 {{ paginateLinks($purchases) }}
-                            </x-admin.ui.table.footer>
+                            </x-user.ui.table.footer>
                         @endif
-                    </x-admin.ui.table.layout>
-                </x-admin.ui.card.body>
-            </x-admin.ui.card>
+                    </x-user.ui.table.layout>
+                </x-user.ui.card.body>
+            </x-user.ui.card>
         </div>
     </div>
 
-    <x-admin.ui.modal id="payment-modal" class="modal-xl">
-        <x-admin.ui.modal.header>
+    <x-user.ui.modal id="payment-modal" class="modal-xl">
+        <x-user.ui.modal.header>
             <h4 class="modal-title">@lang('Add Payment')</h4>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
                 <i class="las la-times"></i>
             </button>
-        </x-admin.ui.modal.header>
-        <x-admin.ui.modal.body>
+        </x-user.ui.modal.header>
+        <x-user.ui.modal.body>
             <form action="" method="POST">
                 @csrf
                 <div class="row gy-4">
@@ -234,37 +234,37 @@
                     </div>
                     <div class="col-12">
                         <div class="mb-3">
-                            <x-admin.ui.btn.modal />
+                            <x-user.ui.btn.modal />
                         </div>
                     </div>
                 </div>
             </form>
-        </x-admin.ui.modal.body>
-    </x-admin.ui.modal>
+        </x-user.ui.modal.body>
+    </x-user.ui.modal>
 
 
-    <x-admin.ui.modal id="payment-history-modal" class="modal-xl">
-        <x-admin.ui.modal.header>
+    <x-user.ui.modal id="payment-history-modal" class="modal-xl">
+        <x-user.ui.modal.header>
             <h4 class="modal-title">@lang('Payment History')</h4>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
                 <i class="las la-times"></i>
             </button>
-        </x-admin.ui.modal.header>
-        <x-admin.ui.modal.body>
+        </x-user.ui.modal.header>
+        <x-user.ui.modal.body>
 
-        </x-admin.ui.modal.body>
-    </x-admin.ui.modal>
+        </x-user.ui.modal.body>
+    </x-user.ui.modal>
 
     <x-confirmation-modal />
 
-    <x-admin.ui.modal id="status-modal">
-        <x-admin.ui.modal.header>
+    <x-user.ui.modal id="status-modal">
+        <x-user.ui.modal.header>
             <h4 class="modal-title">@lang('Payment History')</h4>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
                 <i class="las la-times"></i>
             </button>
-        </x-admin.ui.modal.header>
-        <x-admin.ui.modal.body>
+        </x-user.ui.modal.header>
+        <x-user.ui.modal.body>
             <form method="POST">
                 @csrf
                 <div class="form-group">
@@ -277,16 +277,16 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <x-admin.ui.btn.modal />
+                    <x-user.ui.btn.modal />
                 </div>
             </form>
-        </x-admin.ui.modal.body>
-    </x-admin.ui.modal>
+        </x-user.ui.modal.body>
+    </x-user.ui.modal>
 @endsection
 
 @push('breadcrumb-plugins')
     <x-permission_check permission="add purchase">
-        <x-admin.ui.btn.add href="{{ route('user.purchase.add') }}" text="Add Purchase" />
+        <x-user.ui.btn.add href="{{ route('user.purchase.add') }}" text="Add Purchase" />
     </x-permission_check>
 @endpush
 

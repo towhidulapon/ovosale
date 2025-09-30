@@ -11,7 +11,7 @@ trait ExpenseCategoryOperation
     {
         $baseQuery = ExpenseCategory::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Expense Category';
-        $view      = "admin.expense.category.list";
+        $view      = "Template::user.expense.category.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "ExpenseCategory");

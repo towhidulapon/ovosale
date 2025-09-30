@@ -1,25 +1,3 @@
-{{-- @extends('admin.layouts.master')
-@section('content')
-    <main class="pos">
-        @include('pos.partials.header')
-        <section class="pos-section">
-            @include('pos.partials.left_side')
-            @include('pos.partials.right_side')
-        </section>
-        @include('pos.partials.footer')
-    </main>
-
-    <div class="pos-loader d-none">
-        <span class="loader-spin"></span>
-    </div>
-    @include('pos.partials.audio')
-    @include('pos.partials.shortcut')
-@endsection
-
-@push('style')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/pos.css') }}?v=1000">
-@endpush --}}
-
 @extends($activeTemplate . 'layouts.app')
 @section('app-content')
         <main class="pos">

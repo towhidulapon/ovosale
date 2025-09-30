@@ -121,6 +121,515 @@
                     "permission": ["view purchase"]
                 }
             ]
+        },
+        {
+            "title": "Manage Product",
+            "icon": "lab la-product-hunt",
+            "menu_active": [
+                "admin.category.*",
+                "admin.brand.*",
+                "admin.attribute.*",
+                "admin.variant.*",
+                "admin.unit.*",
+                "user.product.*"
+            ],
+            "permission": [
+                "view product",
+                "add product",
+                "edit product",
+                "print product barcode",
+                "trash product",
+                "export product",
+                "view category",
+                "add category",
+                "edit category",
+                "trash category",
+                "export category",
+                "view brand",
+                "add brand",
+                "edit brand",
+                "trash brand",
+                "export brand",
+                "view unit",
+                "add unit",
+                "edit unit",
+                "trash unit",
+                "export unit",
+                "view attribute",
+                "add attribute",
+                "edit attribute",
+                "trash attribute",
+                "export attribute",
+                "view variant",
+                "add variant",
+                "edit variant",
+                "trash variant",
+                "export variant"
+            ],
+            "submenu": [
+                {
+                    "title": "Add Product",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.product.create",
+                    "menu_active": "user.product.create",
+                    "permission": ["add product"]
+                },
+                {
+                    "title": "Product List",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.product.list",
+                    "menu_active": "user.product.list",
+                    "permission": ["view product"]
+                },
+                {
+                    "title": "Print Label",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.product.print.label",
+                    "menu_active": "user.product.print.label",
+                    "permission": ["print product barcode"]
+                },
+                {
+                    "title": "Manage Category",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.category.list",
+                    "menu_active": "admin.category.list",
+                    "permission": [
+                        "view category",
+                        "add category",
+                        "edit category",
+                        "trash category",
+                        "export category"
+                    ]
+                },
+                {
+                    "title": "Manage Brand",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.brand.list",
+                    "menu_active": "admin.brand.list",
+                    "permission": [
+                        "view brand",
+                        "add brand",
+                        "edit brand",
+                        "trash brand",
+                        "export brand"
+                    ]
+                },
+                {
+                    "title": "Manage Unit",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.unit.list",
+                    "menu_active": "admin.unit.list",
+                    "permission": [
+                        "view unit",
+                        "add unit",
+                        "edit unit",
+                        "trash unit",
+                        "export unit"
+                    ]
+                },
+                {
+                    "title": "Manage Attribute",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.attribute.list",
+                    "menu_active": "admin.attribute.list",
+                    "permission": [
+                        "view attribute",
+                        "add attribute",
+                        "edit attribute",
+                        "trash attribute",
+                        "export attribute"
+                    ]
+                },
+                {
+                    "title": "Manage Variant",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.variant.list",
+                    "menu_active": "admin.variant.list",
+                    "permission": [
+                        "view variant",
+                        "add variant",
+                        "edit variant",
+                        "trash variant",
+                        "export variant"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Stock Transfer",
+            "icon": "las la-database",
+            "menu_active": ["user.stock.transfer*"],
+            "permission": ["view stock transfer", "add stock transfer"],
+            "submenu": [
+                {
+                    "title": "Add Transfer",
+                    "route_name": "user.stock.transfer.add",
+                    "menu_active": "user.stock.transfer.add",
+                    "permission": ["add stock transfer"]
+                },
+                {
+                    "title": "Transfer List",
+                    "route_name": "user.stock.transfer.list",
+                    "menu_active": "user.stock.transfer.list",
+                    "permission": ["view stock transfer"]
+                }
+            ]
+        },
+        {
+            "title": "Report",
+            "icon": "las la-table",
+            "menu_active": [
+                "user.report.stock",
+                "user.report.sale",
+                "user.report.purchase",
+                "user.report.expense",
+                "user.report.profit.invoice_wise",
+                "user.report.profit.product_wise",
+                "user.report.notification.history"
+            ],
+            "permission": [
+                "view sale report",
+                "view purchase report",
+                "view expense report",
+                "view stock report",
+                "view profit loss report",
+                "notification setting"
+            ],
+            "submenu": [
+                {
+                    "title": "Stock Report",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.stock",
+                    "menu_active": "user.report.stock",
+                    "permission": ["view stock report"]
+                },
+                {
+                    "title": "Sales Report",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.sale",
+                    "menu_active": "user.report.sale",
+                    "permission": ["view sale report"]
+                },
+                {
+                    "title": "Purchase Report",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.purchase",
+                    "menu_active": "user.report.purchase",
+                    "permission": ["view purchase report"]
+                },
+                {
+                    "title": "Expense Report",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.expense",
+                    "menu_active": "user.report.expense",
+                    "permission": ["view expense report"]
+                },
+                {
+                    "title": "Profit Loss Report",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.profit.invoice_wise",
+                    "permission": ["view profit loss report"]
+                },
+                {
+                    "title": "Notification History",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.report.notification.history",
+                    "permission": ["notification setting"]
+                }
+            ]
+        }
+    ],
+    "accounting": [
+        {
+            "title": "Manage Expense",
+            "icon": "las la-file-invoice-dollar",
+            "menu_active": ["user.expense.*"],
+            "permission": [
+                "view expense",
+                "add expense",
+                "edit expense",
+                "export expense",
+                "trash expense",
+                "view expense category",
+                "add expense category",
+                "edit expense category",
+                "export expense category",
+                "trash expense category"
+            ],
+            "submenu": [
+                {
+                    "title": "Expense List",
+                    "route_name": "user.expense.list",
+                    "permission": [
+                        "view expense",
+                        "add expense",
+                        "edit expense",
+                        "export expense",
+                        "trash expense"
+                    ]
+                },
+                {
+                    "title": "Expense Category",
+                    "route_name": "user.expense.category.list",
+                    "permission": [
+                        "view expense category",
+                        "add expense category",
+                        "edit expense category",
+                        "export expense category",
+                        "trash expense category"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Manage Payment",
+            "icon": "las la-credit-card",
+            "menu_active": ["user.payment.account.*", "user.payment.type.*"],
+            "permission": [
+                "view payment type",
+                "add payment type",
+                "edit payment type",
+                "export payment type",
+                "trash payment type",
+                "view payment account",
+                "add payment account",
+                "edit payment account",
+                "export payment account",
+                "trash payment account",
+                "add balance to payment account",
+                "deduct balance to payment account"
+            ],
+            "submenu": [
+                {
+                    "title": "Payment Type",
+                    "route_name": "user.payment.type.list",
+                    "menu_active": "user.payment.type.list",
+                    "permission": [
+                        "view payment type",
+                        "add payment type",
+                        "edit payment type",
+                        "export payment type",
+                        "trash payment type"
+                    ]
+                },
+                {
+                    "title": "Payment Account",
+                    "route_name": "user.payment.account.list",
+                    "menu_active": "user.payment.account.list",
+                    "permission": [
+                        "view payment account",
+                        "add payment account",
+                        "edit payment account",
+                        "export payment account",
+                        "trash payment account",
+                        "add balance to payment account",
+                        "deduct balance to payment account"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Transaction History",
+            "route_name": "user.report.transaction",
+            "menu_active": "user.report.transaction",
+            "icon": "las la-exchange-alt",
+            "keyword": [
+                "Transaction Log",
+                "Report",
+                "Transaction report",
+                "Transaction history",
+                "Transaction activity",
+                "balance sheet",
+                "balance log",
+                "balance history",
+                "account log",
+                "account"
+            ],
+            "permission": ["view transaction"]
+        }
+    ],
+    "hrm": [
+        {
+            "title": "Manage Company",
+            "icon": "las la-building",
+            "menu_active": [
+                "user.company.list",
+                "user.department.list",
+                "user.holiday.list"
+            ],
+            "permission": [
+                "view company",
+                "add company",
+                "edit company",
+                "export company",
+                "trash company",
+                "view department",
+                "add department",
+                "edit department",
+                "export department",
+                "trash department",
+                "view holiday",
+                "add holiday",
+                "edit holiday",
+                "export holiday",
+                "trash holiday"
+            ],
+            "submenu": [
+                {
+                    "title": "Manage Company",
+                    "route_name": "user.company.list",
+                    "menu_active": "user.company.list",
+                    "permission": [
+                        "view company",
+                        "add company",
+                        "edit company",
+                        "export company",
+                        "trash company"
+                    ]
+                },
+                {
+                    "title": "Manage Department",
+                    "icon": "las la-building",
+                    "route_name": "user.department.list",
+                    "menu_active": "user.department.list",
+                    "permission": [
+                        "view department",
+                        "add department",
+                        "edit department",
+                        "export department",
+                        "trash department"
+                    ]
+                },
+                {
+                    "title": "Manage Holidays",
+                    "icon": "las la-calendar",
+                    "route_name": "user.holiday.list",
+                    "menu_active": "user.holiday.list",
+                    "permission": [
+                        "view holiday",
+                        "add holiday",
+                        "edit holiday",
+                        "export holiday",
+                        "trash holiday"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Manage Employee",
+            "icon": "las la-users",
+            "menu_active": [
+                "admin.employee.list",
+                "admin.designation.list",
+                "admin.shift.list",
+                "admin.attendance.list"
+            ],
+            "permission": [
+                "view employee",
+                "add employee",
+                "edit employee",
+                "export employee",
+                "trash employee",
+                "view designation",
+                "add designation",
+                "edit designation",
+                "export designation",
+                "trash designation",
+                "view attendance",
+                "add attendance",
+                "edit attendance",
+                "export attendance",
+                "trash attendance"
+            ],
+            "submenu": [
+                {
+                    "title": "Manage Attendance",
+                    "route_name": "admin.attendance.list",
+                    "menu_active": "admin.attendance.list",
+                    "permission": [
+                        "view attendance",
+                        "add attendance",
+                        "edit attendance",
+                        "export attendance",
+                        "trash attendance"
+                    ]
+                },
+                {
+                    "title": "Manage Designation",
+                    "route_name": "admin.designation.list",
+                    "menu_active": "admin.designation.list",
+                    "permission": [
+                        "view designation",
+                        "add designation",
+                        "edit designation",
+                        "export designation",
+                        "trash designation"
+                    ]
+                },
+                {
+                    "title": "Manage Shift",
+                    "icon": "las la-building",
+                    "route_name": "admin.shift.list",
+                    "menu_active": "admin.shift.list",
+                    "permission": [
+                        "view shift",
+                        "add shift",
+                        "edit shift",
+                        "export shift",
+                        "trash shift"
+                    ]
+                },
+                {
+                    "title": "Manage Employee",
+                    "route_name": "admin.employee.list",
+                    "menu_active": "admin.employee.list",
+                    "permission": [
+                        "view employee",
+                        "add employee",
+                        "edit employee",
+                        "export employee",
+                        "trash employee"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Leave Request",
+            "icon": "las la-calendar",
+            "menu_active": ["admin.leave.*"],
+            "permission": [
+                "add leave request",
+                "view leave request",
+                "add leave type",
+                "view leave type"
+            ],
+            "submenu": [
+                {
+                    "title": "Leave Request",
+                    "route_name": "admin.leave.request.list",
+                    "menu_active": "admin.leave.request.list",
+                    "permission": ["view leave request"]
+                },
+                {
+                    "title": "Leave Type",
+                    "route_name": "admin.leave.type.list",
+                    "menu_active": "admin.leave.type.list",
+                    "permission": ["view leave type"]
+                }
+            ]
+        },
+        {
+            "title": "Manage Payroll",
+            "icon": "las la-calendar",
+            "route_name": "admin.payroll.list",
+            "menu_active": "admin.payroll.list",
+            "permission": [
+                "view payroll",
+                "add payroll",
+                "edit payroll",
+                "export payroll",
+                "trash payroll"
+            ]
         }
     ],
 

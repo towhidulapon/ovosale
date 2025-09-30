@@ -21,7 +21,9 @@ trait ProductOperation
     public function list()
     {
         $pageTitle = "Manage Product";
-        $view      = "admin.product.list";
+        $view      = "Template::user.product.list";
+        // $baseQuery      = Product::where('user_id', auth()->id())->latest('id');
+
         $baseQuery = Product::orderBy('id', 'desc')
             ->trashFilter()
             ->with(['details:id,product_id,final_price', 'category:id,name', 'brand:id,name'])
@@ -38,7 +40,7 @@ trait ProductOperation
     public function create()
     {
         $pageTitle = "Add Product";
-        $view      = "admin.product.add";
+        $view      = "Template::user.product.add";
         extract($this->basicDataForProductOperation());
         return responseManager("add_product", $pageTitle, 'success', compact('pageTitle', 'categories', 'units', 'brands', 'taxes', 'attributes', 'view'));
     }
@@ -46,7 +48,7 @@ trait ProductOperation
     public function edit($id)
     {
         $pageTitle = "Edit Product";
-        $view      = "admin.product.edit";
+        $view      = "Template::user.product.edit";
         $product   = Product::with('details.attribute', 'details.variant', 'details', 'details.tax')->where('id', $id)->firstOrFailWithApi('product');
         extract($this->basicDataForProductOperation());
         return responseManager("edit_product", $pageTitle, 'success', compact('pageTitle', 'categories', 'units', 'brands', 'taxes', 'attributes', 'view', 'product'));
@@ -55,7 +57,7 @@ trait ProductOperation
     public function view($id)
     {
         $pageTitle = "View Product";
-        $view      = "admin.product.view";
+        $view      = "Template::user.product.view";
         $product   = Product::with('details.attribute', 'details.variant', 'details', 'details.tax', 'category', 'brand', 'unit')->where('id', $id)->firstOrFailWithApi('product');
         return responseManager("view_product", $pageTitle, 'success', compact('pageTitle', 'product', 'view'));
     }

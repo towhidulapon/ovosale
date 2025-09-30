@@ -14,9 +14,9 @@
                     this.value = "";
                     return false;
                 }
-                
+
                 const searchValue = $(this).val();
-                const action = "{{ route('admin.product.search') }}";
+                const action = "{{ route('user.product.search') }}";
                 const $searchResultElement = $(".product-search-list");
                 const $loadingElement = $searchResultElement.find(".product-search-list-loader");
 
@@ -26,7 +26,7 @@
                     <div class="product-search-list-loader p-5 text-center">
                         <div class="d-flex flex-column align-items-center gap-3">
                             <div>
-                                <img src="{{ asset('assets/images/empty_box.png') }}" class="empty-message">    
+                                <img src="{{ asset('assets/images/empty_box.png') }}" class="empty-message">
                             </div>
                             <div>
                                 <h6 class="mb-1">@lang('Empty Result')</h6>
@@ -120,7 +120,7 @@
 
             function productHtml(product, productDetails) {
                 return `
-                    <li class="list-group-item product-search-list-item" 
+                    <li class="list-group-item product-search-list-item"
                     data-product='${JSON.stringify(product)}'>
                         <div class="d-flex gap-2">
                             <div class="product-search-thumb skeleton">
@@ -128,7 +128,7 @@
                             </div>
                             <div class="product-search-content">
                                 <p class="skeleton">
-                                    ${product.name} ${product.attribute_name ?  `<strong> - ${product.attribute_name} -  ${product.variant_name}</strong>` : '' }  
+                                    ${product.name} ${product.attribute_name ?  `<strong> - ${product.attribute_name} -  ${product.variant_name}</strong>` : '' }
                                 </p>
                                 <p class="skeleton">
                                     <strong>${product.sku}</strong>

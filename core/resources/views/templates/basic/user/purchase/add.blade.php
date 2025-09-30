@@ -4,9 +4,9 @@
         @csrf
         <div class="row  responsive-row">
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.body>
-                        <form action="{{ route('admin.product.create') }}" method="POST" enctype="multipart/form-data">
+                <x-user.ui.card>
+                    <x-user.ui.card.body>
+                        <form action="{{ route('user.product.create') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-lg-4 form-group">
@@ -16,7 +16,7 @@
                                 </div>
                                 <div class="col-lg-4 form-group">
                                     <label class="form-label">@lang('Supplier')</label>
-                                    <x-admin.other.lazy_loading_select name="supplier_id" :route="route('admin.supplier.lazy.loading')" />
+                                    <x-user.other.lazy_loading_select name="supplier_id" :route="route('admin.supplier.lazy.loading')" />
                                 </div>
                                 <div class="col-lg-4 form-group">
                                     <label class="form-label">@lang('Warehouse')</label>
@@ -47,15 +47,15 @@
                                 </div>
                             </div>
                         </form>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Search Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group position-relative">
                             <div class="input-group input--group">
                                 <input type="text" class="form-control product-search-input"
@@ -64,17 +64,17 @@
                                     <i class="las la-barcode"></i>
                                 </span>
                             </div>
-                            <x-admin.other.product_search />
+                            <x-user.other.product_search />
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Selected Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body class="p-0">
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body class="p-0">
                         <div class="table-responsive--md  table-responsive">
                             <table class="product-table table">
                                 <thead>
@@ -92,19 +92,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <x-admin.ui.table.empty_message message="No product you are selected" />
+                                    <x-user.ui.table.empty_message message="No product you are selected" />
                                 </tbody>
                             </table>
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-6">
-                <x-admin.ui.card class="h-100">
-                    <x-admin.ui.card.header>
+                <x-user.ui.card class="h-100">
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Purchase Summary')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group">
                             <label>@lang('Purchase Discount')</label>
                             <div class="input-group input--group">
@@ -173,15 +173,15 @@
                                 </span>
                             </li>
                         </ul>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-6">
-                <x-admin.ui.card class="h-100">
-                    <x-admin.ui.card.header>
+                <x-user.ui.card class="h-100">
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Supplier Payment')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="row">
                             <div class="form-group col-lg-6">
                                 <label>@lang('Paid Amount')</label>
@@ -225,10 +225,10 @@
                                 <textarea class="form-control" name="payment_note"></textarea>
                             </div>
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
-            <x-admin.ui.btn.submit />
+            <x-user.ui.btn.submit />
         </div>
     </form>
 @endsection
@@ -778,7 +778,7 @@
             @if (request()->product_code)
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('admin.product.search') }}",
+                    url: "{{ route('user.product.search') }}",
                     dataType: "json",
                     data: {
                         search: "{{ request()->product_code }}"

@@ -22,7 +22,7 @@ trait StockTransferOperation
     public function add()
     {
         $pageTitle  = "Stock Transfer";
-        $view       = "admin.stock_transfer.add";
+        $view       = "Template::user.stock_transfer.add";
         $warehouses = Warehouse::active()->get();
         return responseManager("add_stock_transfer", $pageTitle, 'success', compact('pageTitle', 'view', 'warehouses'));
     }
@@ -128,7 +128,7 @@ trait StockTransferOperation
     public function list()
     {
         $pageTitle = "Stock Transfer List";
-        $view      = "admin.stock_transfer.list";
+        $view      = "Template::user.stock_transfer.list";
         $transfers = StockTransfer::with(['toWarehouse', 'fromWarehouse', 'admin'])
             ->searchable(['reference_no', 'invoice_number'])
             ->withCount('stockTransferDetails as total_items')
@@ -145,7 +145,7 @@ trait StockTransferOperation
         $transfer  = StockTransfer::where("id", $id)
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails', 'stockTransferDetails.product'])
             ->firstOrFailWithApi("stock_transfer");
-        $view      = "admin.stock_transfer.edit";
+        $view      = "Template::user.stock_transfer.edit";
         $warehouses = Warehouse::active()->get();
 
         return responseManager("edit_stock_transfer", $pageTitle, 'success', compact('pageTitle', 'view', 'transfer', 'warehouses'));
@@ -280,7 +280,7 @@ trait StockTransferOperation
     public function view($id)
     {
         $pageTitle = "Stock Transfer Invoice";
-        $view      = "admin.stock_transfer.view";
+        $view      = "Template::user.stock_transfer.view";
         $transfer  = StockTransfer::where("id", $id)
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails'])
             ->firstOrFailWithApi("stock_transfer");
@@ -296,7 +296,7 @@ trait StockTransferOperation
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails'])
             ->firstOrFailWithApi("stock_transfer");
 
-        $pdf       = Pdf::loadView('admin.stock_transfer.pdf', compact('transfer', 'pageTitle'));
+        $pdf       = Pdf::loadView('Template::user.stock_transfer.pdf', compact('transfer', 'pageTitle'));
         $fileName  = "Stock Transfer Invoice - " . $transfer->invoice_number . ".pdf";
         return $pdf->stream($fileName);
     }

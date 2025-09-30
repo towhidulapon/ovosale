@@ -4,7 +4,7 @@
     </button>
     <input class="pos-search__input product-search-input" type="text"
         placeholder="Enter Product Name / SKU / Scan Barcode">
-    <a href="{{ route('admin.product.create') }}" class="pos-search__add-btn" target="_blank">
+    <a href="{{ route('user.product.create') }}" class="pos-search__add-btn" target="_blank">
         <i class="fas fa-plus"></i>
     </a>
     <x-user.other.product_search />

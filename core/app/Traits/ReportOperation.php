@@ -19,7 +19,7 @@ trait ReportOperation
     public function invoiceWiseReport()
     {
         $pageTitle = 'Invoice Wise Report';
-        $view      = "admin.reports.invoice_wise_profit";
+        $view      = "Template::user.reports.invoice_wise_profit";
 
         $invoicesWise = Sale::query()
             ->with(['customer'])
@@ -44,7 +44,7 @@ trait ReportOperation
     public function productWiseReport()
     {
         $pageTitle = 'Product Wise Report';
-        $view      = "admin.reports.product_wise_profit";
+        $view      = "Template::user.reports.product_wise_profit";
 
         $productsWise = ProductDetail::query()
             ->with(['product'])
@@ -70,7 +70,7 @@ trait ReportOperation
     public function saleReport()
     {
         $pageTitle = 'Sales Report';
-        $view      = "admin.reports.sale";
+        $view      = "Template::user.reports.sale";
         $baseQuery = Sale::with("warehouse", "customer")
             ->withSum('payments', 'amount')
             ->withSum('saleDetails as total_purchase_value', 'purchase_price')
@@ -89,7 +89,7 @@ trait ReportOperation
     public function purchaseReport()
     {
         $pageTitle = 'Purchase Report';
-        $view      = "admin.reports.purchase";
+        $view      = "Template::user.reports.purchase";
         $baseQuery = Purchase::with("warehouse", "supplier")
             ->withSum('supplierPayments', 'amount')
             ->searchable(["invoice_number"])
@@ -105,7 +105,7 @@ trait ReportOperation
     public function stockReport()
     {
         $pageTitle  = 'Stock Report';
-        $view       = "admin.reports.stock";
+        $view       = "Template::user.reports.stock";
         $warehouses = Warehouse::orderBy('name')->get();
         $brands     = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
@@ -130,7 +130,7 @@ trait ReportOperation
     public function expenseReport()
     {
         $pageTitle = 'Expense Report';
-        $view      = "admin.reports.expense";
+        $view      = "Template::user.reports.expense";
         $baseQuery = Expense::with("category", 'admin')
             ->searchable(["category:name"])
             ->dateFilter('expense_date')
@@ -142,7 +142,7 @@ trait ReportOperation
     }
 
 
-    
+
     public function transaction(Request $request)
     {
         $pageTitle = 'Transaction History';
@@ -155,6 +155,6 @@ trait ReportOperation
         }
         $transactions = $baseQuery->with('paymentAccount.paymentType')->paginate(getPaginate());
         return responseManager("transaction_report", $pageTitle, 'success', compact('pageTitle', 'transactions'));
-        
+
     }
 }

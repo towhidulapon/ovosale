@@ -13,7 +13,7 @@ trait PaymentAccountOperation
     {
         $baseQuery = PaymentAccount::searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
         $pageTitle = 'Manage Payment Account';
-        $view      = "admin.payment_account.list";
+        $view      = "Template::user.payment_account.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "PaymentAccount");
@@ -109,7 +109,7 @@ trait PaymentAccountOperation
         $fromAccount = PaymentAccount::where('id', $id)->firstOrFailWithApi('Payment Account');
         $toAccount   = PaymentAccount::where('id', $request->to_account_id)->firstOrFailWithApi('Payment Account');
 
-        
+
         if ($fromAccount->id == $toAccount->id) {
             return responseManager("payment_account", "Cannot transfer to the same account.", 'error');
         }

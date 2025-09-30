@@ -12,7 +12,7 @@ trait PaymentTypeOperation
     {
         $baseQuery = PaymentType::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payment Type';
-        $view      = "admin.payment_type.list";
+        $view      = "Template::user.payment_type.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "PaymentType");
