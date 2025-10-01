@@ -14,10 +14,15 @@ class Brand extends Model
     protected $appends = ['image_src'];
 
     protected $guarded  = ['id'];
-    
+
     public function exportColumns(): array
     {
         return  ['name'];
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function imageSrc(): Attribute

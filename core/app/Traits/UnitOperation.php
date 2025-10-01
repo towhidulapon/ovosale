@@ -9,9 +9,9 @@ trait UnitOperation
 {
     public function list()
     {
-        $baseQuery = Unit::searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+        $baseQuery = Unit::where('user_id', auth()->id())->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
         $pageTitle = 'Manage Unit';
-        $view      = "admin.unit.list";
+        $view      = "Template::user.unit.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Unit");
@@ -28,6 +28,8 @@ trait UnitOperation
             'short_name' => 'required|string|max:40|unique:units,short_name,' . $id,
         ]);
 
+        $user = auth()->user();
+
         if ($id) {
             $unit    = Unit::where('id', $id)->firstOrFailWithApi('unit');
             $message = "Unit updated successfully";
@@ -38,11 +40,12 @@ trait UnitOperation
             $remark  = "unit-updated";
         }
 
+        $unit->user_id    = $user->id;
         $unit->name       = $request->name;
         $unit->short_name = $request->short_name;
         $unit->save();
 
-        adminActivity($remark, get_class($unit), $unit->id);
+        // adminActivity($remark, get_class($unit), $unit->id);
         return responseManager("unit", $message, 'success', compact('unit'));
     }
 

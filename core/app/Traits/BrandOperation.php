@@ -10,9 +10,9 @@ trait BrandOperation
 {
     public function list()
     {
-        $baseQuery = Brand::searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+        $baseQuery = Brand::where('user_id', auth()->id())->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
         $pageTitle = 'Manage Brand';
-        $view      = "admin.brand.list";
+        $view      = "Template::user.brand.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "brand");
@@ -30,8 +30,10 @@ trait BrandOperation
             'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
         ]);
 
+        $user = auth()->user();
+
         if ($id) {
-            $brand   = Brand::where('id', $id)->firstOrFailWithApi('brand');
+            $brand   = Brand::where('id', $id)->where('user_id', $user->id)->firstOrFailWithApi('brand');
             $message = "Brand updated successfully";
             $remark  = "brand-updated";
         } else {
@@ -50,10 +52,11 @@ trait BrandOperation
             }
         }
 
+        $brand->user_id = $user->id;
         $brand->name = $request->name;
         $brand->save();
 
-        adminActivity($remark, get_class($brand), $brand->id);
+        // adminActivity($remark, get_class($brand), $brand->id);
 
         return responseManager("brand", $message, 'success', compact('brand'));
     }

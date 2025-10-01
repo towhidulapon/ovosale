@@ -1,19 +1,18 @@
-@extends('admin.layouts.app')
+@extends($activeTemplate . 'layouts.master')
 @section('panel')
-   
     <div class="row">
         <div class="col-12">
-            <x-admin.ui.card>
-                <x-admin.ui.card.body :paddingZero=true>
-                    <x-admin.ui.table.layout :renderExportButton="false" :hasRecycleBin="false">
-                        <x-admin.ui.table>
-                            <x-admin.ui.table.header>
+            <x-user.ui.card>
+                <x-user.ui.card.body :paddingZero=true>
+                    <x-user.ui.table.layout :renderExportButton="false" :hasRecycleBin="false">
+                        <x-user.ui.table>
+                            <x-user.ui.table.header>
                                 <tr>
                                     <th>@lang('Product')</th>
                                     <th>@lang('Total')</th>
                                 </tr>
-                            </x-admin.ui.table.header>
-                            <x-admin.ui.table.body>
+                            </x-user.ui.table.header>
+                            <x-user.ui.table.body>
                                 @forelse($topSellingProducts as $topSellingProduct)
                                     @php
                                         $productDetails = $topSellingProduct->productDetail;
@@ -48,19 +47,19 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-admin.ui.table.empty_message />
+                                    <x-user.ui.table.empty_message />
                                 @endforelse
-                            </x-admin.ui.table.body>
-                        </x-admin.ui.table>
+                            </x-user.ui.table.body>
+                        </x-user.ui.table>
 
                         @if ($topSellingProducts->hasPages())
-                            <x-admin.ui.table.footer>
+                            <x-user.ui.table.footer>
                                 {{ paginateLinks($topSellingProducts) }}
-                            </x-admin.ui.table.footer>
+                            </x-user.ui.table.footer>
                         @endif
-                    </x-admin.ui.table.layout>
-                </x-admin.ui.card.body>
-            </x-admin.ui.card>
+                    </x-user.ui.table.layout>
+                </x-user.ui.card.body>
+            </x-user.ui.card>
         </div>
     </div>
 

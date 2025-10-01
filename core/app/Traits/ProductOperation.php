@@ -22,9 +22,7 @@ trait ProductOperation
     {
         $pageTitle = "Manage Product";
         $view      = "Template::user.product.list";
-        // $baseQuery      = Product::where('user_id', auth()->id())->latest('id');
-
-        $baseQuery = Product::orderBy('id', 'desc')
+        $baseQuery = Product::where('user_id', auth()->id())->orderBy('id', 'desc')
             ->trashFilter()
             ->with(['details:id,product_id,final_price', 'category:id,name', 'brand:id,name'])
             ->searchable(['product_code', 'name', "details:sku", 'category:name', 'brand:name', 'unit:name']);
@@ -124,6 +122,7 @@ trait ProductOperation
     {
 
         $validator = $this->validation($request);
+        $user = auth()->user();
 
         if ($validator->fails()) {
             return jsonResponse('validation_error', 'error', $validator->errors()->all());
@@ -135,6 +134,7 @@ trait ProductOperation
             DB::beginTransaction();
 
             $product               = new Product();
+            $product->user_id      = $user->id;
             $product->name         = $request->name;
             $product->product_code = $productCode;
             $product->product_type = $request->product_type;
@@ -256,6 +256,7 @@ trait ProductOperation
 
         $validator = Validator::make($request->all(), [
             'name'         => 'required|unique:products,name,' . $id,
+            'user_id'      => "required|integer",
             'brand_id'     => "required|integer|exists:brands,id",
             'unit_id'      => "required|integer|exists:units,id",
             'category_id'  => "required|integer|exists:categories,id",

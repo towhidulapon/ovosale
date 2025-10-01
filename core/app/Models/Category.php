@@ -18,7 +18,12 @@ class Category extends Model
     {
         return  ['name'];
     }
-    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function imageSrc(): Attribute
     {
         return new Attribute(

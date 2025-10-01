@@ -7,7 +7,7 @@
 @if (request()->trash)
     <div class="btn--group">
         <button class="btn btn-outline--success confirmationBtn" data-question='@lang("Are you sure to restore this $moduleNameForMessage?")'
-            data-action="{{ route("admin.$moduleNameForRoute.trash.restore", $id) }}">
+            data-action="{{ route("user.$moduleNameForRoute.trash.restore", $id) }}">
             <i class="las la-undo"></i> @lang('Restore')
         </button>
     </div>
@@ -16,7 +16,7 @@
         {{ $slot }}
         <x-permission_check :permission="$trashPermissionName">
             <button class="btn btn-outline--danger confirmationBtn" data-question='@lang("Are you sure to move this $moduleNameForMessage to trash?")'
-                data-action="{{ route("admin.$moduleNameForRoute.trash.temporary", $id) }}">
+                data-action="{{ route("user.$moduleNameForRoute.trash.temporary", $id) }}">
                 <i class="las la-trash"></i> @lang('Trash')
             </button>
         </x-permission_check>

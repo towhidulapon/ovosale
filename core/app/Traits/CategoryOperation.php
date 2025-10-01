@@ -10,9 +10,9 @@ trait CategoryOperation
 {
     public function list()
     {
-        $baseQuery = Category::searchable(['name'])->orderBy('id', getOrderBy());
+        $baseQuery = Category::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy());
         $pageTitle = 'Manage Category';
-        $view      = "admin.category.list";
+        $view      = "Template::user.category.list";
 
         if (request()->trash) {
             $baseQuery->onlyTrashed();
@@ -33,8 +33,11 @@ trait CategoryOperation
             'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
         ]);
 
+        $user = auth()->user();
+        // dd($user->id);
+
         if ($id) {
-            $category = Category::where('id', $id)->firstOrFailWithApi('category');
+            $category = Category::where('id', $id)->where('user_id', $user->id)->firstOrFailWithApi('category');
             $message  = "Category updated successfully";
             $remark   = "category-updated";
         } else {
@@ -52,15 +55,15 @@ trait CategoryOperation
                 return responseManager('exception', $message);
             }
         }
-
+        $category->user_id  = $user->id;
         $category->save();
-        adminActivity($remark, get_class($category), $category->id);
+        // adminActivity($remark, get_class($category), $category->id);
         return responseManager("category", $message, 'success', compact('category'));
     }
 
     public function status($id)
     {
-        
+
         return Category::changeStatus($id);
     }
 }

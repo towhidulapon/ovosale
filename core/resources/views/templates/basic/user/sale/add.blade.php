@@ -688,13 +688,13 @@
 
 @push('style-lib')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/global/css/flatpickr.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/css/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset($activeTemplateTrue . 'css/invoice.css') }}">
 @endpush
 
 
 @push('breadcrumb-plugins')
     <x-permission_check permission="view sale">
-        <a class="btn btn--primary" href="{{ route('admin.sale.list') }}">
+        <a class="btn btn--primary" href="{{ route('user.sale.list') }}">
             <i class="las la-list me-1"></i>@lang('Sale List')
         </a>
         </x-permission-check>

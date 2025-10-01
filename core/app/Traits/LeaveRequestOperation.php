@@ -14,7 +14,7 @@ trait LeaveRequestOperation
     {
         $baseQuery = LeaveRequest::searchable(['employee:name','leaveType:name'])->with( 'employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Request';
-        $view      = "admin.hrm.leave.request.list";
+        $view      = "Template::user.hrm.leave.request.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "LeaveRequest", "A4 landscape");
         }

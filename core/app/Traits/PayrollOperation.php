@@ -14,7 +14,7 @@ trait PayrollOperation
     {
         $baseQuery = Payroll::searchable(['employee:name', 'employee:phone'])->with('employee')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payroll';
-        $view      = "admin.hrm.payroll.list";
+        $view      = "Template::user.hrm.payroll.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "payroll", "A4 landscape");
         }

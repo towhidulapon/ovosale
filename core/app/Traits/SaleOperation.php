@@ -27,8 +27,8 @@ trait SaleOperation
     public function list() {
         $pageTitle = "Sale List";
         $view      = "Template::user.sale.list";
-        $baseQuery = Sale::latest('id');
-        // $baseQuery      = Sale::where('user_id', auth()->id())->latest('id');
+        // $baseQuery = Sale::latest('id');
+        $baseQuery      = Sale::where('user_id', auth()->id())->latest('id');
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Sale");
@@ -588,7 +588,7 @@ trait SaleOperation
 
     public function topSellingProduct() {
         $pageTitle = 'Top Selling Product';
-        $view      = 'admin.sale.top_selling_product';
+        $view      = 'Template::user.sale.top_selling_product';
 
         $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity,product_details_id')
             ->groupBy('product_details_id')

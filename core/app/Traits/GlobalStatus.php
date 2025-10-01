@@ -35,7 +35,7 @@ trait GlobalStatus
         $message       = keyToTitle($column) . ' changed successfully';
         $query->save();
 
-        adminActivity("$model-status-change", $modelName, $id);
+        // adminActivity("$model-status-change", $modelName, $id);
 
         return responseManager('change_status', $message, 'success', [$model => $query]);
     }

@@ -7,6 +7,7 @@
                     <form action="{{ route('user.product.create') }}" method="POST" class="product-create-form"
                         enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
                         <div class="row">
                             <div class="form-group col-sm-6">
                                 <label>@lang('Product Name')</label>

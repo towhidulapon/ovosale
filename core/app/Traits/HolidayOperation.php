@@ -11,15 +11,16 @@ trait HolidayOperation
 {
     public function list()
     {
+        //TODO::user_id add kora lagbe.
         $baseQuery = Holiday::searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Holiday';
-        $view      = "admin.hrm.holiday.list";
+        $view      = "Template::user.hrm.holiday.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Holiday", "A4 landscape");
         }
         $holidays = $baseQuery->paginate(getPaginate());
         $companies   = Company::active()->orderBy('name')->get();
-        
+
         return responseManager("holiday", $pageTitle, 'success', compact('holidays', 'view', 'pageTitle', 'companies'));
     }
 

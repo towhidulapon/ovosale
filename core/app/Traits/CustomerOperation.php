@@ -11,7 +11,7 @@ trait CustomerOperation
     {
         $baseQuery = Customer::searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Customer';
-        $view      = "admin.customer.list";
+        $view      = "Template::user.customer.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Customer", "A4 landscape");

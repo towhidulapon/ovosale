@@ -13,7 +13,7 @@ trait EmployeeOperation
     {
         $baseQuery = Employee::searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])->with('company', 'department', 'designation')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Employee';
-        $view      = "admin.hrm.employee.list";
+        $view      = "Template::user.hrm.employee.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "employee", "A4 landscape");
         }

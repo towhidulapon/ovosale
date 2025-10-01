@@ -15,7 +15,7 @@ trait SupplierOperation
     {
         $baseQuery = Supplier::searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Supplier';
-        $view      = "admin.supplier.list";
+        $view      = "Template::user.supplier.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Supplier", "A4 landscape");
@@ -77,7 +77,7 @@ trait SupplierOperation
     {
 
         $pageTitle = "Supplier Information";
-        $view      = "admin.supplier.view";
+        $view      = "Template::user.supplier.view";
 
         $supplier  = Supplier::where('id', $id)->firstOrFailWithApi('supplier');
         $baseQuery = SupplierPayment::where('supplier_id', $supplier->id);
@@ -134,12 +134,12 @@ trait SupplierOperation
         $supplierPayment->payment_note    = $request->payment_note;
         $supplierPayment->save();
 
-        
+
         $paymentAccount = PaymentAccount::where('id', $request->payment_account)->first();
 
         $details = "The supplier paid amount subtract from the payment account.";
         createTransaction($paymentAccount, '-', $request->paid_amount, 'balance_subtract', $details);
-        
+
 
         adminActivity("supplier-payment", get_class($supplierPayment), $supplierPayment->id);
         $notify =  "Supplier payment added successfully";

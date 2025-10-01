@@ -11,7 +11,7 @@ trait TaxOperation
     {
         $baseQuery = Tax::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Tax';
-        $view      = "admin.tax.list";
+        $view      = "Template::user.tax.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Tax");

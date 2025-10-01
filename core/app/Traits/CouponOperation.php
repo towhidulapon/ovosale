@@ -12,7 +12,7 @@ trait CouponOperation
     {
         $coupons   = Coupon::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter()->paginate(getPaginate());
         $pageTitle = 'Manage Coupon';
-        $view      = "admin.coupon.list";
+        $view      = "Template::user.coupon.list";
 
         return responseManager("coupons", $pageTitle, 'success', compact('coupons', 'view', 'pageTitle'));
     }

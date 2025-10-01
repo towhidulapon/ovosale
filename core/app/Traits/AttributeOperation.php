@@ -9,9 +9,9 @@ trait AttributeOperation
 {
     public function list()
     {
-        $baseQuery = Attribute::searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+        $baseQuery = Attribute::where('user_id', auth()->id())->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
         $pageTitle = 'Manage Attribute';
-        $view      = "admin.attribute.list";
+        $view      = "Template::user.attribute.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Attribute");
         }
@@ -19,12 +19,15 @@ trait AttributeOperation
         return responseManager("attributes", $pageTitle, 'success', compact('attributes', 'view', 'pageTitle'));
     }
 
-    
+
     public function save(Request $request, $id = 0)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:attributes,name,' . $id,
         ]);
+
+        $user = auth()->user();
+
         if ($id) {
             $attribute = Attribute::where('id', $id)->firstOrFailWithApi('attribute');
             $message   = "Attribute updated successfully";
@@ -34,9 +37,11 @@ trait AttributeOperation
             $message   = "Attribute saved successfully";
             $remark    = "attribute-updated";
         }
+
+        $attribute->user_id = $user->id;
         $attribute->name = $request->name;
         $attribute->save();
-        adminActivity($remark, get_class($attribute), $attribute->id);
+        // adminActivity($remark, get_class($attribute), $attribute->id);
         return responseManager("attribute", $message, 'success', compact('attribute'));
     }
 

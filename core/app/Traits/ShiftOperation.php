@@ -10,9 +10,10 @@ trait ShiftOperation
 {
     public function list()
     {
+        //TODO::user_id
         $baseQuery = Shift::searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Shift';
-        $view      = "admin.hrm.shift.list";
+        $view      = "Template::user.hrm.shift.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Shift", "A4 landscape");
         }

@@ -11,7 +11,7 @@ trait LeaveTypeOperation
     {
         $baseQuery = LeaveType::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Type';
-        $view      = "admin.hrm.leave.type.list";
+        $view      = "Template::user.hrm.leave.type.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "LeaveType", "A4 landscape");

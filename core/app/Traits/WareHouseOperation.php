@@ -14,7 +14,7 @@ trait WareHouseOperation
     {
         $baseQuery = Warehouse::searchable(['name', 'contact_number'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Warehouse';
-        $view      = "admin.warehouse.list";
+        $view      = "Template::user.warehouse.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Warehouse", "A4 landscape");

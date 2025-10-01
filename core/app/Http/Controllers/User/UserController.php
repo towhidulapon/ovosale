@@ -4,11 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\DashBoardWidgetData;
 use App\Lib\FormProcessor;
 use App\Lib\GoogleAuthenticator;
 use App\Models\DeviceToken;
 use App\Models\Form;
+use App\Models\Purchase;
+use App\Models\Sale;
+use App\Models\SaleDetails;
 use App\Models\Transaction;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -18,7 +23,20 @@ class UserController extends Controller
     public function home()
     {
         $pageTitle = 'Dashboard';
-        return view('Template::user.dashboard', compact('pageTitle'));
+        $widget             = DashBoardWidgetData::getWidgetData();
+        $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity,product_details_id')
+            ->groupBy('product_details_id')
+            ->with('productDetail', 'productDetail.attribute', "productDetail.variant", 'productDetail.product.unit')
+            ->orderBy('total_quantity', 'desc')
+            ->take(5)
+            ->get();
+
+        $recentSales     = Sale::with('customer')->latest('id')->take(5)->get();
+        $recentPurchases = Purchase::with('supplier')->latest('id')->take(5)->get();
+        $warehouses      = Warehouse::get();
+
+
+        return view('Template::user.dashboard', compact('pageTitle', 'widget', 'topSellingProducts', 'recentSales', 'recentPurchases', 'warehouses'));
     }
 
     public function depositHistory(Request $request)

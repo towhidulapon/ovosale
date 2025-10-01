@@ -126,11 +126,11 @@
             "title": "Manage Product",
             "icon": "lab la-product-hunt",
             "menu_active": [
-                "admin.category.*",
-                "admin.brand.*",
-                "admin.attribute.*",
-                "admin.variant.*",
-                "admin.unit.*",
+                "user.category.*",
+                "user.brand.*",
+                "user.attribute.*",
+                "user.variant.*",
+                "user.unit.*",
                 "user.product.*"
             ],
             "permission": [
@@ -191,10 +191,10 @@
                 {
                     "title": "Manage Category",
                     "icon": "las la-dot-circle",
-                    "route_name": "admin.category.list",
-                    "menu_active": "admin.category.list",
+                    "route_name": "user.category.list",
+                    "menu_active": "user.category.list",
                     "permission": [
-                        "view category",
+                        "user category",
                         "add category",
                         "edit category",
                         "trash category",
@@ -204,8 +204,8 @@
                 {
                     "title": "Manage Brand",
                     "icon": "las la-dot-circle",
-                    "route_name": "admin.brand.list",
-                    "menu_active": "admin.brand.list",
+                    "route_name": "user.brand.list",
+                    "menu_active": "user.brand.list",
                     "permission": [
                         "view brand",
                         "add brand",
@@ -217,8 +217,8 @@
                 {
                     "title": "Manage Unit",
                     "icon": "las la-dot-circle",
-                    "route_name": "admin.unit.list",
-                    "menu_active": "admin.unit.list",
+                    "route_name": "user.unit.list",
+                    "menu_active": "user.unit.list",
                     "permission": [
                         "view unit",
                         "add unit",
@@ -230,8 +230,8 @@
                 {
                     "title": "Manage Attribute",
                     "icon": "las la-dot-circle",
-                    "route_name": "admin.attribute.list",
-                    "menu_active": "admin.attribute.list",
+                    "route_name": "user.attribute.list",
+                    "menu_active": "user.attribute.list",
                     "permission": [
                         "view attribute",
                         "add attribute",
@@ -243,8 +243,8 @@
                 {
                     "title": "Manage Variant",
                     "icon": "las la-dot-circle",
-                    "route_name": "admin.variant.list",
-                    "menu_active": "admin.variant.list",
+                    "route_name": "user.variant.list",
+                    "menu_active": "user.variant.list",
                     "permission": [
                         "view variant",
                         "add variant",
@@ -519,10 +519,10 @@
             "title": "Manage Employee",
             "icon": "las la-users",
             "menu_active": [
-                "admin.employee.list",
-                "admin.designation.list",
-                "admin.shift.list",
-                "admin.attendance.list"
+                "user.employee.list",
+                "user.designation.list",
+                "user.shift.list",
+                "user.attendance.list"
             ],
             "permission": [
                 "view employee",
@@ -544,8 +544,8 @@
             "submenu": [
                 {
                     "title": "Manage Attendance",
-                    "route_name": "admin.attendance.list",
-                    "menu_active": "admin.attendance.list",
+                    "route_name": "user.attendance.list",
+                    "menu_active": "user.attendance.list",
                     "permission": [
                         "view attendance",
                         "add attendance",
@@ -556,8 +556,8 @@
                 },
                 {
                     "title": "Manage Designation",
-                    "route_name": "admin.designation.list",
-                    "menu_active": "admin.designation.list",
+                    "route_name": "user.designation.list",
+                    "menu_active": "user.designation.list",
                     "permission": [
                         "view designation",
                         "add designation",
@@ -569,8 +569,8 @@
                 {
                     "title": "Manage Shift",
                     "icon": "las la-building",
-                    "route_name": "admin.shift.list",
-                    "menu_active": "admin.shift.list",
+                    "route_name": "user.shift.list",
+                    "menu_active": "user.shift.list",
                     "permission": [
                         "view shift",
                         "add shift",
@@ -581,8 +581,8 @@
                 },
                 {
                     "title": "Manage Employee",
-                    "route_name": "admin.employee.list",
-                    "menu_active": "admin.employee.list",
+                    "route_name": "user.employee.list",
+                    "menu_active": "user.employee.list",
                     "permission": [
                         "view employee",
                         "add employee",
@@ -596,7 +596,7 @@
         {
             "title": "Leave Request",
             "icon": "las la-calendar",
-            "menu_active": ["admin.leave.*"],
+            "menu_active": ["user.leave.*"],
             "permission": [
                 "add leave request",
                 "view leave request",
@@ -606,14 +606,14 @@
             "submenu": [
                 {
                     "title": "Leave Request",
-                    "route_name": "admin.leave.request.list",
-                    "menu_active": "admin.leave.request.list",
+                    "route_name": "user.leave.request.list",
+                    "menu_active": "user.leave.request.list",
                     "permission": ["view leave request"]
                 },
                 {
                     "title": "Leave Type",
-                    "route_name": "admin.leave.type.list",
-                    "menu_active": "admin.leave.type.list",
+                    "route_name": "user.leave.type.list",
+                    "menu_active": "user.leave.type.list",
                     "permission": ["view leave type"]
                 }
             ]
@@ -621,14 +621,111 @@
         {
             "title": "Manage Payroll",
             "icon": "las la-calendar",
-            "route_name": "admin.payroll.list",
-            "menu_active": "admin.payroll.list",
+            "route_name": "user.payroll.list",
+            "menu_active": "user.payroll.list",
             "permission": [
                 "view payroll",
                 "add payroll",
                 "edit payroll",
                 "export payroll",
                 "trash payroll"
+            ]
+        }
+    ],
+    "system setup": [
+        {
+            "title": "Manage Warehouse",
+            "icon": "las la-warehouse",
+            "route_name": "user.warehouse.list",
+            "menu_active": "user.warehouse.list",
+            "permission": [
+                "view warehouse",
+                "add warehouse",
+                "edit warehouse",
+                "export warehouse",
+                "trash warehouse"
+            ]
+        },
+        {
+            "title": "Manage Tax",
+            "icon": "las la-percentage",
+            "route_name": "user.tax.list",
+            "menu_active": "user.tax.list",
+            "permission": [
+                "view tax",
+                "add tax",
+                "edit tax",
+                "export tax",
+                "trash tax"
+            ]
+        },
+        {
+            "title": "Manage Coupon",
+            "icon": "las la-tag",
+            "route_name": "user.coupon.list",
+            "menu_active": "user.coupon.list",
+            "permission": [
+                "view coupon",
+                "add coupon",
+                "edit coupon",
+                "export coupon",
+                "trash coupon"
+            ]
+        }
+    ],
+    "people": [
+        {
+            "title": "Manage Customer",
+            "icon": "las la-users",
+            "menu_active": "user.customer.list",
+            "route_name": "user.customer.list",
+            "permission": [
+                "view customer",
+                "add customer",
+                "edit customer",
+                "export customer",
+                "trash customer"
+            ]
+        },
+        {
+            "title": "Manage Supplier",
+            "icon": "las la-user-friends",
+            "menu_active": "user.supplier.*",
+            "route_name": "user.supplier.list",
+            "permission": [
+                "view supplier",
+                "add supplier",
+                "edit supplier",
+                "export supplier",
+                "trash supplier"
+            ]
+        }
+    ],
+    "administrations": [
+        {
+            "title": "Manage Admin",
+            "icon": "la la-user-circle",
+            "menu_active": "user.list",
+            "route_name": "user.list",
+            "permission": [
+                "view admin",
+                "add admin",
+                "edit admin",
+                "export admin",
+                "trash admin"
+            ]
+        },
+        {
+            "title": "Role & Permissions",
+            "icon": "las la-user-tag",
+            "menu_active": "user.role.*",
+            "route_name": "user.role.list",
+            "permission": [
+                "view role",
+                "add role",
+                "edit role",
+                "trash role",
+                "assign permission"
             ]
         }
     ],

@@ -11,9 +11,10 @@ trait AttendanceOperation
 {
     public function list()
     {
+        //TODO::user_id
         $baseQuery = Attendance::searchable(['employee:name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Attendance';
-        $view      = "admin.hrm.attendance.list";
+        $view      = "Template::user.hrm.attendance.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Attendance", "A4 landscape");
         }
@@ -24,7 +25,7 @@ trait AttendanceOperation
             },
             'shifts'
         ])->active()->orderBy('name')->get();
-        
+
         return responseManager("attendance", $pageTitle, 'success', compact('attendances', 'view', 'pageTitle', 'companies'));
     }
 
@@ -68,7 +69,7 @@ trait AttendanceOperation
             $remark   = "attendance-added";
         }
 
-        /// Duration 
+        /// Duration
         $checkIn  = Carbon::createFromFormat('H:i', $request->check_in);
         $checkOut = Carbon::createFromFormat('H:i', $request->check_out);
         if ($checkOut->lessThan($checkIn)) {

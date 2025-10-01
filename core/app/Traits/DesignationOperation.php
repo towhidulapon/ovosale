@@ -12,7 +12,7 @@ trait DesignationOperation
     {
         $baseQuery = Designation::searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Designation';
-        $view      = "admin.hrm.designation.list";
+        $view      = "Template::user.hrm.designation.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "designation", "A4 landscape");

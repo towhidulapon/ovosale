@@ -13,6 +13,8 @@
     <link href="{{ asset('assets/global/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/global/css/all.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/global/css/select2.min.css') }}">
+
     @stack('style-lib')
 
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}?v=1">
@@ -37,9 +39,11 @@
     @stack('script-lib')
 
     <script src="{{ asset('assets/global/js/global.js') }}"></script>
+    <script src="{{ asset('assets/global/js/select2.min.js   ') }}"></script>
 
     <script src="{{ asset($activeTemplateTrue . 'js/search.js') }}"></script>
     <script src="{{ asset($activeTemplateTrue . 'js/main.js') }}"></script>
+
     @php echo loadExtension('tawk-chat') @endphp
 
     @include('partials.notify')

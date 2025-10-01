@@ -9,9 +9,10 @@ trait CompanyOperation
 {
     public function list()
     {
+        //TODO::user_id add kora lagbe.
         $baseQuery = Company::searchable(['name', 'email', 'mobile'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Company';
-        $view      = "admin.hrm.company.list";
+        $view      = "Template::user.hrm.company.list";
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Company", "A4 landscape");
