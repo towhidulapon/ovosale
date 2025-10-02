@@ -9,7 +9,7 @@ trait ExpenseCategoryOperation
 {
     public function list()
     {
-        $baseQuery = ExpenseCategory::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = ExpenseCategory::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Expense Category';
         $view      = "Template::user.expense.category.list";
 
@@ -35,12 +35,13 @@ trait ExpenseCategoryOperation
             $expenseCategory = new ExpenseCategory();
             $message         = "Expense category saved successfully";
             $remark          = "expense-category-added";
+            $expenseCategory->user_id = auth()->id();
         }
 
         $expenseCategory->name = $request->name;
         $expenseCategory->save();
 
-        adminActivity($remark, get_class($expenseCategory), $expenseCategory->id);
+        // adminActivity($remark, get_class($expenseCategory), $expenseCategory->id);
 
         return responseManager("expenseCategory", $message, 'success', compact('expenseCategory'));
     }

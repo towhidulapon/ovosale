@@ -10,8 +10,7 @@ trait ShiftOperation
 {
     public function list()
     {
-        //TODO::user_id
-        $baseQuery = Shift::searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Shift::where('user_id', auth()->id())->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Shift';
         $view      = "Template::user.hrm.shift.list";
         if (request()->export) {
@@ -27,7 +26,7 @@ trait ShiftOperation
     {
         $request->validate(
             [
-                'name'                => 'required|string|max:255',
+                'name'                => 'required|unique:shifts,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:255',
                 'company_id'          => 'required|exists:companies,id',
             ],
             [
@@ -36,7 +35,7 @@ trait ShiftOperation
         );
 
         if ($id) {
-            $shift    = Shift::where('id', $id)->firstOrFailWithApi('shift');
+            $shift    = Shift::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('shift');
             $message  = "Shift updated successfully";
             $remark   = "shift-updated";
         } else {
@@ -44,11 +43,13 @@ trait ShiftOperation
             $message  = "Shift saved successfully";
             $remark   = "shift-added";
         }
+
+        $shift->user_id       = auth()->id();
         $shift->name          = $request->name;
         $shift->company_id    = $request->company_id;
         $shift->save();
 
-        adminActivity($remark, get_class($shift), $shift->id);
+        // adminActivity($remark, get_class($shift), $shift->id);
         return responseManager("shift", $message, 'success', compact('shift'));
     }
 

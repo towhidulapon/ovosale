@@ -28,8 +28,8 @@ trait PurchaseOperation {
             $q->active();
         })->get();
 
-        // $baseQuery      = Purchase::where('user_id', auth()->id())->latest('id');
-        $baseQuery      = Purchase::latest('id');
+        $baseQuery      = Purchase::where('user_id', auth()->id())->latest('id');
+        // $baseQuery      = Purchase::latest('id');
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Purchase");
@@ -93,7 +93,7 @@ trait PurchaseOperation {
             return jsonResponse('validation_error', 'error', $validator->errors()->all());
         }
 
-        $supplier       = Supplier::where('id', $request->supplier_id)->first();
+        $supplier       = Supplier::where('user_id', auth()->id())->where('id', $request->supplier_id)->first();
         $shippingAmount = $request->shipping_amount ?? 0;
         //get the sub total
 
@@ -457,12 +457,12 @@ trait PurchaseOperation {
 
     private function basicDataForPurchase() {
         return [
-            'warehouses'     => Warehouse::active()->get(),
-            'taxes'          => Tax::active()->get(),
-            'paymentMethods' => PaymentType::active()->with('paymentAccounts', function ($q) {
+            'warehouses'     => Warehouse::where('user_id', auth()->id())->active()->get(),
+            'taxes'          => Tax::where('user_id', auth()->id())->active()->get(),
+            'paymentMethods' => PaymentType::where('user_id', auth()->id())->active()->with('paymentAccounts', function ($q) {
                 $q->active();
             })->get(),
-            'suppliers' => Supplier::active()->get()
+            'suppliers' => Supplier::where('user_id', auth()->id())->active()->get()
         ];
     }
 

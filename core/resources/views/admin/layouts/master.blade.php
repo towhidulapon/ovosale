@@ -33,7 +33,7 @@
 
     <script src="{{ asset('assets/global/js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('assets/global/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/global/js/select2.min.js   ') }}"></script>
+    <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
 
     @include('partials.notify')
     @stack('script-lib')
@@ -67,7 +67,7 @@
                     .then(() => console.log("Service Worker registered successfully."))
                     .catch((error) => console.log("Service Worker registration failed:", error));
             }
-        })(jQuery); 
+        })(jQuery);
     </script>
 </body>
 </html>

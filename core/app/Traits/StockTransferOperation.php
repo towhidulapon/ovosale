@@ -23,7 +23,7 @@ trait StockTransferOperation
     {
         $pageTitle  = "Stock Transfer";
         $view       = "Template::user.stock_transfer.add";
-        $warehouses = Warehouse::active()->get();
+        $warehouses = Warehouse::where('user_id', auth()->id())->active()->get();
         return responseManager("add_stock_transfer", $pageTitle, 'success', compact('pageTitle', 'view', 'warehouses'));
     }
 
@@ -70,7 +70,7 @@ trait StockTransferOperation
             $transfer->to_warehouse_id = $request->to_warehouse_id;
             $transfer->status          = $request->status;
             $transfer->reference_no    = $request->reference_no;
-            $transfer->admin_id        = auth('admin')->user()->id;
+            $transfer->user_id         = auth()->id();
 
             if ($request->hasFile('attachment')) {
                 try {
@@ -129,7 +129,7 @@ trait StockTransferOperation
     {
         $pageTitle = "Stock Transfer List";
         $view      = "Template::user.stock_transfer.list";
-        $transfers = StockTransfer::with(['toWarehouse', 'fromWarehouse', 'admin'])
+        $transfers = StockTransfer::where('user_id', auth()->id())->with(['toWarehouse', 'fromWarehouse', 'admin'])
             ->searchable(['reference_no', 'invoice_number'])
             ->withCount('stockTransferDetails as total_items')
             ->orderBy('id', getOrderBy())
@@ -142,7 +142,7 @@ trait StockTransferOperation
     public function edit($id)
     {
         $pageTitle = "Edit Stock Transfer";
-        $transfer  = StockTransfer::where("id", $id)
+        $transfer  = StockTransfer::where("id", $id)->where("user_id", auth()->id())
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails', 'stockTransferDetails.product'])
             ->firstOrFailWithApi("stock_transfer");
         $view      = "Template::user.stock_transfer.edit";
@@ -281,7 +281,7 @@ trait StockTransferOperation
     {
         $pageTitle = "Stock Transfer Invoice";
         $view      = "Template::user.stock_transfer.view";
-        $transfer  = StockTransfer::where("id", $id)
+        $transfer  = StockTransfer::where("id", $id)->where("user_id", auth()->id())
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails'])
             ->firstOrFailWithApi("stock_transfer");
 
@@ -292,7 +292,7 @@ trait StockTransferOperation
     public function pdf($id)
     {
         $pageTitle = "Stock Transfer Invoice";
-        $transfer  = StockTransfer::where("id", $id)
+        $transfer  = StockTransfer::where("id", $id)->where("user_id", auth()->id())
             ->with(['toWarehouse', 'fromWarehouse', 'admin', 'stockTransferDetails'])
             ->firstOrFailWithApi("stock_transfer");
 

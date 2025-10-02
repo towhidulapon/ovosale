@@ -11,4 +11,9 @@ class Coupon extends Model
     use GlobalStatus, SoftDeletes;
 
     protected $guarded  = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

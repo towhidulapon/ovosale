@@ -17,9 +17,9 @@ class StockTransfer extends Model
         return $this->belongsTo(Warehouse::class, 'to_warehouse_id');
     }
 
-    public function admin()
+    public function user()
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(User::class);
     }
 
     public function stockTransferDetails()

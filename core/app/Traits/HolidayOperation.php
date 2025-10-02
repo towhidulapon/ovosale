@@ -11,15 +11,14 @@ trait HolidayOperation
 {
     public function list()
     {
-        //TODO::user_id add kora lagbe.
-        $baseQuery = Holiday::searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Holiday::where('user_id', auth()->id())->searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Holiday';
         $view      = "Template::user.hrm.holiday.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Holiday", "A4 landscape");
         }
         $holidays = $baseQuery->paginate(getPaginate());
-        $companies   = Company::active()->orderBy('name')->get();
+        $companies   = Company::active()->where('user_id', auth()->id())->orderBy('name')->get();
 
         return responseManager("holiday", $pageTitle, 'success', compact('holidays', 'view', 'pageTitle', 'companies'));
     }
@@ -54,6 +53,7 @@ trait HolidayOperation
         $end   = Carbon::parse($request->end_date);
         $days  = $start->diffInDays($end) + 1;
 
+        $holiday->user_id     = auth()->id();
         $holiday->company_id  = $request->company_id;
         $holiday->title       = $request->title;
         $holiday->start_date  = $request->start_date;
@@ -75,7 +75,7 @@ trait HolidayOperation
             }
         }
 
-        adminActivity($remark, get_class($holiday), $holiday->id);
+        // adminActivity($remark, get_class($holiday), $holiday->id);
         return responseManager("holiday", $message, 'success', compact('holiday'));
     }
 

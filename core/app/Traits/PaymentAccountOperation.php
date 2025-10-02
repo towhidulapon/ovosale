@@ -11,7 +11,7 @@ trait PaymentAccountOperation
 {
     public function list()
     {
-        $baseQuery = PaymentAccount::searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
+        $baseQuery = PaymentAccount::where('user_id', auth()->id())->searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
         $pageTitle = 'Manage Payment Account';
         $view      = "Template::user.payment_account.list";
 
@@ -20,7 +20,7 @@ trait PaymentAccountOperation
         }
 
         $paymentAccounts = $baseQuery->paginate(getPaginate());
-        $paymentTypes    = PaymentType::active()->orderBy('name')->get();
+        $paymentTypes    = PaymentType::where('user_id', auth()->id())->active()->orderBy('name')->get();
         return responseManager("payment_account", $pageTitle, 'success', compact('paymentAccounts', 'view', 'pageTitle', 'paymentTypes'));
     }
 
@@ -51,6 +51,7 @@ trait PaymentAccountOperation
             return responseManager("payment_account", "Payment account already exists", 'error');
         }
 
+        $paymentAccount->user_id         = auth()->id();
         $paymentAccount->payment_type_id = $request->payment_type;
         $paymentAccount->account_name    = $request->account_name;
         $paymentAccount->account_number  = $request->account_number;
@@ -61,7 +62,7 @@ trait PaymentAccountOperation
             createTransaction($paymentAccount, "+", $request->balance, "balance_add", "Initial balance added to the account");
         }
 
-        adminActivity($remark, get_class($paymentAccount), $paymentAccount->id);
+        // adminActivity($remark, get_class($paymentAccount), $paymentAccount->id);
         return responseManager("payment_account", $message, 'success', compact('paymentAccount'));
     }
 
@@ -76,7 +77,7 @@ trait PaymentAccountOperation
         ]);
 
 
-        $paymentAccount = PaymentAccount::where('id', $id)->firstOrFailWithApi('Payment Account');
+        $paymentAccount = PaymentAccount::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('Payment Account');
 
         if ($request->trx_type == "+") {
             $trxType = "+";
@@ -106,8 +107,8 @@ trait PaymentAccountOperation
         ]);
 
 
-        $fromAccount = PaymentAccount::where('id', $id)->firstOrFailWithApi('Payment Account');
-        $toAccount   = PaymentAccount::where('id', $request->to_account_id)->firstOrFailWithApi('Payment Account');
+        $fromAccount = PaymentAccount::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('Payment Account');
+        $toAccount   = PaymentAccount::where('user_id', auth()->id())->where('id', $request->to_account_id)->firstOrFailWithApi('Payment Account');
 
 
         if ($fromAccount->id == $toAccount->id) {

@@ -2,59 +2,59 @@
 @section('panel')
     <div class="row">
         <div class="col-12">
-            <x-admin.ui.card>
-                <x-admin.ui.card.body :paddingZero=true>
-                    <x-admin.ui.table.layout>
-                        <x-admin.ui.table>
-                            <x-admin.ui.table.header>
+            <x-user.ui.card>
+                <x-user.ui.card.body :paddingZero=true>
+                    <x-user.ui.table.layout>
+                        <x-user.ui.table>
+                            <x-user.ui.table.header>
                                 <tr>
                                     <th>@lang('Name')</th>
                                     <th>@lang('Status')</th>
                                     <th>@lang('Action')</th>
                                 </tr>
-                            </x-admin.ui.table.header>
-                            <x-admin.ui.table.body>
+                            </x-user.ui.table.header>
+                            <x-user.ui.table.body>
                                 @forelse($expenseCategories as $expenseCategory)
                                     <tr>
                                         <td>{{ __($expenseCategory->name) }}</td>
                                         <td>
-                                            <x-admin.other.status_switch :status="$expenseCategory->status"
+                                            <x-user.other.status_switch :status="$expenseCategory->status"
                                                 action="{{ route('user.expense.category.status.change', $expenseCategory->id) }}"
                                                 title="expense category" />
                                         </td>
                                         <td>
-                                            <x-admin.ui.btn.table_action module="expense_category" :id="$expenseCategory->id">
+                                            <x-user.ui.btn.table_action module="expense_category" :id="$expenseCategory->id">
                                                 <x-permission_check permission="edit expense category">
-                                                    <x-admin.ui.btn.edit tag="btn" :data-expense-category="$expenseCategory" />
+                                                    <x-user.ui.btn.edit tag="btn" :data-expense-category="$expenseCategory" />
                                                 </x-permission_check>
-                                            </x-admin.ui.btn.table_action>
+                                            </x-user.ui.btn.table_action>
 
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-admin.ui.table.empty_message />
+                                    <x-user.ui.table.empty_message />
                                 @endforelse
-                            </x-admin.ui.table.body>
-                        </x-admin.ui.table>
+                            </x-user.ui.table.body>
+                        </x-user.ui.table>
                         @if ($expenseCategories->hasPages())
-                            <x-admin.ui.table.footer>
+                            <x-user.ui.table.footer>
                                 {{ paginateLinks($expenseCategories) }}
-                            </x-admin.ui.table.footer>
+                            </x-user.ui.table.footer>
                         @endif
-                    </x-admin.ui.table.layout>
-                </x-admin.ui.card.body>
-            </x-admin.ui.card>
+                    </x-user.ui.table.layout>
+                </x-user.ui.card.body>
+            </x-user.ui.card>
         </div>
     </div>
 
-    <x-admin.ui.modal id="modal">
-        <x-admin.ui.modal.header>
+    <x-user.ui.modal id="modal">
+        <x-user.ui.modal.header>
             <h4 class="modal-title">@lang('Add Expense Category')</h4>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
                 <i class="las la-times"></i>
             </button>
-        </x-admin.ui.modal.header>
-        <x-admin.ui.modal.body>
+        </x-user.ui.modal.header>
+        <x-user.ui.modal.body>
             <form method="POST">
                 @csrf
                 <div class="form-group">
@@ -62,11 +62,11 @@
                     <input type="text" class="form-control" name="name" required value="{{ old('name') }}">
                 </div>
                 <div class="form-group">
-                    <x-admin.ui.btn.modal />
+                    <x-user.ui.btn.modal />
                 </div>
             </form>
-        </x-admin.ui.modal.body>
-    </x-admin.ui.modal>
+        </x-user.ui.modal.body>
+    </x-user.ui.modal>
 
     <x-confirmation-modal />
 @endsection
@@ -103,6 +103,6 @@
 @endpush
 @push('breadcrumb-plugins')
 <x-permission_check permission="add expense category">
-    <x-admin.ui.btn.add tag="btn" />
+    <x-user.ui.btn.add tag="btn" />
 </x-permission_check>
 @endpush

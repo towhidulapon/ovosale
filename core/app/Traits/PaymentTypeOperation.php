@@ -10,7 +10,7 @@ trait PaymentTypeOperation
 {
     public function list()
     {
-        $baseQuery = PaymentType::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = PaymentType::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payment Type';
         $view      = "Template::user.payment_type.list";
 
@@ -41,19 +41,20 @@ trait PaymentTypeOperation
             $paymentType       = new PaymentType();
             $message           = "Payment type saved successfully";
             $remark            = "payment-type-added";
+            $paymentType->user_id = auth()->id();
             $paymentType->name = $request->name;
             $paymentType->slug = slug($request->name);
         }
 
         $paymentType->save();
 
-        adminActivity($remark, get_class($paymentType), $paymentType->id);
+        // adminActivity($remark, get_class($paymentType), $paymentType->id);
         return responseManager("payment_type", $message, 'success', compact('paymentType'));
     }
 
     public function status($id)
     {
-        $paymentType = PaymentType::where('id', $id)->where('is_default', Status::NO)->firstOrFailWithApi('Payment type');
+        $paymentType = PaymentType::where('user_id', auth()->id())->where('id', $id)->where('is_default', Status::NO)->firstOrFailWithApi('Payment type');
         if ($paymentType->is_default != Status::YES) {
             return PaymentType::changeStatus($id);
         }

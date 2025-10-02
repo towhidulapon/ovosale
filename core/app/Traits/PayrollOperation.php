@@ -12,15 +12,15 @@ trait PayrollOperation
 {
     public function list()
     {
-        $baseQuery = Payroll::searchable(['employee:name', 'employee:phone'])->with('employee')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Payroll::where('user_id', auth()->id())->searchable(['employee:name', 'employee:phone'])->with('employee')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payroll';
         $view      = "Template::user.hrm.payroll.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "payroll", "A4 landscape");
         }
         $payrolls       = $baseQuery->paginate(getPaginate());
-        $employees      = Employee::active()->orderBy('name')->get();
-        $paymentMethods = PaymentType::with('paymentAccounts')->active()->orderBy('name')->get();
+        $employees      = Employee::where('user_id', auth()->id())->active()->orderBy('name')->get();
+        $paymentMethods = PaymentType::where('user_id', auth()->id())->with('paymentAccounts')->active()->orderBy('name')->get();
 
         return responseManager("payroll", $pageTitle, 'success', compact('payrolls', 'view', 'pageTitle', 'employees', 'paymentMethods'));
     }
@@ -59,6 +59,7 @@ trait PayrollOperation
             $oldAmount                   = 0;
         }
 
+        $payroll->user_id            = auth()->id();
         $payroll->employee_id        = $request->employee_id;
         $payroll->date               = $request->date;
         $payroll->amount             = $request->amount;

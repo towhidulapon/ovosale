@@ -12,15 +12,15 @@ trait LeaveRequestOperation
 {
     public function list()
     {
-        $baseQuery = LeaveRequest::searchable(['employee:name','leaveType:name'])->with( 'employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = LeaveRequest::where('user_id', auth()->id())->searchable(['employee:name','leaveType:name'])->with( 'employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Request';
         $view      = "Template::user.hrm.leave.request.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "LeaveRequest", "A4 landscape");
         }
         $requests    = $baseQuery->paginate(getPaginate());
-        $employees   = Employee::active()->get();
-        $types       = LeaveType::active()->get();
+        $employees   = Employee::where('user_id', auth()->id())->active()->get();
+        $types       = LeaveType::where('user_id', auth()->id())->active()->get();
 
         return responseManager("leave_request", $pageTitle, 'success', compact('requests', 'view', 'pageTitle', 'employees', 'types'));
     }
@@ -67,6 +67,7 @@ trait LeaveRequestOperation
         $end   = Carbon::parse($request->end_date);
         $days  = $start->diffInDays($end) + 1;
 
+        $leaveRequest->user_id       = auth()->id();
         $leaveRequest->employee_id   = $request->employee_id;
         $leaveRequest->leave_type_id = $request->leave_type_id;
         $leaveRequest->start_date    = $request->start_date;
@@ -76,7 +77,7 @@ trait LeaveRequestOperation
         $leaveRequest->reason        = $request->reason;
         $leaveRequest->save();
 
-        adminActivity($remark, get_class($leaveRequest), $leaveRequest->id);
+        // adminActivity($remark, get_class($leaveRequest), $leaveRequest->id);
         return responseManager("leave_request", $message, 'success', compact('leaveRequest'));
     }
 

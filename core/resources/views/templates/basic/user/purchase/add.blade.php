@@ -16,7 +16,7 @@
                                 </div>
                                 <div class="col-lg-4 form-group">
                                     <label class="form-label">@lang('Supplier')</label>
-                                    <x-user.other.lazy_loading_select name="supplier_id" :route="route('admin.supplier.lazy.loading')" />
+                                    <x-user.other.lazy_loading_select name="supplier_id" :route="route('user.supplier.lazy.loading')" />
                                 </div>
                                 <div class="col-lg-4 form-group">
                                     <label class="form-label">@lang('Warehouse')</label>
@@ -334,6 +334,7 @@
             //event handler for product select
             $('body').on('click', ".product-search-list-item", function() {
                 const product = $(this).data('product');
+                console.log(product);
                 const productDetails = $(this).data('product-details');
 
                 let html = htmlGenerateManager.productHtml(product);

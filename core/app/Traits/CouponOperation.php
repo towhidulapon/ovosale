@@ -10,7 +10,7 @@ trait CouponOperation
 {
     public function list()
     {
-        $coupons   = Coupon::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter()->paginate(getPaginate());
+        $coupons   = Coupon::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter()->paginate(getPaginate());
         $pageTitle = 'Manage Coupon';
         $view      = "Template::user.coupon.list";
 
@@ -40,6 +40,7 @@ trait CouponOperation
             $remark  = "coupon-added";
         }
 
+        $coupon->user_id            = auth()->user()->id;
         $coupon->name               = $request->coupon_name;
         $coupon->code               = $request->coupon_code;
         $coupon->start_from         = $request->start_from;
@@ -50,7 +51,7 @@ trait CouponOperation
         $coupon->maximum_using_time = $request->maximum_using_time;
         $coupon->save();
 
-        adminActivity($remark, get_class($coupon), $coupon->id);
+        // adminActivity($remark, get_class($coupon), $coupon->id);
         return responseManager("coupon", $message, 'success', compact('coupon'));
     }
 

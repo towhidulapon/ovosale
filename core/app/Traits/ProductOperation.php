@@ -64,7 +64,10 @@ trait ProductOperation
     {
         $search      = request()->search;
         $search      = "%$search%";
-        $searchQuery = ProductDetail::where('sku', request()->search);
+        $user        = auth()->user();
+        $searchQuery = ProductDetail::whereHas('product', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('sku', request()->search);
         $exactMatch  = true;
 
         if (!(clone $searchQuery)->count()) {

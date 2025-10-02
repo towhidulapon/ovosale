@@ -13,7 +13,7 @@ trait SupplierOperation
 {
     public function list()
     {
-        $baseQuery = Supplier::searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Supplier::where('user_id', auth()->id())->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Supplier';
         $view      = "Template::user.supplier.list";
 
@@ -50,6 +50,7 @@ trait SupplierOperation
             $remark   = "supplier-added";
         }
 
+        $supplier->user_id = auth()->id();
         $supplier->company_name = $request->company_name;
         $supplier->name         = $request->name;
         $supplier->email        = $request->email;
@@ -63,7 +64,7 @@ trait SupplierOperation
         $supplier->save();
 
 
-        adminActivity($remark, get_class($supplier), $supplier->id);
+        // adminActivity($remark, get_class($supplier), $supplier->id);
 
         return responseManager("supplier", $message, 'success', compact('supplier'));
     }

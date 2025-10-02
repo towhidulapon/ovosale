@@ -9,8 +9,7 @@ trait CompanyOperation
 {
     public function list()
     {
-        //TODO::user_id add kora lagbe.
-        $baseQuery = Company::searchable(['name', 'email', 'mobile'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Company::where('user_id', auth()->id())->searchable(['name', 'email', 'mobile'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Company';
         $view      = "Template::user.hrm.company.list";
 
@@ -26,7 +25,7 @@ trait CompanyOperation
     public function save(Request $request, $id = 0)
     {
         $request->validate([
-            'name'    => 'required|string|max:40',
+            'name'    => 'required|Unique:companies,name,' . $id . ',id|string|max:40',
             'email'   => 'nullable|string|email|max:40|unique:companies,email,' . $id,
             'mobile'  => 'nullable|string|max:40|unique:companies,mobile,' . $id,
             'country' => 'nullable|string|max:255',
@@ -43,6 +42,7 @@ trait CompanyOperation
             $remark   = "company-added";
         }
 
+        $company->user_id = auth()->id();
         $company->name    = $request->name;
         $company->email   = $request->email;
         $company->mobile  = $request->mobile;
@@ -50,7 +50,7 @@ trait CompanyOperation
         $company->address = $request->address;
         $company->save();
 
-        adminActivity($remark, get_class($company), $company->id);
+        // adminActivity($remark, get_class($company), $company->id);
 
         return responseManager("company", $message, 'success', compact('company'));
     }

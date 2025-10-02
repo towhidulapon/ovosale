@@ -35,11 +35,11 @@
 
     <script src="{{ asset('assets/global/js/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('assets/global/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
 
     @stack('script-lib')
 
     <script src="{{ asset('assets/global/js/global.js') }}"></script>
-    <script src="{{ asset('assets/global/js/select2.min.js   ') }}"></script>
 
     <script src="{{ asset($activeTemplateTrue . 'js/search.js') }}"></script>
     <script src="{{ asset($activeTemplateTrue . 'js/main.js') }}"></script>
@@ -70,6 +70,13 @@
         $(".langSel").on("change", function () {
             window.location.href = "{{ route('home') }}/change/" + $(this).val();
         });
+
+        window.app_config = {
+            empty_image_url: "{{ asset('assets/images/empty_box.png') }}",
+            empty_title: "@lang('No data found')",
+            empty_message: "@lang('There are no available data to display.')",
+            allow_precision: "{{ gs('allow_precision') }}"
+        }
 
         //show cookie card
         setTimeout(function () {

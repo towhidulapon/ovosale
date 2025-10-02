@@ -34,7 +34,7 @@ class ReportController extends Controller
     public function transaction(Request $request)
     {
         $pageTitle = 'Transaction History';
-        $baseQuery = Transaction::searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
+        $baseQuery = Transaction::where('user_id', auth()->id())->searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
 
         if (request()->payment_type) {
             $baseQuery->whereHas('paymentAccount', function ($q) {

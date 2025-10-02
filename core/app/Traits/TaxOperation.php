@@ -9,7 +9,7 @@ trait TaxOperation
 {
     public function list()
     {
-        $baseQuery = Tax::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Tax::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Tax';
         $view      = "Template::user.tax.list";
 
@@ -38,11 +38,12 @@ trait TaxOperation
             $remark  = "tax-added";
         }
 
+        $tax->user_id    = auth()->id();
         $tax->name       = $request->name;
         $tax->percentage = $request->percentage;
         $tax->save();
 
-        adminActivity($remark, get_class($tax), $tax->id);
+        // adminActivity($remark, get_class($tax), $tax->id);
 
         return responseManager("tax", $message, 'success', compact('tax'));
     }

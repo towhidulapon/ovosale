@@ -11,7 +11,7 @@ trait EmployeeOperation
 {
     public function list()
     {
-        $baseQuery = Employee::searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])->with('company', 'department', 'designation')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Employee::where('user_id', auth()->id())->searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])->with('company', 'department', 'designation')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Employee';
         $view      = "Template::user.hrm.employee.list";
         if (request()->export) {
@@ -74,6 +74,7 @@ trait EmployeeOperation
             }
         }
 
+        $employee->user_id        = auth()->id();
         $employee->name           = $request->name;
         $employee->gender         = $request->gender;
         $employee->dob            = $request->dob;
@@ -86,7 +87,7 @@ trait EmployeeOperation
         $employee->designation_id = $request->designation_id;
         $employee->save();
 
-        adminActivity($remark, get_class($employee), $employee->id);
+        // adminActivity($remark, get_class($employee), $employee->id);
         return responseManager("employee", $message, 'success', compact('employee'));
     }
 

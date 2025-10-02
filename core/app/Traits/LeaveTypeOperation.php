@@ -9,7 +9,7 @@ trait LeaveTypeOperation
 {
     public function typeList()
     {
-        $baseQuery = LeaveType::searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = LeaveType::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Type';
         $view      = "Template::user.hrm.leave.type.list";
 
@@ -35,10 +35,11 @@ trait LeaveTypeOperation
             $message   = "Leave type saved successfully";
             $remark    = "leave-type-added";
         }
+        $leaveType->user_id  = auth()->id();
         $leaveType->name     = $request->name;
         $leaveType->save();
 
-        adminActivity($remark, get_class($leaveType), $leaveType->id);
+        // adminActivity($remark, get_class($leaveType), $leaveType->id);
         return responseManager("leave_type", $message, 'success', compact('leaveType'));
     }
 

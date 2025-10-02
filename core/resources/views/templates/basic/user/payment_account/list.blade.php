@@ -81,7 +81,7 @@
                                                     </x-permission_check>
                                                     <x-permission_check permission="trash payment account">
                                                         <a class="dropdown-list d-block w-100 text-start"
-                                                            href="{{ route('admin.report.transaction') }}?payment_account_id={{ $paymentAccount->id }}">
+                                                            href="{{ route('user.report.transaction') }}?payment_account_id={{ $paymentAccount->id }}">
                                                             <i class="las la-exchange-alt text--info"></i>
                                                             @lang('Transaction History')
                                                         </a>

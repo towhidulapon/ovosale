@@ -11,8 +11,7 @@ trait AttendanceOperation
 {
     public function list()
     {
-        //TODO::user_id
-        $baseQuery = Attendance::searchable(['employee:name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Attendance::where('user_id', auth()->id())->searchable(['employee:name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Attendance';
         $view      = "Template::user.hrm.attendance.list";
         if (request()->export) {
@@ -24,7 +23,7 @@ trait AttendanceOperation
                 $q->notOnLeaveToday();
             },
             'shifts'
-        ])->active()->orderBy('name')->get();
+        ])->where('user_id', auth()->id())->active()->orderBy('name')->get();
 
         return responseManager("attendance", $pageTitle, 'success', compact('attendances', 'view', 'pageTitle', 'companies'));
     }
@@ -49,7 +48,7 @@ trait AttendanceOperation
         );
 
         // Check
-        $attendanceQuery = Attendance::where('company_id', $request->company_id)
+        $attendanceQuery = Attendance::where('user_id', auth()->id())->where('company_id', $request->company_id)
             ->where('employee_id', $request->employee_id)
             ->where('date', $request->date);
 
@@ -60,7 +59,7 @@ trait AttendanceOperation
             return responseManager("attendance", "This employee has already been marked for this date", 'error');
         }
         if ($id) {
-            $attendance = Attendance::where('id', $id)->firstOrFailWithApi('attendance');
+            $attendance = Attendance::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('attendance');
             $message  = "Attendance updated successfully";
             $remark   = "attendance-updated";
         } else {
@@ -78,6 +77,7 @@ trait AttendanceOperation
         $diff = $checkIn->diff($checkOut);
         $duration = sprintf('%02d:%02d', $diff->h, $diff->i);
 
+        $attendance->user_id      = auth()->id();
         $attendance->company_id   = $request->company_id;
         $attendance->employee_id  = $request->employee_id;
         $attendance->shift_id     = $request->shift_id;
@@ -87,7 +87,7 @@ trait AttendanceOperation
         $attendance->duration     = $duration;
         $attendance->save();
 
-        adminActivity($remark, get_class($attendance), $attendance->id);
+        // adminActivity($remark, get_class($attendance), $attendance->id);
         return responseManager("attendance", $message, 'success', compact('attendance'));
     }
 

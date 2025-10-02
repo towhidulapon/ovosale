@@ -13,7 +13,7 @@ trait ExpenseOperation
 {
     public function list()
     {
-        $baseQuery = Expense::orderBy('id', getOrderBy())->with('paymentType', 'paymentAccount');
+        $baseQuery = Expense::orderBy('id', getOrderBy())->where('user_id', auth()->id())->with('paymentType', 'paymentAccount');
         $pageTitle = 'Manage Expense';
         $view      = "Template::user.expense.list";
 
@@ -66,6 +66,7 @@ trait ExpenseOperation
             $expense->added_by           = getAdmin('id');
             $message                     = "Expense added successfully";
             $remark                      = "expense-add";
+            $expense->user_id            = auth()->id();
             $expense->payment_type_id    = $request->payment_type;
             $expense->payment_account_id = $request->payment_account;
             $oldExpenseAmount            = 0;
@@ -104,7 +105,7 @@ trait ExpenseOperation
             }
         }
 
-        adminActivity($remark, get_class($expense), $expense->id);
+        // adminActivity($remark, get_class($expense), $expense->id);
         return responseManager("expense", $message, 'success', compact('expense'));
     }
 

@@ -10,9 +10,7 @@ trait DepartmentOperation
 {
     public function list()
     {
-
-        //TODO::user_id add kora lagbe.
-        $baseQuery = Department::searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Department::where('user_id', auth()->id())->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Department';
         $view      = "Template::user.hrm.department.list";
         if (request()->export) {
@@ -27,7 +25,7 @@ trait DepartmentOperation
     public function save(Request $request, $id = 0)
     {
         $request->validate([
-            'name'       => 'required|string|max:40',
+            'name'       => 'required|unique:departments,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:40',
             'company_id' => 'required|exists:companies,id',
         ],
         [
@@ -44,11 +42,12 @@ trait DepartmentOperation
             $remark     = "department-added";
         }
 
+        $department->user_id    = auth()->id();
         $department->name       = $request->name;
         $department->company_id = $request->company_id;
         $department->save();
 
-        adminActivity($remark, get_class($department), $department->id);
+        // adminActivity($remark, get_class($department), $department->id);
         return responseManager("department", $message, 'success', compact('department'));
     }
 

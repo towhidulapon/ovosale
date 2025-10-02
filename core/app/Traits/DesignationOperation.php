@@ -10,7 +10,7 @@ trait DesignationOperation
 {
     public function list()
     {
-        $baseQuery = Designation::searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Designation::where('user_id', auth()->id())->searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Designation';
         $view      = "Template::user.hrm.designation.list";
 
@@ -19,7 +19,7 @@ trait DesignationOperation
         }
 
         $designations = $baseQuery->paginate(getPaginate());
-        $companies    = Company::with('departments')->active()->get();
+        $companies    = Company::where('user_id', auth()->id())->with('departments')->active()->get();
 
         return responseManager("designation", $pageTitle, 'success', compact('designations', 'view', 'pageTitle', 'companies'));
     }
@@ -29,7 +29,7 @@ trait DesignationOperation
     {
         $request->validate(
             [
-                'name'          => 'required|string|max:40',
+                'name'          => 'required|unique:designations,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:40',
                 'company_id'    => 'required|exists:companies,id',
                 'department_id' => 'required|exists:departments,id',
             ],
@@ -49,12 +49,13 @@ trait DesignationOperation
             $remark   = "designation-added";
         }
 
+        $designation->user_id       = auth()->id();
         $designation->name          = $request->name;
         $designation->company_id    = $request->company_id;
         $designation->department_id = $request->department_id;
         $designation->save();
 
-        adminActivity($remark, get_class($designation), $designation->id);
+        // adminActivity($remark, get_class($designation), $designation->id);
         return responseManager("designation", $message, 'success', compact('designation'));
     }
 

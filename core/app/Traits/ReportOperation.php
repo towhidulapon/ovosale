@@ -13,23 +13,21 @@ use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-trait ReportOperation
-{
+trait ReportOperation {
 
-    public function invoiceWiseReport()
-    {
+    public function invoiceWiseReport() {
         $pageTitle = 'Invoice Wise Report';
         $view      = "Template::user.reports.invoice_wise_profit";
 
         $invoicesWise = Sale::query()
             ->with(['customer'])
+            ->where('user_id', auth()->id())
             ->withSum('saleDetails as total_sales_price', DB::raw('sale_price * quantity'))
             ->withSum('saleDetails as total_purchase_price', DB::raw('purchase_price * quantity'))
             ->withSum('saleDetails as gross_profit', DB::raw('(sale_price - purchase_price) * quantity'))
             ->searchable(['invoice_number', 'customer:name'])
             ->dateFilter('sale_date')
             ->paginate(getPaginate());
-
 
         $widget['total_invoices'] = $invoicesWise->count();
         $widget['total_sale']     = $invoicesWise->sum('total_sales_price');
@@ -39,10 +37,7 @@ trait ReportOperation
         return responseManager("invoice_wise_report", $pageTitle, 'success', compact('pageTitle', 'view', 'invoicesWise', 'widget'));
     }
 
-
-
-    public function productWiseReport()
-    {
+    public function productWiseReport() {
         $pageTitle = 'Product Wise Report';
         $view      = "Template::user.reports.product_wise_profit";
 
@@ -58,20 +53,19 @@ trait ReportOperation
             })
             ->paginate(getPaginate());
 
-        $widget['sales_quantity']   = $productsWise->sum('total_sales_quantity');
-        $widget['total_sale']       = $productsWise->sum('total_sales_price');
-        $widget['total_purchase']   = $productsWise->sum('total_purchase_price');
-        $widget['gross_profit']     = $productsWise->sum('gross_profit');
+        $widget['sales_quantity'] = $productsWise->sum('total_sales_quantity');
+        $widget['total_sale']     = $productsWise->sum('total_sales_price');
+        $widget['total_purchase'] = $productsWise->sum('total_purchase_price');
+        $widget['gross_profit']   = $productsWise->sum('gross_profit');
 
         return responseManager("product_wise_report", $pageTitle, 'success', compact('pageTitle', 'view', 'productsWise', 'widget'));
     }
 
-
-    public function saleReport()
-    {
+    public function saleReport() {
         $pageTitle = 'Sales Report';
         $view      = "Template::user.reports.sale";
         $baseQuery = Sale::with("warehouse", "customer")
+            ->where('user_id', auth()->id())
             ->withSum('payments', 'amount')
             ->withSum('saleDetails as total_purchase_value', 'purchase_price')
             ->withCount('saleDetails')
@@ -79,18 +73,16 @@ trait ReportOperation
             ->dateFilter('sale_date')
             ->filter(['customer_id']);
 
-
         $sales = $baseQuery->paginate(getPaginate());
 
         return responseManager("sale_report", $pageTitle, 'success', compact('pageTitle', 'view', 'sales'));
     }
 
-
-    public function purchaseReport()
-    {
+    public function purchaseReport() {
         $pageTitle = 'Purchase Report';
         $view      = "Template::user.reports.purchase";
         $baseQuery = Purchase::with("warehouse", "supplier")
+            ->where('user_id', auth()->id())
             ->withSum('supplierPayments', 'amount')
             ->searchable(["invoice_number"])
             ->dateFilter('purchase_date')
@@ -101,21 +93,24 @@ trait ReportOperation
         return responseManager("purchase_report", $pageTitle, 'success', compact('pageTitle', 'view', 'purchases'));
     }
 
-
-    public function stockReport()
-    {
+    public function stockReport() {
         $pageTitle  = 'Stock Report';
         $view       = "Template::user.reports.stock";
-        $warehouses = Warehouse::orderBy('name')->get();
-        $brands     = Brand::orderBy('name')->get();
-        $categories = Category::orderBy('name')->get();
+        $user       = auth()->user();
+        $warehouses = Warehouse::where('user_id', $user->id)->orderBy('name')->get();
+        $brands     = Brand::where('user_id', $user->id)->orderBy('name')->get();
+        $categories = Category::where('user_id', $user->id)->orderBy('name')->get();
 
-        $selectWarehouse = request()->warehouse_id ?  Warehouse::where('id', request()->warehouse_id)->firstOrFailWithApi('Warehouse') : $warehouses->first();
+        $selectWarehouse = request()->warehouse_id ? Warehouse::where('id', request()->warehouse_id)->firstOrFailWithApi('Warehouse') : $warehouses->first();
 
-        $baseQuery       = ProductDetail::with('product', "product.unit", 'productStock.warehouse')
-            ->withSum(['productStock' => function ($q) use ($selectWarehouse) {
-                $q->where('warehouse_id', $selectWarehouse->id ?? 0);
-            }], 'stock')
+        $baseQuery = ProductDetail::with('product', "product.unit", 'productStock.warehouse')->whereHas('product', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->withSum([
+                'productStock' => function ($q) use ($selectWarehouse) {
+                    $q->where('warehouse_id', $selectWarehouse->id ?? 0);
+                },
+            ], 'stock')
             ->orderBy('product_stock_sum_stock', 'desc');
 
         if (!$selectWarehouse) {
@@ -126,12 +121,11 @@ trait ReportOperation
         return responseManager("stock_report", $pageTitle, 'success', compact('pageTitle', 'view', 'products', 'warehouses', 'brands', 'categories', 'selectWarehouse'));
     }
 
-
-    public function expenseReport()
-    {
+    public function expenseReport() {
         $pageTitle = 'Expense Report';
         $view      = "Template::user.reports.expense";
         $baseQuery = Expense::with("category", 'admin')
+            ->where('user_id', auth()->id())
             ->searchable(["category:name"])
             ->dateFilter('expense_date')
             ->filter(['category_id']);
@@ -141,10 +135,7 @@ trait ReportOperation
         return responseManager("expense_report", $pageTitle, 'success', compact('pageTitle', 'view', 'expenses'));
     }
 
-
-
-    public function transaction(Request $request)
-    {
+    public function transaction(Request $request) {
         $pageTitle = 'Transaction History';
         $baseQuery = Transaction::searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
 
@@ -155,6 +146,5 @@ trait ReportOperation
         }
         $transactions = $baseQuery->with('paymentAccount.paymentType')->paginate(getPaginate());
         return responseManager("transaction_report", $pageTitle, 'success', compact('pageTitle', 'transactions'));
-
     }
 }

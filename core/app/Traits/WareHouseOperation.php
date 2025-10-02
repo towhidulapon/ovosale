@@ -12,7 +12,7 @@ trait WareHouseOperation
 
     public function list()
     {
-        $baseQuery = Warehouse::searchable(['name', 'contact_number'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Warehouse::where('user_id', auth()->id())->searchable(['name', 'contact_number'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Warehouse';
         $view      = "Template::user.warehouse.list";
 
@@ -45,6 +45,9 @@ trait WareHouseOperation
             $remark    = "warehouse-added";
         }
 
+        $user = auth()->user();
+
+        $warehouse->user_id        = $user->id;
         $warehouse->contact_number = $request->contact_number;
         $warehouse->name           = $request->name;
         $warehouse->address        = $request->address;
@@ -53,7 +56,7 @@ trait WareHouseOperation
         $warehouse->postcode       = $request->postcode;
         $warehouse->save();
 
-        adminActivity($remark, get_class($warehouse), $warehouse->id);
+        // adminActivity($remark, get_class($warehouse), $warehouse->id);
 
         return responseManager("warehouse", $message, 'success', compact('warehouse'));
     }
