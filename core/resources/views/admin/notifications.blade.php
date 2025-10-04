@@ -43,18 +43,11 @@
                                 </small>
                             </div>
                             <div class="notification-item__action">
-                                @if ($notification->is_read == Status::YES)
-                                    <button type="button" disabled class="btn btn--success disabled">
-                                        <i class="fa-regular fa-eye"></i>
-                                        @lang('View')
-                                    </button>
-                                @else
-                                    <a href="{{ route('admin.notification.read', $notification->id) }}"
-                                        class="btn btn--success">
-                                        <i class="fa-regular fa-eye"></i>
-                                        @lang('View')
-                                    </a>
-                                @endif
+                                <a href="{{ route('admin.notification.read', $notification->id) }}"
+                                    class="btn btn--success">
+                                    <i class="fa-regular fa-eye"></i>
+                                    @lang('View')
+                                </a>
                                 <button type="button" class="btn  btn--danger  confirmationBtn"
                                     data-question="@lang('Are you sure to delete the notification?')"
                                     data-action="{{ route('admin.notifications.delete.single', $notification->id) }}">

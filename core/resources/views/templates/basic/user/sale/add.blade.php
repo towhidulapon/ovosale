@@ -224,7 +224,7 @@
             </button>
         </x-user.ui.modal.header>
         <x-user.ui.modal.body>
-            <form method="POST" action="{{ route('admin.customer.create') }}?from=pos" class="customer-form">
+            <form method="POST" action="{{ route('user.customer.create') }}?from=pos" class="customer-form">
                 @csrf
                 <div class="row">
                     <div class="form-group col-lg-12">
@@ -310,7 +310,7 @@
                 const $this = $(this);
 
                 $.ajax({
-                    url: "{{ route('admin.sale.store') }}",
+                    url: "{{ route('user.sale.store') }}",
                     method: "POST",
                     data: formData,
                     cache: false,
@@ -582,7 +582,7 @@
 
             $(`select[name=customer_id]`).select2({
                 ajax: {
-                    url: "{{ route('admin.customer.lazy.loading') }}",
+                    url: "{{ route('user.customer.lazy.loading') }}",
                     type: "get",
                     dataType: 'json',
                     delay: 1000,

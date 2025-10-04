@@ -9,6 +9,7 @@ use App\Lib\FormProcessor;
 use App\Lib\GoogleAuthenticator;
 use App\Models\DeviceToken;
 use App\Models\Form;
+use App\Models\ProductDetail;
 use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\SaleDetails;
@@ -17,11 +18,10 @@ use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
-class UserController extends Controller
-{
-    public function home()
-    {
+class UserController extends Controller {
+    public function home() {
         $pageTitle = 'Dashboard';
         $widget             = DashBoardWidgetData::getWidgetData();
         $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity,product_details_id')
@@ -39,15 +39,13 @@ class UserController extends Controller
         return view('Template::user.dashboard', compact('pageTitle', 'widget', 'topSellingProducts', 'recentSales', 'recentPurchases', 'warehouses'));
     }
 
-    public function depositHistory(Request $request)
-    {
+    public function depositHistory(Request $request) {
         $pageTitle = 'Deposit History';
-        $deposits = auth()->user()->deposits()->searchable(['trx'])->with(['gateway'])->orderBy('id','desc')->paginate(getPaginate());
+        $deposits = auth()->user()->deposits()->searchable(['trx'])->with(['gateway'])->orderBy('id', 'desc')->paginate(getPaginate());
         return view('Template::user.deposit_history', compact('pageTitle', 'deposits'));
     }
 
-    public function show2faForm()
-    {
+    public function show2faForm() {
         $ga = new GoogleAuthenticator();
         $user = auth()->user();
         $secret = $ga->createSecret();
@@ -56,14 +54,13 @@ class UserController extends Controller
         return view('Template::user.twofactor', compact('pageTitle', 'secret', 'qrCodeUrl'));
     }
 
-    public function create2fa(Request $request)
-    {
+    public function create2fa(Request $request) {
         $user = auth()->user();
         $request->validate([
             'key' => 'required',
             'code' => 'required',
         ]);
-        $response = verifyG2fa($user,$request->code,$request->key);
+        $response = verifyG2fa($user, $request->code, $request->key);
         if ($response) {
             $user->tsc = $request->key;
             $user->ts = Status::ENABLE;
@@ -76,14 +73,13 @@ class UserController extends Controller
         }
     }
 
-    public function disable2fa(Request $request)
-    {
+    public function disable2fa(Request $request) {
         $request->validate([
             'code' => 'required',
         ]);
 
         $user = auth()->user();
-        $response = verifyG2fa($user,$request->code);
+        $response = verifyG2fa($user, $request->code);
         if ($response) {
             $user->tsc = null;
             $user->ts = Status::DISABLE;
@@ -95,42 +91,84 @@ class UserController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function transactions()
-    {
+    public function saleAndPurchaseChart() {
+        extract(saleAndPurchaseDataForGraph(30));
+
+        $message[] = "Sale and Purchase chart";
+        return jsonResponse(
+            'sale_and_purchase_chart',
+            'success',
+            $message,
+            [
+                'dates'    => $dates,
+                'sales'    => $sales,
+                'purchase' => $purchase,
+            ]
+        );
+    }
+
+    public function lowStockProduct() {
+        if (request()->warehouse_id) {
+            $warehouse = Warehouse::where('user_id', auth()->id())->where('id', request()->warehouse_id)->first();
+        } else {
+            $warehouse = Warehouse::where('user_id', auth()->id())->first();
+        }
+
+        $lowStockProducts = ProductDetail::withSum([
+            'productStock' => function ($q) use ($warehouse) {
+                $q->where('warehouse_id', @$warehouse->id)->select(DB::raw('COALESCE(SUM(stock), 0)'));
+            }
+        ], 'stock')
+            ->when(!$warehouse, function ($q) {
+                return $q->whereRaw('0=1');  //return a empty result if no warehouse
+            })
+            ->whereHas('product', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
+            ->having('product_stock_sum_stock', '<', DB::raw('alert_quantity'))
+            ->with('attribute', "variant", 'product.unit')
+            ->take(5)
+            ->get();
+
+        $message[] = "Low Stock Product";
+
+        return jsonResponse("low_stock_product", "success", $message, [
+            'html' => view('Template::partials.low_stock_product', compact('lowStockProducts'))->render()
+        ]);
+    }
+
+    public function transactions() {
         $pageTitle = 'Transactions';
         $remarks = Transaction::distinct('remark')->orderBy('remark')->get('remark');
 
-        $transactions = Transaction::where('user_id',auth()->id())->searchable(['trx'])->filter(['trx_type','remark'])->orderBy('id','desc')->paginate(getPaginate());
+        $transactions = Transaction::where('user_id', auth()->id())->searchable(['trx'])->filter(['trx_type', 'remark'])->orderBy('id', 'desc')->paginate(getPaginate());
 
-        return view('Template::user.transactions', compact('pageTitle','transactions','remarks'));
+        return view('Template::user.transactions', compact('pageTitle', 'transactions', 'remarks'));
     }
 
-    public function kycForm()
-    {
+    public function kycForm() {
         if (auth()->user()->kv == Status::KYC_PENDING) {
-            $notify[] = ['error','Your KYC is under review'];
+            $notify[] = ['error', 'Your KYC is under review'];
             return to_route('user.home')->withNotify($notify);
         }
         if (auth()->user()->kv == Status::KYC_VERIFIED) {
-            $notify[] = ['error','You are already KYC verified'];
+            $notify[] = ['error', 'You are already KYC verified'];
             return to_route('user.home')->withNotify($notify);
         }
         $pageTitle = 'KYC Form';
-        $form = Form::where('act','kyc')->first();
-        return view('Template::user.kyc.form', compact('pageTitle','form'));
+        $form = Form::where('act', 'kyc')->first();
+        return view('Template::user.kyc.form', compact('pageTitle', 'form'));
     }
 
-    public function kycData()
-    {
+    public function kycData() {
         $user = auth()->user();
         $pageTitle = 'KYC Data';
-        abort_if($user->kv == Status::VERIFIED,403);
-        return view('Template::user.kyc.info', compact('pageTitle','user'));
+        abort_if($user->kv == Status::VERIFIED, 403);
+        return view('Template::user.kyc.info', compact('pageTitle', 'user'));
     }
 
-    public function kycSubmit(Request $request)
-    {
-        $form = Form::where('act','kyc')->firstOrFail();
+    public function kycSubmit(Request $request) {
+        $form = Form::where('act', 'kyc')->firstOrFail();
         $formData = $form->form_data;
         $formProcessor = new FormProcessor();
         $validationRule = $formProcessor->valueValidation($formData);
@@ -138,7 +176,7 @@ class UserController extends Controller
         $user = auth()->user();
         foreach (@$user->kyc_data ?? [] as $kycData) {
             if ($kycData->type == 'file') {
-                fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
+                fileManager()->removeFile(getFilePath('verify') . '/' . $kycData->value);
             }
         }
         $userData = $formProcessor->processFormData($request, $formData);
@@ -147,13 +185,11 @@ class UserController extends Controller
         $user->kv = Status::KYC_PENDING;
         $user->save();
 
-        $notify[] = ['success','KYC data submitted successfully'];
+        $notify[] = ['success', 'KYC data submitted successfully'];
         return to_route('user.home')->withNotify($notify);
-
     }
 
-    public function userData()
-    {
+    public function userData() {
         $user = auth()->user();
 
         if ($user->profile_complete == Status::YES) {
@@ -168,8 +204,7 @@ class UserController extends Controller
         return view('Template::user.user_data', compact('pageTitle', 'user', 'countries', 'mobileCode'));
     }
 
-    public function userDataSubmit(Request $request)
-    {
+    public function userDataSubmit(Request $request) {
 
         $user = auth()->user();
 
@@ -187,7 +222,7 @@ class UserController extends Controller
             'country'      => 'required|in:' . $countries,
             'mobile_code'  => 'required|in:' . $mobileCodes,
             'username'     => 'required|unique:users|min:6',
-            'mobile'       => ['required','regex:/^([0-9]*)$/',Rule::unique('users')->where('dial_code',$request->mobile_code)],
+            'mobile'       => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
         ]);
 
 
@@ -216,8 +251,7 @@ class UserController extends Controller
     }
 
 
-    public function addDeviceToken(Request $request)
-    {
+    public function addDeviceToken(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'token' => 'required',
@@ -242,20 +276,18 @@ class UserController extends Controller
         return ['success' => true, 'message' => 'Token saved successfully'];
     }
 
-    public function downloadAttachment($fileHash)
-    {
+    public function downloadAttachment($fileHash) {
         $filePath = decrypt($fileHash);
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-        $title = slug(gs('site_name')).'- attachments.'.$extension;
+        $title = slug(gs('site_name')) . '- attachments.' . $extension;
         try {
             $mimetype = mime_content_type($filePath);
         } catch (\Exception $e) {
-            $notify[] = ['error','File does not exists'];
+            $notify[] = ['error', 'File does not exists'];
             return back()->withNotify($notify);
         }
         header('Content-Disposition: attachment; filename="' . $title);
         header("Content-Type: " . $mimetype);
         return readfile($filePath);
     }
-
 }

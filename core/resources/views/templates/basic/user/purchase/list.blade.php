@@ -136,7 +136,7 @@
                                                     <x-permission_check permission="view purchase">
                                                         @if ($purchase->attachment)
                                                             <a class="dropdown-list d-block w-100 text-start"
-                                                                href="{{ route('admin.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}">
+                                                                href="{{ route('user.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}">
                                                                 <span class="me-2">
                                                                     <i class="las la-download text--warning"></i>
                                                                 </span>
@@ -288,6 +288,14 @@
     <x-permission_check permission="add purchase">
         <x-user.ui.btn.add href="{{ route('user.purchase.add') }}" text="Add Purchase" />
     </x-permission_check>
+@endpush
+
+@push('script-lib')
+    <script src="{{ asset('assets/global/js/flatpickr.js') }}"></script>
+@endpush
+
+@push('style-lib')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/global/css/flatpickr.min.css') }}">
 @endpush
 
 @push('script')
@@ -530,5 +538,5 @@
 
 
 @push('style-lib')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/css/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset($activeTemplateTrue . 'css/invoice.css') }}">
 @endpush

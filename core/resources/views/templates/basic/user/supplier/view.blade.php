@@ -1,10 +1,10 @@
-@extends('admin.layouts.app')
+@extends($activeTemplate . 'layouts.master')
 @section('panel')
-    @include('admin.supplier.widget')
+    @include('Template::user.supplier.widget')
     <div class="row responsive-row">
         <div class="col-lg-6">
-            <x-admin.ui.card class="h-100">
-                <x-admin.ui.card.header class="d-flex gap-1 flex-wrap justify-content-between align-items-center">
+            <x-user.ui.card class="h-100">
+                <x-user.ui.card.header class="d-flex gap-1 flex-wrap justify-content-between align-items-center">
                     <h4 class="card-title">@lang('Purchase History')</h4>
                     <form method="GET" action="{{ url()->current() }}">
                         <div class="input-group input--group">
@@ -16,18 +16,18 @@
                         </div>
                     </form>
 
-                </x-admin.ui.card.header>
-                <x-admin.ui.card.body class="p-0">
-                    <x-admin.ui.table>
-                        <x-admin.ui.table.header>
+                </x-user.ui.card.header>
+                <x-user.ui.card.body class="p-0">
+                    <x-user.ui.table>
+                        <x-user.ui.table.header>
                             <tr>
                                 <th>@lang('Invoice Number')</th>
                                 <th>@lang('Purchase Date') | @lang('Created at')</th>
                                 <th>@lang('Total Amount')</th>
                                 <th>@lang('Status')</th>
                             </tr>
-                        </x-admin.ui.table.header>
-                        <x-admin.ui.table.body>
+                        </x-user.ui.table.header>
+                        <x-user.ui.table.body>
                             @forelse($purchases as $purchase)
                                 <tr>
                                     <td>
@@ -45,22 +45,22 @@
                                     <td>@php echo $purchase->statusBadge @endphp</td>
                                 </tr>
                             @empty
-                                <x-admin.ui.table.empty_message />
+                                <x-user.ui.table.empty_message />
                             @endforelse
-                        </x-admin.ui.table.body>
-                    </x-admin.ui.table>
+                        </x-user.ui.table.body>
+                    </x-user.ui.table>
                     @if ($purchases->hasPages())
                         <div class="p-3">
                             {{ paginateLinks($purchases) }}
                         </div>
                     @endif
-                </x-admin.ui.card.body>
-            </x-admin.ui.card>
+                </x-user.ui.card.body>
+            </x-user.ui.card>
         </div>
 
         <div class="col-lg-6">
-            <x-admin.ui.card class="h-100">
-                <x-admin.ui.card.header class="d-flex gap-1 flex-wrap justify-content-between align-items-center">
+            <x-user.ui.card class="h-100">
+                <x-user.ui.card.header class="d-flex gap-1 flex-wrap justify-content-between align-items-center">
                     <h4 class="card-title">@lang('Payment History')</h4>
                     <form method="GET" action="{{ url()->current() }}">
                         <div class="input-group input--group">
@@ -72,17 +72,17 @@
                         </div>
                     </form>
 
-                </x-admin.ui.card.header>
-                <x-admin.ui.card.body :paddingZero=true>
-                    <x-admin.ui.table>
-                        <x-admin.ui.table.header>
+                </x-user.ui.card.header>
+                <x-user.ui.card.body :paddingZero=true>
+                    <x-user.ui.table>
+                        <x-user.ui.table.header>
                             <tr>
                                 <th>@lang('Payment Date') | @lang('Created at')</th>
                                 <th>@lang('Amount')</th>
                                 <th>@lang('Payment Method')</th>
                             </tr>
-                        </x-admin.ui.table.header>
-                        <x-admin.ui.table.body>
+                        </x-user.ui.table.header>
+                        <x-user.ui.table.body>
                             @forelse($payments as $payment)
                                 <tr>
                                     <td>
@@ -96,30 +96,30 @@
                                     <td>{{ @$payment->paymentType->name }}</td>
                                 </tr>
                             @empty
-                                <x-admin.ui.table.empty_message />
+                                <x-user.ui.table.empty_message />
                             @endforelse
-                        </x-admin.ui.table.body>
-                    </x-admin.ui.table>
+                        </x-user.ui.table.body>
+                    </x-user.ui.table>
                     @if ($payments->hasPages())
                         <div class="p-3">
                             {{ paginateLinks($payments) }}
                         </div>
                     @endif
-                </x-admin.ui.card.body>
-            </x-admin.ui.card>
+                </x-user.ui.card.body>
+            </x-user.ui.card>
         </div>
     </div>
 
 
 
-    <x-admin.ui.modal id="payment-modal" class="modal-xl">
-        <x-admin.ui.modal.header>
+    <x-user.ui.modal id="payment-modal" class="modal-xl">
+        <x-user.ui.modal.header>
             <h4 class="modal-title">@lang('Add Payment')</h4>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
                 <i class="las la-times"></i>
             </button>
-        </x-admin.ui.modal.header>
-        <x-admin.ui.modal.body>
+        </x-user.ui.modal.header>
+        <x-user.ui.modal.body>
             <form action="{{ route('admin.supplier.add.payment', $supplier->id) }}" method="POST">
                 @csrf
                 <div class="row gy-4">
@@ -175,20 +175,20 @@
                     </div>
                     <div class="col-12">
                         <div class="mb-3">
-                            <x-admin.ui.btn.modal />
+                            <x-user.ui.btn.modal />
                         </div>
                     </div>
                 </div>
             </form>
-        </x-admin.ui.modal.body>
-    </x-admin.ui.modal>
+        </x-user.ui.modal.body>
+    </x-user.ui.modal>
 @endsection
 
 
 @push('breadcrumb-plugins')
     <div class="d-flex gap-2">
         <x-permission_check permission="add purchase payment">
-            <x-admin.ui.btn.add data-bs-toggle="modal" data-bs-target="#payment-modal" text="Add Payment" />
+            <x-user.ui.btn.add data-bs-toggle="modal" data-bs-target="#payment-modal" text="Add Payment" />
         </x-permission_check>
         <x-back_btn route="{{ route('admin.supplier.list') }}" />
     </div>

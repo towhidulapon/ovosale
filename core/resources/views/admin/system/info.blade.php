@@ -25,7 +25,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap ps-0">
                             <span class="flex-align gap-2">
-                                <i class="fa fa-copyright"></i>
+                                <x-admin.svg.ovo />
                                 <span class="text--secondary">@lang('OvoPanel Version')</span>
                             </span>
                             <span class="fw-500">{{ $systemDetails['admin_panel_version'] }}</span>
@@ -50,6 +50,19 @@
                                 <span class="text--secondary">@lang('Default Language')</span>
                             </span>
                             <span class="fw-500">{{ config('app.locale') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap ps-0">
+                            <span class="flex-align gap-2">
+                                <x-admin.svg.maintaince />
+                                <span class="text--secondary">@lang('Maintenance Mode')</span>
+                            </span>
+                            <span class="fw-500">
+                                @if (gs('maintenance_mode') == Status::ENABLE)
+                                    <span class="text--warning">@lang('Enable')</span>
+                                @else
+                                    <span class="text--success">@lang('Disable')</span>
+                                @endif
+                            </span>
                         </li>
                     </ul>
                 </x-admin.ui.card.body>

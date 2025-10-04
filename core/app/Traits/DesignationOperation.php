@@ -6,11 +6,11 @@ use App\Models\Company;
 use App\Models\Designation;
 use Illuminate\Http\Request;
 
-trait DesignationOperation
-{
-    public function list()
-    {
-        $baseQuery = Designation::where('user_id', auth()->id())->searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
+trait DesignationOperation {
+    public function list() {
+        $baseQuery = Designation::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Designation';
         $view      = "Template::user.hrm.designation.list";
 
@@ -19,14 +19,18 @@ trait DesignationOperation
         }
 
         $designations = $baseQuery->paginate(getPaginate());
-        $companies    = Company::where('user_id', auth()->id())->with('departments')->active()->get();
+        $companies    = Company::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })
+            ->with('departments')
+            ->active()
+            ->get();
 
         return responseManager("designation", $pageTitle, 'success', compact('designations', 'view', 'pageTitle', 'companies'));
     }
 
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $request->validate(
             [
                 'name'          => 'required|unique:designations,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:40',
@@ -49,7 +53,6 @@ trait DesignationOperation
             $remark   = "designation-added";
         }
 
-        $designation->user_id       = auth()->id();
         $designation->name          = $request->name;
         $designation->company_id    = $request->company_id;
         $designation->department_id = $request->department_id;
@@ -59,8 +62,7 @@ trait DesignationOperation
         return responseManager("designation", $message, 'success', compact('designation'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return Designation::changeStatus($id);
     }
 }

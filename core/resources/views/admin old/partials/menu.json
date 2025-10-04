@@ -1,0 +1,489 @@
+{
+    "main": [
+        {
+            "keyword": [
+                "Dashboard",
+                "Home",
+                "Panel",
+                "Admin",
+                "Control center",
+                "Overview",
+                "Main hub",
+                "Management hub",
+                "Administrative hub",
+                "Central hub",
+                "Command center",
+                "Administrator portal",
+                "Centralized interface",
+                "Admin console",
+                "Management dashboard",
+                "Main screen",
+                "Administrative dashboard",
+                "Command dashboard",
+                "Main control panel"
+            ],
+            "title": "Dashboard",
+            "icon": "las la-tachometer-alt",
+            "route_name": "admin.dashboard",
+            "permission": [
+                "view dashboard"
+            ]
+        },
+        {
+            "title": "Manage Users",
+            "icon": "las la-user-friends",
+            "counters": [
+                "bannedUsersCount",
+                "emailUnverifiedUsersCount",
+                "mobileUnverifiedUsersCount",
+                "kycUnverifiedUsersCount",
+                "kycPendingUsersCount"
+            ],
+            "menu_active": "admin.users*",
+            "permission": [
+                "view user",
+                "update user"
+            ],
+            "submenu": [
+                {
+                    "keyword": [
+                        "active users",
+                        "Manage Users",
+                        "User management",
+                        "User control",
+                        "User status",
+                        "User activity",
+                        "User analytics"
+                    ],
+                    "title": "Active Users",
+                    "route_name": "admin.users.active",
+                    "menu_active": "admin.users.active",
+                    "permission": ["view user" ]
+                },
+                {
+                    "keyword": [
+                        "banned users",
+                        "Manage Users",
+                        "User management",
+                        "Account bans",
+                        "User activity"
+                    ],
+                    "title": "Banned Users",
+                    "route_name": "admin.users.banned",
+                    "menu_active": "admin.users.banned",
+                    "counter": "bannedUsersCount",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "email unverified users",
+                        "Manage Users",
+                        "User verification",
+                        "User authentication",
+                        "User management"
+                    ],
+                    "title": "Email Unverified",
+                    "route_name": "admin.users.email.unverified",
+                    "menu_active": "admin.users.email.unverified",
+                    "counter": "emailUnverifiedUsersCount",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "mobile unverified users",
+                        "Manage Users",
+                        "User verification",
+                        "User authentication",
+                        "User management"
+                    ],
+                    "title": "Mobile Unverified",
+                    "route_name": "admin.users.mobile.unverified",
+                    "menu_active": "admin.users.mobile.unverified",
+                    "counter": "mobileUnverifiedUsersCount",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "kyc unverified users",
+                        "Manage Users",
+                        "User verification",
+                        "User authentication",
+                        "User management"
+                    ],
+                    "title": "KYC Unverified",
+                    "route_name": "admin.users.kyc.unverified",
+                    "menu_active": "admin.users.kyc.unverified",
+                    "counter": "kycUnverifiedUsersCount",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "kyc pending users",
+                        "Manage Users",
+                        "User verification",
+                        "User authentication",
+                        "User management"
+                    ],
+                    "title": "KYC Pending",
+                    "route_name": "admin.users.kyc.pending",
+                    "menu_active": "admin.users.kyc.pending",
+                    "counter": "kycPendingUsersCount",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "with balance users",
+                        "Manage Users",
+                        "User management",
+                        "User activity",
+                        "Account management"
+                    ],
+                    "title": "With Balance",
+                    "route_name": "admin.users.with.balance",
+                    "menu_active": "admin.users.with.balance",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "all users users",
+                        "Manage Users",
+                        "User management",
+                        "User control",
+                        "User activity",
+                        "User analytics"
+                    ],
+                    "title": "All Users",
+                    "route_name": "admin.users.all",
+                    "menu_active": "admin.users.all",
+                    "permission": ["view user"]
+                },
+                {
+                    "keyword": [
+                        "send notification users",
+                        "Manage Users",
+                        "User notifications",
+                        "User management",
+                        "User activity"
+                    ],
+                    "title": "Send Notification",
+                    "route_name": "admin.users.notification.all",
+                    "menu_active": "admin.users.notification.all",
+                    "permission": ["view user"]
+                }
+            ]
+        }
+    ],
+    "administrations": [
+        {
+            "title": "Manage Admin",
+            "icon": "la la-user-circle",
+            "menu_active": "admin.list",
+            "route_name": "admin.list",
+            "permission": [
+                "view admin",
+                "add admin",
+                "edit admin",
+                "export admin",
+                "trash admin"
+            ]
+        },
+        {
+            "title": "Role & Permissions",
+            "icon": "las la-user-tag",
+            "menu_active": "admin.role.*",
+            "route_name": "admin.role.list",
+            "permission": [
+                "view role",
+                "add role",
+                "edit role",
+                "trash role",
+                "assign permission"
+            ]
+        }
+    ],
+    "utilities": [
+        {
+            "title": "Manage Extension",
+            "icon": "las la-puzzle-piece",
+            "route_name": "admin.extensions.index",
+            "menu_active": "admin.extensions.index",
+            "keyword": [
+                "extensions",
+                "plugins",
+                "addons",
+                "extension settings",
+                "plugin settings",
+                "addon settings",
+                "captcha",
+                "custom captcha",
+                "google captcha",
+                "recaptcha",
+                "re-captcha",
+                "re captcha",
+                "tawk",
+                "tawk.to",
+                "tawk to",
+                "analytics",
+                "google analytics",
+                "facebook comment"
+            ],
+            "permission": [
+                "manage extension"
+            ]
+        },
+        {
+            "title": "Manage Language",
+            "icon": "las la-language",
+            "route_name": "admin.language.manage",
+            "menu_active": "admin.language.*",
+            "keyword": [
+                "language",
+                "localize",
+                "translation",
+                "translate",
+                "internationalization",
+                "language settings",
+                "localization settings",
+                "translation settings",
+                "configure languages",
+                "configure localization"
+            ],
+            "permission": [
+                "manage language"
+            ]
+        }
+    ],
+    "settings": [
+        {
+            "title": "Manage Setting",
+            "icon": "las la-cog",
+            "menu_active": [
+                "admin.setting.general",
+                "admin.setting.prefix",
+                "admin.setting.company",
+                "admin.setting.brand",
+                "admin.setting.pwa"
+            ],
+            "permission": [
+                "general setting",
+                "prefix setting",
+                "company setting",
+                "brand setting",
+                "pwa setting"
+            ],
+            "submenu": [
+                {
+                    "title": "General Setting",
+                    "route_name": "admin.setting.general",
+                    "menu_active": "admin.setting.general",
+                    "keyword": [
+                        "general",
+                        "fundamental",
+                        "site information",
+                        "site",
+                        "website settings",
+                        "basic settings",
+                        "global settings",
+                        "timezone",
+                        "site currency",
+                        "pagination",
+                        "currency format",
+                        "site title",
+                        "paginate"
+                    ],
+                    "permission": [
+                        "general setting"
+                    ]
+                },
+                {
+                    "title": "Prefix Settings",
+                    "route_name": "admin.setting.prefix",
+                    "menu_active": "admin.setting.prefix",
+                    "keyword": [
+                        "prefix",
+                        "purchase prefix number",
+                        "sale prefix number",
+                        "product prefix number",
+                        "supplier id prefix",
+                        "customer id prefix"
+                    ],
+                    "permission": [
+                        "prefix setting"
+                    ]
+                },
+                {
+                    "title": "Company Setting",
+                    "route_name": "admin.setting.company",
+                    "menu_active": "admin.setting.company",
+                    "permission": [
+                        "company setting"
+                    ],
+                    "keyword": [
+                        "company setting",
+                        "company name",
+                        "company email",
+                        "company phone",
+                        "company address"
+                    ]
+                },
+                {
+                    "title": "Brand Setting",
+                    "route_name": "admin.setting.brand",
+                    "menu_active": "admin.setting.brand",
+                    "keyword": [
+                        "branding",
+                        "brand setting",
+                        "identity",
+                        "logo upload",
+                        "site branding",
+                        "brand identity",
+                        "favicon",
+                        "website icon",
+                        "website favicon",
+                        "website logo"
+                    ],
+                    "permission": [
+                        "brand setting"
+                    ]
+                },
+                {
+                    "title": "PWA Setting",
+                    "route_name": "admin.setting.pwa",
+                    "menu_active": "admin.setting.pwa",
+                    "keyword": [
+                        "pwa",
+                        "pwa setting",
+                        "pwa configuration"
+                    ],
+                    "permission": [
+                        "brand setting"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "System Configuration",
+            "icon": "las la-tools",
+            "route_name": "admin.setting.system.configuration",
+            "menu_active": "admin.setting.system.configuration",
+            "keyword": [
+                "basic modules",
+                "control",
+                "modules",
+                "system",
+                "configuration settings",
+                "system control",
+                "force ssl",
+                "force secure password",
+                "kyc control",
+                "email control",
+                "sms control",
+                "verification control",
+                "push notification control",
+                "language control",
+                "mobile verification",
+                "email verification"
+            ],
+            "permission": [
+                "system configuration"
+            ]
+        },
+        {
+            "title": "Notification Setting",
+            "icon": "las la-bell",
+            "menu_active": "admin.setting.notification.*",
+            "permission": [
+                "notification setting"
+            ],
+            "submenu": [
+                {
+                    "title": "Global Template",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.setting.notification.global.email",
+                    "menu_active": "admin.setting.notification.global.*",
+                    "permission": [
+                        "notification setting"
+                    ],
+                    "keyword": [
+                        "email configuration",
+                        "email setting",
+                        "email template",
+                        "global template",
+                        "global notification"
+                    ]
+                },
+                {
+                    "title": "Email Setting",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.setting.notification.email",
+                    "menu_active": "admin.setting.notification.email",
+                    "permission": [
+                        "notification setting"
+                    ],
+                    "keyword": [
+                        "email configuration",
+                        "email setting",
+                        "smtp",
+                        "sendgrid",
+                        "send grid",
+                        "mailjet",
+                        "mail jet",
+                        "php"
+                    ]
+                },
+                {
+                    "title": "SMS Setting",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.setting.notification.sms",
+                    "menu_active": "admin.setting.notification.sms",
+                    "permission": [
+                        "notification setting"
+                    ],
+                    "keyword": [
+                        "sms configure",
+                        "sms setting",
+                        "sms template",
+                        "sms broadcast",
+                        "nexmo",
+                        "clickatell",
+                        "infobip",
+                        "message bird",
+                        "twilio",
+                        "text magic",
+                        "custom api"
+                    ]
+                },
+                {
+                    "title": "Notification Templates",
+                    "icon": "las la-dot-circle",
+                    "route_name": "admin.setting.notification.templates",
+                    "menu_active": "admin.setting.notification.templates",
+                    "permission": [
+                        "notification setting"
+                    ],
+                    "keyword": [
+                        "email template",
+                        "sms template",
+                        "push notification template",
+                        "notification template",
+                        "template setting",
+                        "global template",
+                        "global notification",
+                        "custom api"
+                    ]
+                }
+            ]
+        }
+    ],
+    "other": [
+        {
+            "title": "Application Information",
+            "icon": "las la-folder-plus",
+            "route_name": "admin.system.info",
+            "menu_active": "admin.system.info",
+            "permission": [
+                "application information"
+            ]
+        }
+    ]
+}

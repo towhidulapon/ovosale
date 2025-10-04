@@ -41,12 +41,11 @@
                             @endforeach
                         </select>
                     </div>
-                  
+
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label>@lang('Currency')</label>
-                            <input class="form-control" type="text" name="cur_text" required
-                                value="{{ gs('cur_text') }}">
+                            <input class="form-control" type="text" name="cur_text" required value="{{ gs('cur_text') }}">
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -121,32 +120,32 @@
 @endpush
 
 @push('style-lib')
-    <link rel = "stylesheet" href = "{{ asset('assets/admin/css/spectrum.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/spectrum.css') }}">
 @endpush
 
 @push('script')
     <script>
         "use strict";
-        (function($) {
+        (function ($) {
             $('.colorPicker').spectrum({
                 color: $(this).data('color'),
-                change: function(color) {
+                change: function (color) {
                     changeColor($(this), color.toHexString())
                 }
             });
 
-            $('.colorCode').on('input', function() {
+            $('.colorCode').on('input', function () {
                 var clr = $(this).val();
                 $(this).closest('.form-group').find('.colorPicker').spectrum({
                     color: clr,
-                    change: function(color) {
+                    change: function (color) {
                         changeColor($(this), color.toHexString());
                     }
                 });
                 changeColor($(this), `#${clr}`)
             });
 
-            $.each($('.colorCode'), function(i, element) {
+            $.each($('.colorCode'), function (i, element) {
                 const $element = $(element);
                 const colorCode = `#${$element.val()}`;
                 changeColor($element, colorCode);

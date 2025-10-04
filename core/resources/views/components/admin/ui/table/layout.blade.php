@@ -4,13 +4,12 @@
     'renderFilterOption' => true,
     'filterBoxLocation' => null,
     'searchPlaceholder' => 'Search here',
-    'hasRecycleBin' => true,
 ])
 
 <div class="table-layout">
     @if ($renderTableFilter)
         <x-admin.ui.table.filter :renderExportButton=$renderExportButton :renderFilterOption=$renderFilterOption
-            :searchPlaceholder=$searchPlaceholder :filterBoxLocation="$filterBoxLocation" :hasRecycleBin="$hasRecycleBin" />
+            :searchPlaceholder=$searchPlaceholder :filterBoxLocation=$filterBoxLocation />
     @endif
     {{ $slot }}
 </div>

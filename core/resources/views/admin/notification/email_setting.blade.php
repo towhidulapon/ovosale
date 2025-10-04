@@ -126,8 +126,8 @@
     </x-admin.ui.modal>
 @endsection
 @push('breadcrumb-plugins')
-    <button type="button" data-bs-target="#testMailModal" data-bs-toggle="modal" class="btn  btn--primary"><i
-            class="fa-regular fa-paper-plane"></i> @lang('Send Test Mail')</button>
+    <button type="button" data-bs-target="#testMailModal" data-bs-toggle="modal"
+        class="btn  btn--primary"><i class="fa-regular fa-paper-plane"></i> @lang('Send Test Mail')</button>
 @endpush
 
 @push('script')

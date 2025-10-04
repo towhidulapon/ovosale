@@ -1,11 +1,11 @@
-<x-admin.ui.modal id="shortcut-modal">
-    <x-admin.ui.modal.header>
+<x-user.ui.modal id="shortcut-modal">
+    <x-user.ui.modal.header>
         <h4 class="modal-title">@lang('Keyboard Shortcut')</h4>
         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
             <i class="las la-times"></i>
         </button>
-    </x-admin.ui.modal.header>
-    <x-admin.ui.modal.body>
+    </x-user.ui.modal.header>
+    <x-user.ui.modal.body>
         <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex gap-2 justify-content-between flex-wrap">
                 <span>@lang('Open Calculator')</span>
@@ -98,8 +98,8 @@
                 </span>
             </li>
         </ul>
-    </x-admin.ui.modal.body>
-</x-admin.ui.modal>
+    </x-user.ui.modal.body>
+</x-user.ui.modal>
 
 @push('script')
     <script>

@@ -25,7 +25,7 @@
                         <div class="mb-3">
                             <p>{{ __($language->info) }}</p>
                         </div>
-                        <div class="btn--group justify-content-start">
+                        <div class="btn--group">
                             <a href="{{ route('admin.language.key', $language->id) }}" class="btn  btn-outline--success">
                                 <i class="la la-language"></i> @lang('Translate')
                             </a>
@@ -173,11 +173,11 @@
             });
 
             $('.copyBtn').on('click', function() {
-                const $this = $(this);
+                const $this     = $(this);
                 const $textArea = $(".langKeys");
-                const textArea = $textArea[0];
-                const copyText = $textArea.text();
-                const oldHtml = $this.html();
+                const textArea  = $textArea[0];
+                const copyText  = $textArea.text();
+                const oldHtml   = $this.html();
 
                 textArea.select();
                 textArea.setSelectionRange(0, 99999);

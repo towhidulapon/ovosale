@@ -14,6 +14,7 @@
             <strong class="d-block">
                 {{ __(@$user->fullname) }}
             </strong>
+            <a class="fs-13" href="{{ route('admin.users.detail', $user->id) }}">{{ @$user->username }}</a>
         </div>
     </div>
 @else

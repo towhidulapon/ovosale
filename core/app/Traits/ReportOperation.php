@@ -118,13 +118,14 @@ trait ReportOperation {
         }
 
         $products = $baseQuery->searchable(['product:name', 'sku'])->filter(['product:brand_id', 'product:category_id'])->paginate(getPaginate());
+
         return responseManager("stock_report", $pageTitle, 'success', compact('pageTitle', 'view', 'products', 'warehouses', 'brands', 'categories', 'selectWarehouse'));
     }
 
     public function expenseReport() {
         $pageTitle = 'Expense Report';
         $view      = "Template::user.reports.expense";
-        $baseQuery = Expense::with("category", 'admin')
+        $baseQuery = Expense::with("category")
             ->where('user_id', auth()->id())
             ->searchable(["category:name"])
             ->dateFilter('expense_date')

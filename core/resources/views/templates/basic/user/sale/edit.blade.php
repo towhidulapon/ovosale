@@ -1,11 +1,11 @@
-@extends('admin.layouts.app')
+@extends($activeTemplate . 'layouts.master')
 @section('panel')
     <form method="POST" class="sale-form no-submit-loader">
         @csrf
         <div class="row  responsive-row">
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.body>
+                <x-user.ui.card>
+                    <x-user.ui.card.body>
                         <div class="row">
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Sale Date')</label>
@@ -43,15 +43,15 @@
                                 </select>
                             </div>
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Search Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group position-relative">
                             <div class="input-group input--group">
                                 <input type="text" class="form-control product-search-input"
@@ -60,17 +60,17 @@
                                     <i class="las la-barcode"></i>
                                 </span>
                             </div>
-                            <x-admin.other.product_search />
+                            <x-user.other.product_search />
                         </div>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-12">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Selected Product')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body class="p-0">
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body class="p-0">
                         <div class="table-responsive--md  table-responsive">
                             <table class="product-table table">
                                 <thead>
@@ -149,7 +149,7 @@
                                                     </span>
                                                     <input type="number" step="any"
                                                         class="form-control  discount-value"
-                                                        name="sale_details[{{ $saleDetails->product_details_id }}][discount]"
+                                                        name="sale_details[{{ $saleDetails->product_details_id }}][discount_value]"
                                                         value="{{ getAmount($saleDetails->discount_value) }}">
                                                 </div>
                                             </td>
@@ -180,7 +180,7 @@
                                                     <button type="button"
                                                         class="input-group-text btn btn--danger confirmationBtn"
                                                         data-question="@lang('Are you sure to remove this item')?"
-                                                        data-action="{{ route('admin.sale.remove.single.item', $saleDetails->id) }}">
+                                                        data-action="{{ route('user.sale.remove.single.item', $saleDetails->id) }}">
                                                         <i class="las la-times"></i>
                                                     </button>
                                                 </div>
@@ -191,18 +191,18 @@
                             </table>
                         </div>
 
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             @php
-                $paymentsCount = $sale->payments->count();
+$paymentsCount = $sale->payments->count();
             @endphp
             <div class="col-lg-6">
-                <x-admin.ui.card class="h-100">
-                    <x-admin.ui.card.header>
+                <x-user.ui.card class="h-100">
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Payment Information')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         @foreach ($sale->payments as $payment)
                             <div class="mb-4">
                                 <div class="row gy-4">
@@ -250,15 +250,15 @@
                                 <hr>
                             @endif
                         @endforeach
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
             </div>
             <div class="col-lg-6">
-                <x-admin.ui.card>
-                    <x-admin.ui.card.header>
+                <x-user.ui.card>
+                    <x-user.ui.card.header>
                         <h4 class="card-title">@lang('Sale Summary')</h4>
-                    </x-admin.ui.card.header>
-                    <x-admin.ui.card.body>
+                    </x-user.ui.card.header>
+                    <x-user.ui.card.body>
                         <div class="form-group">
                             <label>@lang('Sale Discount')</label>
                             <div class="input-group input--group">
@@ -322,8 +322,8 @@
                                 </span>
                             </li>
                         </ul>
-                    </x-admin.ui.card.body>
-                </x-admin.ui.card>
+                    </x-user.ui.card.body>
+                </x-user.ui.card>
                 <div class="d-flex gap-3 flex-wrap justify-content-end mt-3">
                     <button class="btn btn--success btn-large only-save" type="button">
                         <span class="me-1"><i class="fa-regular fa-paper-plane"></i></span>
@@ -376,7 +376,7 @@
                 formData.append('invoice_type', 'regular');
                 const $this = $(this);
                 $.ajax({
-                    url: "{{ route('admin.sale.update', $sale->id) }}",
+                    url: "{{ route('user.sale.update', $sale->id) }}",
                     method: "POST",
                     data: formData,
                     cache: false,
@@ -433,7 +433,7 @@
 
                 /**
                  * Generates an HTML row for a product in a table layout.
-                 * 
+                 *
                  * @param {object} productDetail - Details about the specific product variant (e.g., ID, SKU, final price).
                  * @param {object} product - The main product object containing general details (e.g., image, name).
                  * @returns {string} A `<tr>` element containing product image, name, SKU, and quantity input field.
@@ -451,14 +451,14 @@
                                 <span class="d-block">${product.name}</span>
                                 <span class="d-block"><strong class="product-code">${productDetail.sku}</strong></span>
                                 <span class="d-block">
-                                    @lang('In Stock'): 
+                                    @lang('In Stock'):
                                     <span class="in-stock">${product.in_stock}</span>
                                     <span class="unit-name">${product.unit_name}</span>
                                 </span>
                                 <input name="sale_details[${product.id}][product_id]" value="${productDetail.product_id}" type="hidden" />
                                 <input name="sale_details[${product.id}][product_detail_id]" value="${productDetail.id}" type="hidden" />
-                                
-                            </td>  
+
+                            </td>
                             <td>
                                 <div class="input-group input--group">
                                     <span class="input-group-text">{{ gs('cur_sym') }}</span>
@@ -510,7 +510,7 @@
 
                 /**
                  * Generates an HTML row for a product empty layout.
-                 * 
+                 *
                  * @returns {string} A `<tr>` element containing product image, name, SKU, and quantity input field.
                  *                  Returns an empty string if the product ID is already in `selectedProductIds`.
                  */
@@ -631,8 +631,8 @@
                 const accounts                 = $(this).find('option:selected').data('payment-account');
                 const selectedPaymentAccountId = $(this).find('option:selected').data('payment-account-id');
 
-               
-                
+
+
                 let   html     = ``;
                 if(accounts && accounts.length > 0){
                     accounts.forEach(account => {
@@ -644,7 +644,7 @@
                     html+=`<option selected disabled value="">@lang('No Account F')</option>`
                 }
                 $('.payment-account').html(html).trigger('change');
-                
+
             }).change();
 
         })(jQuery);
@@ -657,12 +657,12 @@
 
 @push('style-lib')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/global/css/flatpickr.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/css/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset($activeTemplateTrue . '/css/invoice.css') }}">
 @endpush
 
 
 @push('breadcrumb-plugins')
-    <a class="btn btn--primary" href="{{ route('admin.sale.list') }}">
+    <a class="btn btn--primary" href="{{ route('user.sale.list') }}">
         <i class="las la-list me-1"></i>@lang('Sale List')
     </a>
 @endpush

@@ -1,4 +1,3 @@
-
 <div class="table-header">
     <div class="table-search">
         <input form="filter-form" type="search" name="search" placeholder="{{ $searchPlaceholder }}"
@@ -11,9 +10,6 @@
         @endif
         @if ($renderFilterOption)
             <x-admin.ui.table.filter_box :filterBoxLocation=$filterBoxLocation />
-        @endif
-        @if ($hasRecycleBin)
-            <x-admin.ui.table.recycle_bin_btn />
         @endif
     </div>
 </div>

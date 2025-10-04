@@ -8,26 +8,25 @@ use App\Models\LeaveType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-trait LeaveRequestOperation
-{
-    public function list()
-    {
-        $baseQuery = LeaveRequest::where('user_id', auth()->id())->searchable(['employee:name','leaveType:name'])->with( 'employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
+trait LeaveRequestOperation {
+    public function list() {
+        $baseQuery = LeaveRequest::where('user_id', auth()->id())->searchable(['employee:name', 'leaveType:name'])->with('employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Request';
         $view      = "Template::user.hrm.leave.request.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "LeaveRequest", "A4 landscape");
         }
         $requests    = $baseQuery->paginate(getPaginate());
-        $employees   = Employee::where('user_id', auth()->id())->active()->get();
+        $employees   = Employee::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->active()->get();
         $types       = LeaveType::where('user_id', auth()->id())->active()->get();
 
         return responseManager("leave_request", $pageTitle, 'success', compact('requests', 'view', 'pageTitle', 'employees', 'types'));
     }
 
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
 
         $request->validate(
             [
@@ -81,8 +80,7 @@ trait LeaveRequestOperation
         return responseManager("leave_request", $message, 'success', compact('leaveRequest'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return LeaveRequest::changeStatus($id);
     }
 }

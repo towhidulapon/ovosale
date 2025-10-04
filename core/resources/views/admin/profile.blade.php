@@ -33,15 +33,6 @@
                                 <span class="text--info">{{ diffForHumans($admin->created_at) }}</span>
                             </span>
                         </li>
-
-                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
-                            <span class=" text-muted"><i class="las la-clock"></i> @lang('Role')</span>
-                            <span class="text-end">
-                                @foreach ($admin->getRoleNames() as $role)
-                                    <span class="badge badge--success">{{ __($role) }}</span>
-                                @endforeach
-                            </span>
-                        </li>
                     </ul>
                 </x-admin.ui.card.body>
             </x-admin.ui.card>
@@ -84,11 +75,9 @@
             data-bs-target="#profileModal">
             <i class="la la-pencil"></i> @lang('Edit')
         </button>
-        <x-permission_check permission="view dashboard">
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline--dark flex-fill">
-                <i class="las la-tachometer-alt"></i> @lang('Dashboard')
-            </a>
-        </x-permission_check>
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline--dark flex-fill">
+            <i class="las la-tachometer-alt"></i> @lang('Dashboard')
+        </a>
     </div>
 @endpush
 
@@ -100,7 +89,6 @@
             border-radius: 50%;
             margin: 0 auto;
         }
-
         .admin-profile-image img {
             margin: 0 auto;
             border-radius: 100%;

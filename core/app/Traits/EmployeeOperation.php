@@ -7,11 +7,16 @@ use App\Models\Employee;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
-trait EmployeeOperation
-{
-    public function list()
-    {
-        $baseQuery = Employee::where('user_id', auth()->id())->searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])->with('company', 'department', 'designation')->orderBy('id', getOrderBy())->trashFilter();
+trait EmployeeOperation {
+    public function list() {
+        $baseQuery = Employee::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })
+            ->searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])
+            ->with('company', 'department', 'designation')
+            ->orderBy('id', getOrderBy())
+            ->trashFilter();
+
         $pageTitle = 'Manage Employee';
         $view      = "Template::user.hrm.employee.list";
         if (request()->export) {
@@ -22,8 +27,7 @@ trait EmployeeOperation
         return responseManager("employee", $pageTitle, 'success', compact('employees', 'view', 'pageTitle', 'companies'));
     }
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $request->validate(
             [
                 'name'           => 'required|string|max:40',
@@ -74,7 +78,6 @@ trait EmployeeOperation
             }
         }
 
-        $employee->user_id        = auth()->id();
         $employee->name           = $request->name;
         $employee->gender         = $request->gender;
         $employee->dob            = $request->dob;
@@ -91,8 +94,7 @@ trait EmployeeOperation
         return responseManager("employee", $message, 'success', compact('employee'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return Employee::changeStatus($id);
     }
 }

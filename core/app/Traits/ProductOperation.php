@@ -47,7 +47,7 @@ trait ProductOperation
     {
         $pageTitle = "Edit Product";
         $view      = "Template::user.product.edit";
-        $product   = Product::with('details.attribute', 'details.variant', 'details', 'details.tax')->where('id', $id)->firstOrFailWithApi('product');
+        $product   = Product::where('user_id', auth()->id())->with('details.attribute', 'details.variant', 'details', 'details.tax')->where('id', $id)->firstOrFailWithApi('product');
         extract($this->basicDataForProductOperation());
         return responseManager("edit_product", $pageTitle, 'success', compact('pageTitle', 'categories', 'units', 'brands', 'taxes', 'attributes', 'view', 'product'));
     }
@@ -56,7 +56,7 @@ trait ProductOperation
     {
         $pageTitle = "View Product";
         $view      = "Template::user.product.view";
-        $product   = Product::with('details.attribute', 'details.variant', 'details', 'details.tax', 'category', 'brand', 'unit')->where('id', $id)->firstOrFailWithApi('product');
+        $product   = Product::where('user_id', auth()->id())->with('details.attribute', 'details.variant', 'details', 'details.tax', 'category', 'brand', 'unit')->where('id', $id)->firstOrFailWithApi('product');
         return responseManager("view_product", $pageTitle, 'success', compact('pageTitle', 'product', 'view'));
     }
 
@@ -177,11 +177,11 @@ trait ProductOperation
         } catch (Exception $ex) {
             DB::rollBack();
             $message[] = $ex->getMessage();
-            adminActivity("product", get_class($product), $product->id, "Try the product add but failed for: " . $ex->getMessage());
+            // adminActivity("product", get_class($product), $product->id, "Try the product add but failed for: " . $ex->getMessage());
             return jsonResponse('exception', 'error', $message);
         }
 
-        adminActivity("product-add", get_class($product), $product->id);
+        // adminActivity("product-add", get_class($product), $product->id);
         $message[] = "Product added successfully";
         return jsonResponse('product', 'success', $message);
     }
@@ -244,11 +244,11 @@ trait ProductOperation
         } catch (Exception $ex) {
             DB::rollBack();
             $message[] = $ex->getMessage();
-            adminActivity("product", get_class($product), $product->id, "Try the product update but failed for: " . $ex->getMessage());
+            // adminActivity("product", get_class($product), $product->id, "Try the product update but failed for: " . $ex->getMessage());
             return jsonResponse('exception', 'error', $message);
         }
 
-        adminActivity("product-updated", get_class($product), $product->id);
+        // adminActivity("product-updated", get_class($product), $product->id);
         $message[] = "Product update successfully";
         return jsonResponse('product', 'success', $message);
     }

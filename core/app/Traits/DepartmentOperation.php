@@ -10,7 +10,9 @@ trait DepartmentOperation
 {
     public function list()
     {
-        $baseQuery = Department::where('user_id', auth()->id())->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Department::whereHas('company', function($q){
+            $q->where('user_id', auth()->id());
+        })->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Department';
         $view      = "Template::user.hrm.department.list";
         if (request()->export) {
@@ -42,7 +44,6 @@ trait DepartmentOperation
             $remark     = "department-added";
         }
 
-        $department->user_id    = auth()->id();
         $department->name       = $request->name;
         $department->company_id = $request->company_id;
         $department->save();

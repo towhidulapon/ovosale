@@ -8,20 +8,20 @@
         <div class="pos-action-btns">
             <button class="pos-btn pos-btn--primary payment-btn" type="button" data-id="{{ $cashPayment->id }}"
                 data-payment-accounts='@json($cashPayment->paymentAccounts)'>
-                <x-admin.svg.cash />
+                <x-user.svg.cash />
                 <span>{{ __(@$cashPayment->name) }}</span>
             </button>
             <button class="pos-btn pos-btn--info payment-btn" type="button" data-id="{{ $cartPayment->id }}"
                 data-payment-accounts='@json($cartPayment->paymentAccounts)'>
-                <x-admin.svg.card />
+                <x-user.svg.card />
                 <span>{{ __(@$cartPayment->name) }}</span>
             </button>
             <button class="pos-btn pos-btn--primary multiple-pay-btn" type="button">
-                <x-admin.svg.multi_pay />
+                <x-user.svg.multi_pay />
                 <span>@lang('Multiple Pay')</span>
             </button>
             <button class="pos-btn pos-btn--danger cancelBtn" type="button">
-                <x-admin.svg.times />
+                <x-user.svg.times />
                 <span>@lang('Cancel')</span>
             </button>
         </div>
@@ -35,14 +35,14 @@
     </div>
 </footer>
 
-<x-admin.ui.modal id="payment-modal" class="modal-xl">
-    <x-admin.ui.modal.header>
+<x-user.ui.modal id="payment-modal" class="modal-xl">
+    <x-user.ui.modal.header>
         <h4 class="modal-title">@lang('Payment')</h4>
         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
             <i class="las la-times"></i>
         </button>
-    </x-admin.ui.modal.header>
-    <x-admin.ui.modal.body>
+    </x-user.ui.modal.header>
+    <x-user.ui.modal.body>
         <div class="row gy-4">
             <div class="col-lg-7">
                 <div class="mb-3 payment-row-wrapper">
@@ -179,8 +179,8 @@
                 </div>
             </div>
         </div>
-    </x-admin.ui.modal.body>
-</x-admin.ui.modal>
+    </x-user.ui.modal.body>
+</x-user.ui.modal>
 
 @push('script')
     <script>
@@ -201,7 +201,7 @@
                 const $this = $(this);
 
                 $.ajax({
-                    url: "{{ route('admin.sale.store') }}",
+                    url: "{{ route('user.sale.store') }}",
                     method: "POST",
                     data: formData,
                     cache: false,
@@ -372,7 +372,7 @@
             const functionManager = {
                 /**
                  * Resets the cart by clearing the cart items, resetting the totals, and updating the UI to reflect an empty cart state.
-                 * 
+                 *
                  * @returns {void} - No return value.
                  */
                 resetCart: function() {
@@ -386,7 +386,7 @@
 
                 /**
                  * Calculates the change amount based on the total payable amount and the amount being paid, then updates the payment modal with the calculated values.
-                 * 
+                 *
                  * @returns {void} - No return value.
                  */
                 calculateChangeAmount: function() {
@@ -411,7 +411,7 @@
 
                 /**
                  * Sets the summary data in the payment modal, including item count, total, discount, and payable amount, and triggers the change amount calculation.
-                 * 
+                 *
                  * @returns {void} - No return value.
                  */
                 setSummaryData: function() {
@@ -429,7 +429,7 @@
 
                 /**
                  * Counts the number of items currently in the cart by checking the number of cart item elements.
-                 * 
+                 *
                  * @returns {number} - The total number of items in the cart.
                  */
                 cartItemCount: function() {
@@ -438,7 +438,7 @@
 
                 /**
                  * Reinitializes all select2 dropdowns with specific options to ensure proper functionality and layout.
-                 * 
+                 *
                  * @returns {void} - No return value.
                  */
                 select2ReInit: function() {
@@ -462,7 +462,7 @@
 
                 /**
                  * Generates the HTML structure for an empty cart message.
-                 * 
+                 *
                  * @returns {string} - The HTML structure for the empty cart message.
                  */
                 cartEmptyHtml: function() {
@@ -479,7 +479,7 @@
 
                 /**
                  * Generates the HTML structure for a payment row, including fields for the paying amount, payment type, and payment note.
-                 * 
+                 *
                  * @returns {string} - The HTML structure for a payment row.
                  */
                 paymentRowHtml: function() {

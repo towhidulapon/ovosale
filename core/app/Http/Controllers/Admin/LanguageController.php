@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Frontend;
 use Illuminate\Http\Request;
 use App\Models\Language;
 use App\Rules\FileTypeValidate;
@@ -34,8 +35,7 @@ class LanguageController extends Controller
 
         File::put($path, $data);
 
-        $language = new Language();
-
+        $language = new  Language();
         if ($request->hasFile('image')) {
             try {
                 $language->image = fileUploader($request->image, getFilePath('language'), getFileSize('language'));
@@ -58,8 +58,6 @@ class LanguageController extends Controller
         $language->code       = strtolower($request->code);
         $language->is_default = $request->is_default ? Status::YES : Status::NO;
         $language->save();
-
-        adminActivity("language-added", get_class($language), $language->id);
 
         $notify[] = ['success', 'Language added successfully'];
         return back()->withNotify($notify);
@@ -104,8 +102,6 @@ class LanguageController extends Controller
                 $lang->save();
             }
         }
-
-        adminActivity("language-updated", get_class($language), $language->id);
         $notify[] = ['success', 'Language updated successfully'];
         return back()->withNotify($notify);
     }
@@ -122,9 +118,6 @@ class LanguageController extends Controller
         fileManager()->removeFile(resource_path('lang/') . $lang->code . '.json');
         fileManager()->removeFile(getFilePath('language') . '/' . $lang->image);
         $lang->delete();
-
-        adminActivity("language-deleted", get_class($lang), $lang->id);
-
         $notify[] = ['success', 'Language deleted successfully'];
         return back()->withNotify($notify);
     }
@@ -202,9 +195,7 @@ class LanguageController extends Controller
             file_put_contents(resource_path('lang/') . $tolang->code . '.json', json_encode($result));
         }
 
-        adminActivity("language-imported", get_class($tolang), $tolang->id);
-        
-        $notify[] = ['success', 'Import keyword successfully'];
+        $notify[] = ['success', 'Import data successfully'];
         return back()->withNotify($notify);
     }
 
@@ -227,7 +218,6 @@ class LanguageController extends Controller
             $itemData        = json_decode($items, true);
             $result          = array_merge($itemData, $newArr);
             file_put_contents(resource_path('lang/') . $lang->code . '.json', json_encode($result));
-            adminActivity("language-keyword-added", get_class($lang), $lang->id);
             $notify[] = ['success', "Language key added successfully"];
             return back()->withNotify($notify);
         }
@@ -243,7 +233,6 @@ class LanguageController extends Controller
         unset($jsonArr[urldecode($key)]);
 
         file_put_contents(resource_path('lang/') . $lang->code . '.json', json_encode($jsonArr));
-        adminActivity("language-keyword-deleted", get_class($lang), $lang->id);
         $notify[] = ['success', "Language key deleted successfully"];
         return back()->withNotify($notify);
     }
@@ -266,7 +255,6 @@ class LanguageController extends Controller
 
         file_put_contents($filePath, json_encode($keywords));
         $notify[] = ['success', 'Language key updated successfully'];
-        adminActivity("language-keyword-updated", get_class($lang), $lang->id);
         return back()->withNotify($notify);
     }
 
@@ -276,6 +264,16 @@ class LanguageController extends Controller
         $dirname  = resource_path('views');
         foreach ($this->getAllFiles($dirname) as $file) {
             $langKeys = array_merge($langKeys, $this->getLangKeys($file));
+        }
+        $frontendData = Frontend::where('data_keys', '!=', 'seo.data')->get();
+        foreach ($frontendData as $frontend) {
+            foreach ($frontend->data_values as $key => $frontendValue) {
+                if ($key != 'has_image' && !isImage($frontendValue) && !isHtml($frontendValue)) {
+                    if (!$this->checkSpecialCharter($frontendValue)) {
+                        $langKeys[] = $frontendValue;
+                    }
+                }
+            }
         }
         $langKeys = array_unique($langKeys);
         $keyText  = '';

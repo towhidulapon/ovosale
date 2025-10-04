@@ -8,30 +8,25 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class GeneralSettingController extends Controller
-{
+class GeneralSettingController extends Controller {
 
-    public function general()
-    {
+    public function general() {
         $pageTitle       = 'General Setting';
         $timezones       = timezone_identifiers_list();
         $currentTimezone = array_search(config('app.timezone'), $timezones);
         return view('admin.setting.general', compact('pageTitle', 'timezones', 'currentTimezone'));
     }
 
-    public function prefixSetting()
-    {
+    public function prefixSetting() {
         $pageTitle = 'Prefix Setting';
         return view('admin.setting.prefix', compact('pageTitle'));
     }
-    public function companySetting()
-    {
+    public function companySetting() {
         $pageTitle = 'Company Setting';
         return view('admin.setting.company', compact('pageTitle'));
     }
 
-    public function companySettingUpdate(Request $request)
-    {
+    public function companySettingUpdate(Request $request) {
         $request->validate([
             'company_information'         => 'required|array',
             'company_information.name'    => 'required',
@@ -48,8 +43,7 @@ class GeneralSettingController extends Controller
         adminActivity("company-information-updated", get_class($gs), $gs->id);
         return back()->withNotify($notify);
     }
-    public function generalUpdate(Request $request)
-    {
+    public function generalUpdate(Request $request) {
         $request->validate([
             'site_name'          => 'required|string|max:40',
             'cur_text'           => 'required|string|max:40',
@@ -87,8 +81,7 @@ class GeneralSettingController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function prefixSettingUpdate(Request $request)
-    {
+    public function prefixSettingUpdate(Request $request) {
         $request->validate([
             'product_code_prefix'           => 'required',
             'purchase_invoice_prefix'       => 'required',
@@ -112,16 +105,14 @@ class GeneralSettingController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function systemConfiguration()
-    {
+    public function systemConfiguration() {
         $pageTitle      = 'System Configuration';
         $configurations = json_decode(file_get_contents(resource_path('views/admin/setting/configuration.json')));
         return view('admin.setting.configuration', compact('pageTitle', 'configurations'));
     }
 
 
-    public function systemConfigurationUpdate($key)
-    {
+    public function systemConfigurationUpdate($key) {
         try {
             $general   = gs();
             $newStatus = !$general->$key;
@@ -143,14 +134,12 @@ class GeneralSettingController extends Controller
     }
 
 
-    public function logoIcon()
-    {
+    public function logoIcon() {
         $pageTitle = 'Brand Setting';
         return view('admin.setting.logo_icon', compact('pageTitle'));
     }
 
-    public function logoIconUpdate(Request $request)
-    {
+    public function logoIconUpdate(Request $request) {
         $request->validate([
             'logo'    => ['image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
             'favicon' => ['image', new FileTypeValidate(['png'])],
@@ -187,14 +176,12 @@ class GeneralSettingController extends Controller
     }
 
 
-    public function pwaIcon()
-    {
+    public function pwaIcon() {
         $pageTitle = 'PWA Setting';
         return view('admin.setting.pwa', compact('pageTitle'));
     }
 
-    public function pwaIconUpdate(Request $request)
-    {
+    public function pwaIconUpdate(Request $request) {
 
         $request->validate([
             'pwa_small_icon' => ['image', new FileTypeValidate(['png']), "dimensions:width=192,height=192"],

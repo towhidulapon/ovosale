@@ -9,7 +9,7 @@ trait CustomerOperation
 {
     public function list()
     {
-        $baseQuery = Customer::searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Customer::where('user_id', auth()->id())->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Customer';
         $view      = "Template::user.customer.list";
 
@@ -46,6 +46,7 @@ trait CustomerOperation
             $remark   = "customer-added";
         }
 
+        $customer->user_id  = auth()->id();
         $customer->name     = $request->name;
         $customer->email    = $request->email;
         $customer->mobile   = $request->mobile;
@@ -57,7 +58,7 @@ trait CustomerOperation
         $customer->postcode = $request->postcode;
         $customer->save();
 
-        adminActivity($remark, get_class($customer), $customer->id);
+        // adminActivity($remark, get_class($customer), $customer->id);
         if (request()->from == 'pos') {
             return jsonResponse('success', 'success', (array) $message, [
                 'customer' => $customer

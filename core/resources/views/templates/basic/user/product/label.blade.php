@@ -308,7 +308,7 @@
             @if (request()->product_code)
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('admin.product.search') }}",
+                    url: "{{ route('user.product.search') }}",
                     dataType: "json",
                     data: {
                         search: "{{ request()->product_code }}"

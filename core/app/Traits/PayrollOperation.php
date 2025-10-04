@@ -8,10 +8,8 @@ use App\Models\PaymentType;
 use App\Models\Payroll;
 use Illuminate\Http\Request;
 
-trait PayrollOperation
-{
-    public function list()
-    {
+trait PayrollOperation {
+    public function list() {
         $baseQuery = Payroll::where('user_id', auth()->id())->searchable(['employee:name', 'employee:phone'])->with('employee')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payroll';
         $view      = "Template::user.hrm.payroll.list";
@@ -19,15 +17,19 @@ trait PayrollOperation
             return exportData($baseQuery, request()->export, "payroll", "A4 landscape");
         }
         $payrolls       = $baseQuery->paginate(getPaginate());
-        $employees      = Employee::where('user_id', auth()->id())->active()->orderBy('name')->get();
+        $employees      = Employee::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })
+            ->active()
+            ->orderBy('name')
+            ->get();
         $paymentMethods = PaymentType::where('user_id', auth()->id())->with('paymentAccounts')->active()->orderBy('name')->get();
 
         return responseManager("payroll", $pageTitle, 'success', compact('payrolls', 'view', 'pageTitle', 'employees', 'paymentMethods'));
     }
 
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $isRequired = $id ? 'nullable' : 'required';
         $request->validate(
             [
@@ -92,7 +94,7 @@ trait PayrollOperation
 
         $payroll->save();
 
-        adminActivity($remark, get_class($payroll), $payroll->id);
+        // adminActivity($remark, get_class($payroll), $payroll->id);
         return responseManager("payroll", $message, 'success', compact('payroll'));
     }
 }

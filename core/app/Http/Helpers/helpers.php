@@ -752,16 +752,11 @@ function productTooltip()
     ];
 }
 
-function saleAndPurchaseDataForGraph($maxDate, $adminId = 0, $dataFormat = "Y-m-d")
+function saleAndPurchaseDataForGraph($maxDate, $dataFormat = "Y-m-d")
 {
     $today            = Carbon::today();
     $saleQuery        = Sale::query();
     $purchaseQuery    = Purchase::query();
-
-    if ($adminId) {
-        $saleQuery->where('admin_id', $adminId);
-        $purchaseQuery->where('admin_id', $adminId);
-    }
 
     $dates    = [];
     $sales    = [];
@@ -769,8 +764,8 @@ function saleAndPurchaseDataForGraph($maxDate, $adminId = 0, $dataFormat = "Y-m-
 
     for ($i = 0; $i < $maxDate; $i++) {
         $date = $today->copy()->subDays($i)->format('Y-m-d');
-        array_push($sales, getAmount((clone $saleQuery)->whereDate('sale_date', $date)->sum('total')));
-        array_push($purchase, getAmount((clone $purchaseQuery)->whereDate('purchase_date', $date)->sum('total')));
+        array_push($sales, getAmount((clone $saleQuery)->where('user_id', auth()->id())->whereDate('sale_date', $date)->sum('total')));
+        array_push($purchase, getAmount((clone $purchaseQuery)->where('user_id', auth()->id())->whereDate('purchase_date', $date)->sum('total')));
 
         $formattedDate = now()->parse($date)->format($dataFormat);
         array_push($dates, $formattedDate);
@@ -859,6 +854,7 @@ function createTransaction($paymentAccount, $trxType, $amount, $remark, $details
 
     $transaction                     = new Transaction();
     $transaction->payment_account_id = $paymentAccount->id;
+    $transaction->user_id            = auth()->id();
     $transaction->trx_type           = $trxType;
     $transaction->amount             = $amount;
     $transaction->post_balance       = $paymentAccount->balance;

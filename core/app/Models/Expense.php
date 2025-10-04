@@ -8,15 +8,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Expense extends Model
 {
     use SoftDeletes;
-    
+
     protected $guarded  = ['id'];
     public function category()
     {
         return $this->belongsTo(ExpenseCategory::class);
     }
-    public function admin()
-    {
-        return $this->belongsTo(Admin::class, "added_by");
+    // public function admin()
+    // {
+    //     return $this->belongsTo(Admin::class, "added_by");
+    // }
+
+    public function user() {
+        return $this->belongsTo(User::class);
     }
     public function paymentAccount()
     {

@@ -12,7 +12,7 @@ class SaleController extends Controller
 
     use SaleOperation;
     public function print($id) {
-        $sale = Sale::withSum('payments', 'amount')->where("id", $id)->with("warehouse", "customer")->first();
+        $sale = Sale::where('user_id', auth()->id())->withSum('payments', 'amount')->where("id", $id)->with("warehouse", "customer")->first();
         if (!$sale) {
             $message[] = "The sale is not found";
             return jsonResponse('not_found', 'error', $message);

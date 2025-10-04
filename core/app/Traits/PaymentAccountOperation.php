@@ -11,7 +11,9 @@ trait PaymentAccountOperation
 {
     public function list()
     {
-        $baseQuery = PaymentAccount::where('user_id', auth()->id())->searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
+        $baseQuery = PaymentAccount::whereHas('paymentType', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
         $pageTitle = 'Manage Payment Account';
         $view      = "Template::user.payment_account.list";
 
@@ -51,7 +53,6 @@ trait PaymentAccountOperation
             return responseManager("payment_account", "Payment account already exists", 'error');
         }
 
-        $paymentAccount->user_id         = auth()->id();
         $paymentAccount->payment_type_id = $request->payment_type;
         $paymentAccount->account_name    = $request->account_name;
         $paymentAccount->account_number  = $request->account_number;

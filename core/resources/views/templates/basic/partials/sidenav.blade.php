@@ -5,7 +5,7 @@
 <aside class="dashboard__sidebar  sidebar-menu">
     <div class="dashboard__sidebar-area">
         <div class="dashboard__sidebar-header">
-            <a href="{{ route('admin.dashboard') }}" class="dashboard__sidebar-logo">
+            <a href="{{ route('user.home') }}" class="dashboard__sidebar-logo">
                 <img class="img-fluid light-show" src="{{ siteLogo() }}">
                 <img class="img-fluid dark-show" src="{{ siteLogo('dark') }}">
             </a>

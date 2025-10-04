@@ -7,13 +7,13 @@
         <div class="col-12">
             <div class="d-flex flex-wrap gap-3">
                 <x-permission_check permission="edit sale">
-                    <a class="btn btn--primary" href="{{ route('Template::user.sale.edit', $sale->id) }}">
+                    <a class="btn btn--primary" href="{{ route('user.sale.edit', $sale->id) }}">
                         <i class="las la-pencil-alt"></i>
                         @lang('Edit Sale')
                     </a>
                 </x-permission_check>
                 <x-permission_check permission="download sale invoice">
-                    <a class="btn btn--info" href="{{ route('Template::user.sale.pdf', $sale->id) }}">
+                    <a class="btn btn--info" href="{{ route('user.sale.pdf', $sale->id) }}">
                         <i class="las  la-file-download "></i>
                         @lang('Download PDF')
                     </a>
@@ -26,13 +26,13 @@
                 </x-permission_check>
                 <x-permission_check permission="print pos sale invoice">
                     <button type="button" class="btn btn--success print-pos-invoice"
-                        data-action="{{ route('Template::user.sale.print', $sale->id) }}?invoice_type=pos">
+                        data-action="{{ route('user.sale.print', $sale->id) }}?invoice_type=pos">
                         <i class="las la-print"></i>
                         @lang('Print POS Invoice')
                     </button>
                 </x-permission_check>
                 <x-permission_check permission="view sale">
-                    <x-back_btn route="{{ route('Template::user.sale.list') }}" />
+                    <x-back_btn route="{{ route('user.sale.list') }}" />
                 </x-permission_check>
             </div>
         </div>

@@ -19,23 +19,18 @@ class ExtensionController extends Controller
     {
         $extension      = Extension::findOrFail($id);
         $validationRule = [];
-
         foreach ($extension->shortcode as $key => $val) {
-            $validationRule = array_merge($validationRule, [$key => 'required']);
+            $validationRule = array_merge($validationRule,[$key => 'required']);
         }
-
         $request->validate($validationRule);
-        $shortcode = json_decode(json_encode($extension->shortcode), true);
 
+        $shortcode = json_decode(json_encode($extension->shortcode), true);
         foreach ($shortcode as $key => $value) {
             $shortcode[$key]['value'] = $request->$key;
         }
 
         $extension->shortcode = $shortcode;
         $extension->save();
-
-        adminActivity("extension-updated", get_class($extension), $extension->id);
-
         $notify[] = ['success', $extension->name . ' updated successfully'];
         return back()->withNotify($notify);
     }

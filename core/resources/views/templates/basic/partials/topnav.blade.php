@@ -90,19 +90,13 @@
                     </div>
                     <div class="user__body">
                         <nav class="user__link">
-                            <a href="{{ route('admin.profile') }}" class="user__link-item">
+                            <a href="{{ route('user.profile.setting') }}" class="user__link-item">
                                 <span class="user__link-item-icon">
                                     <i class="las la-user-alt"></i>
                                 </span>
                                 <span class="user__link-item-text">@lang('My Profile')</span>
                             </a>
-                            <a href="{{ route('admin.activity') }}" class="user__link-item">
-                                <span class="user__link-item-icon">
-                                    <i class="lab la-accessible-icon"></i>
-                                </span>
-                                <span class="user__link-item-text">@lang('My Activity')</span>
-                            </a>
-                            <a href="{{ route('admin.password') }}" class="user__link-item">
+                            <a href="{{ route('user.change.password') }}" class="user__link-item">
                                 <span class="user__link-item-icon">
                                     <i class="las la-lock-open"></i>
                                 </span>
@@ -111,7 +105,7 @@
                         </nav>
                     </div>
                     <div class="user__footer">
-                        <a href="{{ route('admin.logout') }}" class="btn btn--danger ">
+                        <a href="{{ route('user.logout') }}" class="btn btn--danger ">
                             <span class="btn--icon"><i class="fas fa-sign-out text--danger"></i></span>
                             @lang('Logout')
                         </a>

@@ -13,7 +13,7 @@
                                 <th>@lang('Expense From Account')</th>
                                 <th>@lang('Reference No')</th>
                                 <th>@lang('Amount')</th>
-                                <th>@lang('Added By')</th>
+                                {{-- <th>@lang('Added By')</th> --}}
                                 <th>@lang('Action')</th>
                             </tr>
                         </x-user.ui.table.header>
@@ -37,7 +37,7 @@
                                 </td>
                                 <td>{{ __(@$expense->reference_no ?? 'N/A') }}</td>
                                 <td>{{ showAmount(@$expense->amount) }}</td>
-                                <td>{{ __(@$expense->admin->name) }}</td>
+                                {{-- <td>{{ __(@$expense->admin->name) }}</td> --}}
                                 <td>
                                     <x-user.ui.btn.table_action module="expense" :id="$expense->id">
                                         <x-permission_check permission="edit expense">

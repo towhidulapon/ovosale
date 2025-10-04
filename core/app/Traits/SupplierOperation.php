@@ -80,11 +80,11 @@ trait SupplierOperation
         $pageTitle = "Supplier Information";
         $view      = "Template::user.supplier.view";
 
-        $supplier  = Supplier::where('id', $id)->firstOrFailWithApi('supplier');
+        $supplier  = Supplier::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('supplier');
         $baseQuery = SupplierPayment::where('supplier_id', $supplier->id);
 
         $widget                   = [];
-        $widget['total_purchase'] = Purchase::where('supplier_id', $supplier->id)->sum('total');
+        $widget['total_purchase'] = Purchase::where('user_id', auth()->id())->where('supplier_id', $supplier->id)->sum('total');
         $widget['total_payment']  = (clone $baseQuery)->sum('amount');
         $widget['total_due']      = $widget['total_purchase'] -  $widget['total_payment'];
         $widget['today_payment']  = (clone $baseQuery)->where('payment_date', now()->format('Y-m-d'))->sum('amount');

@@ -63,7 +63,7 @@ trait ExpenseOperation
             $oldExpenseAmount = $expense->amount;
         } else {
             $expense                     = new Expense();
-            $expense->added_by           = getAdmin('id');
+            // $expense->added_by           = getAdmin('id');
             $message                     = "Expense added successfully";
             $remark                      = "expense-add";
             $expense->user_id            = auth()->id();

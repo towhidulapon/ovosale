@@ -1,7 +1,8 @@
 @props(['action', 'title', 'status'])
+
 @php
-    $enableMessage = trans("Are you sure to enable this $title?");
-    $disableMessage = trans("Are you sure to disable this $title?");
+    $enableMessage = trans("Are you sure to enable this $title");
+    $disableMessage = trans("Are you sure to disable this $title");
 @endphp
 
 <div class="d-flex justify-content-center">

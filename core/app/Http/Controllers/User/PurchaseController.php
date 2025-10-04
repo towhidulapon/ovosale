@@ -6,13 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use App\Traits\PurchaseOperation;
 
-class PurchaseController extends Controller
-{
+class PurchaseController extends Controller {
     use PurchaseOperation;
 
-    public function print($id)
-    {
+    public function print($id) {
         $purchase = Purchase::withSum('supplierPayments', 'amount')
+            ->where('user_id', auth()->id())
             ->where("id", $id)
             ->with("warehouse", "supplier", 'supplierPayments.paymentType')
             ->first();
@@ -24,7 +23,7 @@ class PurchaseController extends Controller
 
         $message[] = "Print Invoice";
         return jsonResponse('print', 'success', $message, [
-            'html' => view('user.purchase.invoice', compact('purchase'))->render()
+            'html' => view('Template::user.purchase.invoice', compact('purchase'))->render()
         ]);
     }
 }

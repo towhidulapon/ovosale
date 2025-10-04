@@ -7,11 +7,11 @@ use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-trait AttendanceOperation
-{
-    public function list()
-    {
-        $baseQuery = Attendance::where('user_id', auth()->id())->searchable(['employee:name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+trait AttendanceOperation {
+    public function list() {
+        $baseQuery = Attendance::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->searchable(['employee:name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Attendance';
         $view      = "Template::user.hrm.attendance.list";
         if (request()->export) {
@@ -29,8 +29,7 @@ trait AttendanceOperation
     }
 
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $request->validate(
             [
                 'company_id'   => 'required|exists:companies,id',
@@ -48,7 +47,10 @@ trait AttendanceOperation
         );
 
         // Check
-        $attendanceQuery = Attendance::where('user_id', auth()->id())->where('company_id', $request->company_id)
+        $attendanceQuery = Attendance::where('company_id', $request->company_id)
+            ->whereHas('company', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
             ->where('employee_id', $request->employee_id)
             ->where('date', $request->date);
 
@@ -59,7 +61,7 @@ trait AttendanceOperation
             return responseManager("attendance", "This employee has already been marked for this date", 'error');
         }
         if ($id) {
-            $attendance = Attendance::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('attendance');
+            $attendance = Attendance::where('id', $id)->firstOrFailWithApi('attendance');
             $message  = "Attendance updated successfully";
             $remark   = "attendance-updated";
         } else {
@@ -77,7 +79,6 @@ trait AttendanceOperation
         $diff = $checkIn->diff($checkOut);
         $duration = sprintf('%02d:%02d', $diff->h, $diff->i);
 
-        $attendance->user_id      = auth()->id();
         $attendance->company_id   = $request->company_id;
         $attendance->employee_id  = $request->employee_id;
         $attendance->shift_id     = $request->shift_id;
@@ -91,8 +92,7 @@ trait AttendanceOperation
         return responseManager("attendance", $message, 'success', compact('attendance'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return Attendance::changeStatus($id);
     }
 }

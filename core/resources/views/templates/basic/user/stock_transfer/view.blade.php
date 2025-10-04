@@ -2,7 +2,7 @@
 @section('panel')
     <div class="row  responsive-row">
         <div class="col-12">
-            @include('user.stock_transfer.invoice')
+            @include('Template::user.stock_transfer.invoice')
         </div>
         <div class="col-12">
             <div class="d-flex flex-wrap align-items-center  gap-3">

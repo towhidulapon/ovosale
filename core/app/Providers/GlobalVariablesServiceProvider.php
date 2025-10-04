@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Constants\Status;
 use App\Models\AdminNotification;
 use App\Models\Language;
+use App\Models\SupportTicket;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -48,6 +49,14 @@ class GlobalVariablesServiceProvider extends ServiceProvider
                 'menus' => json_decode(file_get_contents(resource_path('views/templates/basic/partials/menu.json'))),
             ]);
         });
+
+        view()->composer(['admin.partials.sidenav', 'admin.partials.topnav'], function ($view) {
+            $view->with([
+                'menus'                => json_decode(file_get_contents(resource_path('views/admin/partials/menu.json'))),
+                'pendingTicketCount'   => SupportTicket::whereIn('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count()
+            ]);
+        });
+
 
         view()->composer('admin.partials.sidenav', function ($view) {
             $view->with([

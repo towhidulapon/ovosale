@@ -4,38 +4,48 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\DashBoardWidgetData;
-use App\Models\Admin;
-use App\Models\AdminActivity;
 use App\Models\AdminNotification;
-use App\Models\ProductDetail;
-use App\Models\Purchase;
-use App\Models\Sale;
-use App\Models\SaleDetails;
-use App\Models\Warehouse;
-use App\Traits\AdminOperation;
-use Illuminate\Support\Facades\DB;
+use App\Models\Deposit;
+use App\Models\SupportTicket;
+use App\Models\Transaction;
+use App\Models\User;
+use App\Models\UserLogin;
+use App\Models\Withdrawal;
+use App\Rules\FileTypeValidate;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    use AdminOperation;
 
     public function dashboard()
     {
-        $pageTitle          = 'Dashboard';
-        $widget             = DashBoardWidgetData::getWidgetData();
-        $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity,product_details_id')
-            ->groupBy('product_details_id')
-            ->with('productDetail', 'productDetail.attribute', "productDetail.variant", 'productDetail.product.unit')
-            ->orderBy('total_quantity', 'desc')
-            ->take(5)
+
+        $userQuery     = User::query();
+        $trxQuery      = Transaction::query();
+
+        $widget['total_users']             = (clone $userQuery)->count();
+        $widget['active_users']            = (clone $userQuery)->active()->count();
+        $widget['email_unverified_users']  = (clone $userQuery)->emailUnverified()->count();
+        $widget['mobile_unverified_users'] = (clone $userQuery)->mobileUnverified()->count();
+
+
+        $widget['total_trx']       = (clone $trxQuery)->count();
+        $widget['total_trx_plus']  = (clone $trxQuery)->where('trx_type', "+")->count();
+        $widget['total_trx_minus'] = (clone $trxQuery)->where('trx_type', "-")->count();
+        $widget['total_trx_count'] = (clone $trxQuery)->count();
+
+        $pageTitle = 'Dashboard';
+        $admin     = auth('admin')->user();
+
+
+        $userLogin = UserLogin::selectRaw('browser, COUNT(*) as total')
+            ->groupBy('browser')
+            ->orderBy('total', 'desc')
             ->get();
 
-        $recentSales     = Sale::with('customer')->latest('id')->take(5)->get();
-        $recentPurchases = Purchase::with('supplier')->latest('id')->take(5)->get();
-        $warehouses      = Warehouse::get();
-
-        return view('admin.dashboard', compact('pageTitle', 'widget', 'topSellingProducts', 'recentSales', 'recentPurchases', 'warehouses'));
+        return view('admin.dashboard', compact('pageTitle', 'admin', 'widget', 'userLogin'));
     }
 
     public function profile()
@@ -45,7 +55,33 @@ class AdminController extends Controller
         return view('admin.profile', compact('pageTitle', 'admin'));
     }
 
+    public function profileUpdate(Request $request)
+    {
+        $request->validate([
+            'name'  => 'required|max:40',
+            'email' => 'required|email',
+            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
+        ]);
 
+        $user = auth('admin')->user();
+
+        if ($request->hasFile('image')) {
+            try {
+                $old         = $user->image;
+                $user->image = fileUploader($request->image, getFilePath('adminProfile'), getFileSize('adminProfile'), $old);
+            } catch (\Exception $exp) {
+                $notify[] = ['error', 'Couldn\'t upload your image'];
+                return back()->withNotify($notify);
+            }
+        }
+
+        $user->name  = $request->name;
+        $user->email = $request->email;
+        $user->save();
+
+        $notify[] = ['success', 'Profile updated successfully'];
+        return to_route('admin.profile')->withNotify($notify);
+    }
 
     public function password()
     {
@@ -54,6 +90,69 @@ class AdminController extends Controller
         return view('admin.password', compact('pageTitle', 'admin'));
     }
 
+    public function passwordUpdate(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'password'     => 'required|min:6|confirmed',
+        ]);
+
+        $user = auth('admin')->user();
+        if (!Hash::check($request->old_password, $user->password)) {
+            $notify[] = ['error', 'Password doesn\'t match!!'];
+            return back()->withNotify($notify);
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
+        $notify[] = ['success', 'Password changed successfully.'];
+        return to_route('admin.password')->withNotify($notify);
+    }
+
+    public function transactionReport(Request $request)
+    {
+
+        $today             = Carbon::today();
+        $timePeriodDetails = $this->timePeriodDetails($today);
+
+        $timePeriod        = (object) $timePeriodDetails[$request->time_period ?? 'daily'];
+        $carbonMethod      = $timePeriod->carbon_method;
+        $starDate          = $today->copy()->$carbonMethod($timePeriod->take);
+        $endDate           = $today->copy();
+
+        $plusTransactions   = Transaction::where('trx_type', '+')
+            ->whereDate('created_at', '>=', $starDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE_FORMAT(created_at, "' . $timePeriod->sql_date_format . '") as date,SUM(amount) as amount')
+            ->orderBy('date', 'asc')
+            ->groupBy('date')
+            ->get();
+
+        $minusTransactions  = Transaction::where('trx_type', '-')
+            ->whereDate('created_at', '>=', $starDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE_FORMAT(created_at, "' . $timePeriod->sql_date_format . '") as date,SUM(amount) as amount')
+            ->orderBy('date', 'asc')
+            ->groupBy('date')
+            ->get();
+
+        $data = [];
+
+        for ($i = 0; $i < $timePeriod->take; $i++) {
+            $date       = $today->copy()->$carbonMethod($i)->format($timePeriod->php_date_format);
+            $plusTransaction  = $plusTransactions->where('date', $date)->first();
+            $minusTransaction = $minusTransactions->where('date', $date)->first();
+
+            $plusAmount  = $plusTransaction ? $plusTransaction->amount : 0;
+            $minusAmount = $minusTransaction ? $minusTransaction->amount : 0;
+
+            $data[$date] = [
+                'plus_amount'  => $plusAmount,
+                'minus_amount' => $minusAmount
+            ];
+        }
+
+        return response()->json($data);
+    }
 
     public function notifications()
     {
@@ -67,6 +166,7 @@ class AdminController extends Controller
 
     public function notificationRead($id)
     {
+
         $notification          = AdminNotification::findOrFail($id);
         $notification->is_read = Status::YES;
         $notification->save();
@@ -100,63 +200,51 @@ class AdminController extends Controller
         return back()->withNotify($notify);
     }
 
-
-    public function saleAndPurchaseChart()
+    private function timePeriodDetails($today): array
     {
-        extract(saleAndPurchaseDataForGraph(30));
-
-        $message[] = "Sale and Purchase chart";
-        return jsonResponse(
-            'sale_and_purchase_chart',
-            'success',
-            $message,
-            [
-                'dates'    => $dates,
-                'sales'    => $sales,
-                'purchase' => $purchase,
-            ]
-        );
-    }
-    public function activity()
-    {
-        $authAdminId = getAdmin('id');
-
-        if (request()->admin_id) {
-            abort_if($authAdminId != Status::SUPPER_ADMIN_ID, 403);
-            $adminId = request()->admin_id;
+        if (request()->date) {
+            $date                 = explode('to', request()->date);
+            $startDateForCustom   = Carbon::parse(trim($date[0]))->format('Y-m-d');
+            $endDateDateForCustom = @$date[1] ? Carbon::parse(trim(@$date[1]))->format('Y-m-d') : $startDateForCustom;
         } else {
-            $adminId = $authAdminId;
+            $startDateForCustom   = $today->copy()->subDays(15);
+            $endDateDateForCustom = $today->copy();
         }
 
-        $pageTitle  = 'Admin Activity';
-        $activities = AdminActivity::with('admin')->latest()->where('admin_id', $adminId)->selectRaw('*,DATE(created_at) as date')->paginate(getPaginate());
-        return view('admin.activity', compact('pageTitle', 'activities'));
-    }
-
-    public function lowStockProduct()
-    {
-        if (request()->warehouse_id) {
-            $warehouse = Warehouse::where('id', request()->warehouse_id)->first();
-        } else {
-            $warehouse = Warehouse::first();
-        }
-
-        $lowStockProducts = ProductDetail::withSum(['productStock' => function ($q) use ($warehouse) {
-            $q->where('warehouse_id', @$warehouse->id)->select(DB::raw('COALESCE(SUM(stock), 0)'));
-        }], 'stock')
-            ->when(!$warehouse, function ($q) {
-                return $q->whereRaw('0=1');  //return a empty result if no warehouse
-            })
-            ->having('product_stock_sum_stock', '<', DB::raw('alert_quantity'))
-            ->with('attribute', "variant", 'product.unit')
-            ->take(5)
-            ->get();
-
-        $message[] = "Low Stock Product";
-
-        return jsonResponse("low_stock_product", "success", $message, [
-            'html' => view('admin.partials.low_stock_product', compact('lowStockProducts'))->render()
-        ]);
+        return  [
+            'daily'   => [
+                'sql_date_format' => "%d %b,%Y",
+                'php_date_format' => "d M,Y",
+                'take'            => 15,
+                'carbon_method'   => 'subDays',
+                'start_date'      => $today->copy()->subDays(15),
+                'end_date'        => $today->copy(),
+            ],
+            'monthly' => [
+                'sql_date_format' => "%b,%Y",
+                'php_date_format' => "M,Y",
+                'take'            => 12,
+                'carbon_method'   => 'subMonths',
+                'start_date'      => $today->copy()->subMonths(12),
+                'end_date'        => $today->copy(),
+            ],
+            'yearly'  => [
+                'sql_date_format' => '%Y',
+                'php_date_format' => 'Y',
+                'take'            => 12,
+                'carbon_method'   => 'subYears',
+                'start_date'      => $today->copy()->subYears(12),
+                'end_date'        => $today->copy(),
+            ],
+            'date_range'   => [
+                'sql_date_format' => "%d %b,%Y",
+                'php_date_format' => "d M,Y",
+                'take'            => (int) Carbon::parse($startDateForCustom)->diffInDays(Carbon::parse($endDateDateForCustom)),
+                'carbon_method'   => 'subDays',
+                'start_date'      => $startDateForCustom,
+                'end_date'        => $endDateDateForCustom,
+            ],
+        ];
     }
 
     public function downloadAttachment($fileHash)
@@ -164,7 +252,6 @@ class AdminController extends Controller
         $filePath  = decrypt($fileHash);
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
         $title     = slug(gs('site_name')) . '- attachments.' . $extension;
-
         try {
             $mimetype = mime_content_type($filePath);
         } catch (\Exception $e) {

@@ -2,7 +2,7 @@
 @section('panel')
     <div class="row gy-4">
         <div class="col-12">
-            @include('user.purchase.invoice')
+            @include('Template::user.purchase.invoice')
         </div>
         <div class="col-12">
             <div class="d-flex gap-3 flex-wrap">
@@ -26,7 +26,7 @@
                 </x-permission_check>
                 <x-permission_check permission="download purchase invoice">
                     <a class="btn btn--success"
-                        @if ($purchase->attachment) href="{{ route('admin.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}"
+                        @if ($purchase->attachment) href="{{ route('user.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}"
                     @else href="javascript:void(0)" @endif>
                         <i class="las la-download"></i>
                         @lang('Attachment')
@@ -41,7 +41,7 @@
 @endsection
 
 @push('style-lib')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/css/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset($activeTemplateTrue . 'css/invoice.css') }}">
 @endpush
 
 @push('script')

@@ -6,7 +6,7 @@
         <div class="pos-customer">
             <div class="pos-customer-field">
                 <div class="pos-customer-field__icon">
-                    <x-admin.svg.user />
+                    <x-user.svg.user />
                 </div>
                 <div class="position-relative" id="customer-select2">
                     <select class="form-control form--control" name="customer_id" form="pos-form">
@@ -61,7 +61,7 @@
                         <spa class="label">(-) @lang('Discount'):</spa>
                         <div class="d-flex align-items-center gap-2">
                             <button class="pos-cart-summery__info-btn summary-discount-btn" type="button">
-                                <x-admin.svg.edit />
+                                <x-user.svg.edit />
                             </button>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                         <spa class="label">(+) @lang('Shipping'):</spa>
                         <div class="d-flex align-items-center gap-2">
                             <button class="pos-cart-summery__info-btn summary-discount-btn" type="button">
-                                <x-admin.svg.edit />
+                                <x-user.svg.edit />
                             </button>
                         </div>
                     </div>
@@ -87,15 +87,15 @@
     </div>
 </aside>
 
-<x-admin.ui.modal id="customer-modal">
-    <x-admin.ui.modal.header>
+<x-user.ui.modal id="customer-modal">
+    <x-user.ui.modal.header>
         <h4 class="modal-title">@lang('Add Customer')</h4>
         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
             <i class="las la-times"></i>
         </button>
-    </x-admin.ui.modal.header>
-    <x-admin.ui.modal.body>
-        <form method="POST" action="{{ route('admin.customer.create') }}?from=pos" class="customer-form">
+    </x-user.ui.modal.header>
+    <x-user.ui.modal.body>
+        <form method="POST" action="{{ route('user.customer.create') }}?from=pos" class="customer-form">
             @csrf
             <div class="row">
                 <div class="form-group col-lg-12">
@@ -136,34 +136,34 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <x-admin.ui.btn.modal />
+                        <x-user.ui.btn.modal />
                     </div>
                 </div>
             </div>
         </form>
-    </x-admin.ui.modal.body>
-</x-admin.ui.modal>
+    </x-user.ui.modal.body>
+</x-user.ui.modal>
 
-<x-admin.ui.modal id="pricing-details-modal">
-    <x-admin.ui.modal.header>
+<x-user.ui.modal id="pricing-details-modal">
+    <x-user.ui.modal.header>
         <h4 class="modal-title">@lang('Product Price')</h4>
         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
             <i class="las la-times"></i>
         </button>
-    </x-admin.ui.modal.header>
-    <x-admin.ui.modal.body>
+    </x-user.ui.modal.header>
+    <x-user.ui.modal.body>
 
-    </x-admin.ui.modal.body>
-</x-admin.ui.modal>
+    </x-user.ui.modal.body>
+</x-user.ui.modal>
 
-<x-admin.ui.modal id="discount-shipping-modal">
-    <x-admin.ui.modal.header>
+<x-user.ui.modal id="discount-shipping-modal">
+    <x-user.ui.modal.header>
         <h4 class="modal-title">@lang('Discount & Shipping')</h4>
         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close">
             <i class="las la-times"></i>
         </button>
-    </x-admin.ui.modal.header>
-    <x-admin.ui.modal.body>
+    </x-user.ui.modal.header>
+    <x-user.ui.modal.body>
 
         <div class="form-group">
             <label>@lang('Coupon')</label>
@@ -216,8 +216,8 @@
 
         <input type="hidden" name="coupon_id" class="coupon_id" form="pos-form">
 
-    </x-admin.ui.modal.body>
-</x-admin.ui.modal>
+    </x-user.ui.modal.body>
+</x-user.ui.modal>
 
 @push('script')
     <script>
@@ -228,7 +228,7 @@
 
             $(`select[name=customer_id]`).select2({
                 ajax: {
-                    url: "{{ route('admin.customer.lazy.loading') }}",
+                    url: "{{ route('user.customer.lazy.loading') }}",
                     type: "get",
                     dataType: 'json',
                     delay: 1000,
@@ -441,7 +441,7 @@
                 const productId = $(this).data('id');
                 const findProductIdIndex = window.added_product_id.findIndex(windowProductId =>
                     windowProductId == productId);
-                    
+
                 window.added_product_id.splice(findProductIdIndex, 1)
 
                 $(this).closest('.card-single-item').remove();
@@ -457,7 +457,7 @@
                     `);
                     $('body').find('.pos-sidebar-body').addClass('product-cart-empty');
                 }
-                
+
                 let productCount=parseInt($('body').find('.cart-count').text() || 0);
                 if(productCount > 0){
                     $('body').find('.cart-count').text(productCount-1);
@@ -508,7 +508,7 @@
                 const subtotal = parseFloat($('.pos-cart-summery').find(".summary-subtotal").text() || 0);
 
                 $.ajax({
-                    url: `{{ route('admin.sale.apply.coupon') }}`,
+                    url: `{{ route('user.sale.apply.coupon') }}`,
                     type: 'POST',
                     data: {
                         coupon_code: coupon_code,

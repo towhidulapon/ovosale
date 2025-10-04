@@ -14,7 +14,7 @@ trait RecycleBinManager
 
         $message = $modelName . " trashed successfully";
 
-        adminActivity("$modelName-trash", "App\\Models\\$modelName", $id);
+        // adminActivity("$modelName-trash", "App\\Models\\$modelName", $id);
         return responseManager('trash', $message, 'success');
     }
 
@@ -25,7 +25,7 @@ trait RecycleBinManager
         $item->restore();
 
         $message = $modelName . " restored successfully";
-        adminActivity("$modelName-restore", "App\\Models\\$modelName", $id);
+        // adminActivity("$modelName-restore", "App\\Models\\$modelName", $id);
         return responseManager('trash', $message, 'success');
     }
 

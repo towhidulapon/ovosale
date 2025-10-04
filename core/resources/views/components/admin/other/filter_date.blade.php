@@ -19,7 +19,7 @@
         "use strict";
         (function($) {
             $(".date-picker").flatpickr({
-                mode: "range",
+                mode: 'range',
                 maxDate: new Date(),
             });
         })(jQuery);

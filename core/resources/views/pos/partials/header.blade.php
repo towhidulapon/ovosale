@@ -52,7 +52,7 @@
             <span class="text">@lang('Shortcut')</span>
         </button>
         <x-permission_check permission="view sale">
-            <a class="pos-btn pos-btn--sm pos-btn-outline--info"  href="{{ route('admin.sale.list') }}">
+            <a class="pos-btn pos-btn--sm pos-btn-outline--info"  href="{{ route('user.sale.list') }}">
                 <span class="icon">
                     <i class="fas fa-list"></i>
                 </span>
@@ -62,7 +62,7 @@
 
         <x-permission_check permission="view dashboard">
             <a class="pos-btn pos-btn--sm pos-btn-outline--primary"
-                href="{{ route('admin.dashboard') }}">
+                href="{{ route('user.home') }}">
                 <span class="icon">
                     <i class="la la-dashboard"></i>
                 </span>
@@ -94,7 +94,7 @@
                 </a>
             </div>
             <div class="dropdown-menu-body">
-                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                <a class="dropdown-item" href="{{ route('user.home') }}">
                     <i class="la la-dashboard"></i>
                     <span class="text">@lang('Dashboard')</span>
                 </a>

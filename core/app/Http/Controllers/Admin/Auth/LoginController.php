@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Http\Controllers\Admin\Auth;
 
-use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -62,34 +60,23 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        if (!verifyCaptcha()) {
-            $notify[] = ['error', 'Invalid captcha provided'];
+        if(!verifyCaptcha()){
+            $notify[] = ['error','Invalid captcha provided'];
             return back()->withNotify($notify);
         }
+
 
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (
-            method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)
-        ) {
+        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
             return $this->sendLockoutResponse($request);
         }
 
         if ($this->attemptLogin($request)) {
-            $admin = auth('admin')->user();
-            if ($admin->can('view dashboard')) {
-                $this->redirectTo = "admin";
-            } elseif ($admin->can('view sale')) {
-                $this->redirectTo = "admin/sale/list";
-            } elseif ($admin->can('view purchase')) {
-                $this->redirectTo = "admin/purchase/list";
-            } else {
-                $this->redirectTo = "admin/profile";
-            }
             return $this->sendLoginResponse($request);
         }
 
@@ -99,11 +86,6 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
-    }
-
-    protected function credentials(Request $request)
-    {
-        return ['username' => $request->username, 'password' => $request->password, 'status' => Status::USER_ACTIVE];
     }
 
 

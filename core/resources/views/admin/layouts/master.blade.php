@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ config('app.locale') }}">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,7 +12,6 @@
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
 
-    <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <script src="{{ asset('assets/admin/js/theme.js') }}"></script>
 
     <link rel="stylesheet" href="{{ asset('assets/global/css/bootstrap.min.css') }}">
@@ -22,7 +22,6 @@
     @stack('style-lib')
 
     <link rel="stylesheet" href="{{ asset('assets/admin/css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/custom.css') }}">
     @stack('style')
 </head>
 
@@ -46,7 +45,6 @@
     <script>
         (function($) {
             "use strict";
-
             // event when change lang
             $(".langSel").on("click", function() {
                 const code = $(this).data('code')
@@ -60,14 +58,8 @@
                 empty_message: "@lang('There are no available data to display.')",
                 allow_precision: "{{ gs('allow_precision') }}"
             }
-
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker
-                    .register("{{ asset('assets/admin/js/service_worker.js') }}")
-                    .then(() => console.log("Service Worker registered successfully."))
-                    .catch((error) => console.log("Service Worker registration failed:", error));
-            }
         })(jQuery);
     </script>
 </body>
+
 </html>

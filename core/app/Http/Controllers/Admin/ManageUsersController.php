@@ -36,7 +36,7 @@ class ManageUsersController extends Controller
         if (request()->export) {
             return $this->callExportData($baseQuery);
         }
-
+        
         $users = $baseQuery->paginate(getPaginate());
         return view('admin.users.list', compact('pageTitle', 'users', 'widget'));
     }
@@ -149,7 +149,7 @@ class ManageUsersController extends Controller
     protected function userData($scope = 'query')
     {
         $baseQuery  = User::$scope()->searchable(['email', 'username', 'firstname', 'lastname'])->dateFilter()->filter(['status'])->orderBy('id', getOrderBy());
-
+        
         $countQuery = User::query();
         $widget['all']   = (clone $countQuery)->count();
         $widget['today'] = (clone $countQuery)->whereDate('created_at', now())->count();
@@ -168,8 +168,8 @@ class ManageUsersController extends Controller
         $pageTitle = 'User Detail - ' . $user->username;
         $loginLogs = UserLogin::where('user_id', $user->id)->take(6)->get();
 
-        // $widget['total_deposit']     = Deposit::where('user_id', $user->id)->successful()->sum('amount');
-        // $widget['total_withdraw']    = Withdrawal::where('user_id', $user->id)->approved()->sum('amount');
+        $widget['total_deposit']     = Deposit::where('user_id', $user->id)->successful()->sum('amount');
+        $widget['total_withdraw']    = Withdrawal::where('user_id', $user->id)->approved()->sum('amount');
         $widget['total_transaction'] = Transaction::where('user_id', $user->id)->sum('amount');
         $countries                   = json_decode(file_get_contents(resource_path('views/partials/country.json')));
 

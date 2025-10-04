@@ -16,8 +16,8 @@ class AdminController extends Controller
     public function dashboard()
     {
         $admin = getAdmin();
-        extract(saleAndPurchaseDataForGraph(5, $admin->id, "D"));
-        $message[] = "admin_dashboard";
+        extract(saleAndPurchaseDataForGraph(5,  "D"));
+        $message[] = "user_dashboard";
         $data      = [
             'graph' => [
                 'dates'    => $dates,

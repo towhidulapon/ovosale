@@ -11,7 +11,9 @@ trait HolidayOperation
 {
     public function list()
     {
-        $baseQuery = Holiday::where('user_id', auth()->id())->searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+        $baseQuery = Holiday::whereHas('company', function($q){
+            $q->where('user_id', auth()->id());
+        })->searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Holiday';
         $view      = "Template::user.hrm.holiday.list";
         if (request()->export) {
@@ -53,7 +55,6 @@ trait HolidayOperation
         $end   = Carbon::parse($request->end_date);
         $days  = $start->diffInDays($end) + 1;
 
-        $holiday->user_id     = auth()->id();
         $holiday->company_id  = $request->company_id;
         $holiday->title       = $request->title;
         $holiday->start_date  = $request->start_date;

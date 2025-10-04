@@ -12,6 +12,10 @@ class PaymentType extends Model
 
     protected $guarded  = ['id'];
 
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
     public function paymentAccounts()
     {
         return $this->hasMany(PaymentAccount::class, 'payment_type_id');

@@ -29,7 +29,6 @@ trait PurchaseOperation {
         })->get();
 
         $baseQuery      = Purchase::where('user_id', auth()->id())->latest('id');
-        // $baseQuery      = Purchase::latest('id');
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Purchase");
@@ -67,7 +66,7 @@ trait PurchaseOperation {
 
     public function edit($id) {
         $pageTitle = "Edit Purchase";
-        $purchase  = Purchase::where("id", $id)->where("id", $id)->with('purchaseDetails.product', "purchaseDetails.productDetail.attribute", "purchaseDetails.productDetail.variant")->firstOrFailWithApi("purchase");
+        $purchase  = Purchase::where("user_id", auth()->id())->where("id", $id)->with('purchaseDetails.product', "purchaseDetails.productDetail.attribute", "purchaseDetails.productDetail.variant")->firstOrFailWithApi("purchase");
         $view      = "Template::user.purchase.edit";
 
         extract($this->basicDataForPurchase());
@@ -79,6 +78,7 @@ trait PurchaseOperation {
         $view      = "Template::user.purchase.view";
 
         $purchase = Purchase::withSum('supplierPayments', 'amount')
+            ->where("user_id", auth()->id())
             ->where("id", $id)
             ->with("warehouse", "supplier", 'supplierPayments.paymentType')
             ->firstOrFailWithApi("purchase");
@@ -129,7 +129,7 @@ trait PurchaseOperation {
             DB::beginTransaction();
 
             $purchase                   = new Purchase();
-            $purchase->user_id = auth()->id();
+            $purchase->user_id          = auth()->id();
             $purchase->invoice_number   = $this->invoiceNumber();
             $purchase->supplier_id      = $supplier->id;
             $purchase->warehouse_id     = $request->warehouse_id;
@@ -144,7 +144,7 @@ trait PurchaseOperation {
             $purchase->subtotal        = $subtotal;
             $purchase->total           = $total;
             $purchase->status          = $request->status;
-            $purchase->admin_id        = getAdmin('id');
+            // $purchase->admin_id        = getAdmin('id');
 
             if ($request->hasFile('attachment')) {
                 try {
@@ -193,11 +193,11 @@ trait PurchaseOperation {
         } catch (Exception $e) {
             DB::rollBack();
             $notify[] = $e->getMessage();
-            adminActivity("purchase", activityMessage: "Try the purchase add but failed for: " . $e->getMessage());
+            // adminActivity("purchase", activityMessage: "Try the purchase add but failed for: " . $e->getMessage());
             return jsonResponse('exception', 'error', $notify);
         }
 
-        adminActivity("purchase-add", get_class($purchase), $purchase->id);
+        // adminActivity("purchase-add", get_class($purchase), $purchase->id);
         $message[] = "Purchase added successfully";
         return jsonResponse('purchase', 'success', $message);
     }
@@ -335,11 +335,11 @@ trait PurchaseOperation {
         } catch (Exception $e) {
             DB::rollBack();
             $notify[] = $e->getMessage();
-            adminActivity("purchase", get_class($purchase), $purchase->id, "Try the purchase update but failed for: " . $e->getMessage());
+            // adminActivity("purchase", get_class($purchase), $purchase->id, "Try the purchase update but failed for: " . $e->getMessage());
             return jsonResponse('exception', 'error', $notify);
         }
 
-        adminActivity("purchase-updated", get_class($purchase), $purchase->id);
+        // adminActivity("purchase-updated", get_class($purchase), $purchase->id);
         $message[] = "Purchase update successfully";
         return jsonResponse('purchase', 'success', $message);
     }
@@ -366,7 +366,7 @@ trait PurchaseOperation {
         }
 
         $this->purchasePayment($purchase, $request);
-        adminActivity("purchase-payment", get_class($purchase), $purchase->id);
+        // adminActivity("purchase-payment", get_class($purchase), $purchase->id);
         $notify =  "Purchase payment added successfully";
         return responseManager("purchase_payment", $notify, 'success');
     }
@@ -407,14 +407,14 @@ trait PurchaseOperation {
                     $this->updateStock($purchase, $productDetail, $purchaseDetails->quantity);
                 }
             }
-            adminActivity("purchase-status-change", get_class($purchase), $purchase->id);
+            // adminActivity("purchase-status-change", get_class($purchase), $purchase->id);
             DB::commit();
             $notify =  "Purchase status updated successfully";
             return responseManager("change_status", $notify, 'success');
         } catch (Exception $e) {
             DB::rollBack();
             $notify[] = $e->getMessage();
-            adminActivity("purchase", get_class($purchase), $purchase->id, "Try the update purchase status but failed for: " . $e->getMessage());
+            // adminActivity("purchase", get_class($purchase), $purchase->id, "Try the update purchase status but failed for: " . $e->getMessage());
             return jsonResponse('exception', 'error', $notify);
         }
     }

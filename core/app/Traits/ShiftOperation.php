@@ -6,11 +6,16 @@ use App\Models\Company;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 
-trait ShiftOperation
-{
-    public function list()
-    {
-        $baseQuery = Shift::where('user_id', auth()->id())->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
+trait ShiftOperation {
+    public function list() {
+        $baseQuery = Shift::whereHas('company', function ($q) {
+            $q->where('user_id', auth()->id());
+        })
+            ->searchable(['name', 'company:name'])
+            ->with('company')
+            ->orderBy('id', getOrderBy())
+            ->trashFilter();
+
         $pageTitle = 'Manage Shift';
         $view      = "Template::user.hrm.shift.list";
         if (request()->export) {
@@ -22,8 +27,7 @@ trait ShiftOperation
     }
 
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $request->validate(
             [
                 'name'                => 'required|unique:shifts,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:255',
@@ -35,7 +39,10 @@ trait ShiftOperation
         );
 
         if ($id) {
-            $shift    = Shift::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('shift');
+            $shift    = Shift::where('id', $id)->whereHas('company', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
+                ->firstOrFailWithApi('shift');
             $message  = "Shift updated successfully";
             $remark   = "shift-updated";
         } else {
@@ -44,7 +51,6 @@ trait ShiftOperation
             $remark   = "shift-added";
         }
 
-        $shift->user_id       = auth()->id();
         $shift->name          = $request->name;
         $shift->company_id    = $request->company_id;
         $shift->save();
@@ -53,8 +59,7 @@ trait ShiftOperation
         return responseManager("shift", $message, 'success', compact('shift'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return Shift::changeStatus($id);
     }
 }

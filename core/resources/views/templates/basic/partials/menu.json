@@ -284,8 +284,7 @@
                 "user.report.purchase",
                 "user.report.expense",
                 "user.report.profit.invoice_wise",
-                "user.report.profit.product_wise",
-                "user.report.notification.history"
+                "user.report.profit.product_wise"
             ],
             "permission": [
                 "view sale report",
@@ -329,12 +328,6 @@
                     "icon": "las la-dot-circle",
                     "route_name": "user.report.profit.invoice_wise",
                     "permission": ["view profit loss report"]
-                },
-                {
-                    "title": "Notification History",
-                    "icon": "las la-dot-circle",
-                    "route_name": "user.report.notification.history",
-                    "permission": ["notification setting"]
                 }
             ]
         }
@@ -698,34 +691,6 @@
                 "edit supplier",
                 "export supplier",
                 "trash supplier"
-            ]
-        }
-    ],
-    "administrations": [
-        {
-            "title": "Manage Admin",
-            "icon": "la la-user-circle",
-            "menu_active": "user.list",
-            "route_name": "user.list",
-            "permission": [
-                "view admin",
-                "add admin",
-                "edit admin",
-                "export admin",
-                "trash admin"
-            ]
-        },
-        {
-            "title": "Role & Permissions",
-            "icon": "las la-user-tag",
-            "menu_active": "user.role.*",
-            "route_name": "user.role.list",
-            "permission": [
-                "view role",
-                "add role",
-                "edit role",
-                "trash role",
-                "assign permission"
             ]
         }
     ],

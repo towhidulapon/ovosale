@@ -27,7 +27,6 @@ trait SaleOperation
     public function list() {
         $pageTitle = "Sale List";
         $view      = "Template::user.sale.list";
-        // $baseQuery = Sale::latest('id');
         $baseQuery      = Sale::where('user_id', auth()->id())->latest('id');
 
         if (request()->export) {
@@ -66,16 +65,16 @@ trait SaleOperation
 
     public function edit($id) {
         $pageTitle = "Edit Sale";
-        $sale      = Sale::where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
-        $view      = "admin.sale.edit";
+        $sale      = Sale::where('user_id', auth()->id())->where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
+        $view      = "Template::user.sale.edit";
         extract($this->basicDataForSale());
         return responseManager("edit_sale", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'paymentMethods', 'view', 'sale'));
     }
 
     public function view($id) {
         $pageTitle          = "Sale Invoice";
-        $view               = "admin.sale.view";
-        $sale               = Sale::where("id", $id)->with("warehouse", "customer", 'payments', 'saleDetails.productDetail.product')->firstOrFailWithApi("sale");
+        $view               = "Template::user.sale.view";
+        $sale               = Sale::where('user_id', auth()->id())->where("id", $id)->with("warehouse", "customer", 'payments', 'saleDetails.productDetail.product')->firstOrFailWithApi("sale");
         $companyInformation = gs('company_information');
         return responseManager("view_sale", $pageTitle, 'success', compact('pageTitle', 'sale', 'view', 'companyInformation'));
     }
@@ -83,7 +82,7 @@ trait SaleOperation
     public function pdf($id) {
         $pageTitle = "Sale Invoice";
         $sale      = Sale::where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
-        $pdf       = Pdf::loadView('admin.sale.pdf', compact('sale', 'pageTitle'));
+        $pdf       = Pdf::loadView('Template::user.sale.pdf', compact('sale', 'pageTitle'));
         $fileName  = "Sale Invoice - " . $sale->invoice_number . ".pdf";
         return $pdf->download($fileName);
     }
@@ -192,6 +191,7 @@ trait SaleOperation
 
         try {
             $sale                  = new Sale();
+            $sale->user_id         = auth()->id();
             $sale->invoice_number  = $this->invoiceNumber($saleId);
             $sale->sale_date       = $request->sale_date ?? date('Y-m-d');
             $sale->customer_id     = $request->customer_id ?? 1;
@@ -206,9 +206,10 @@ trait SaleOperation
             $sale->total           = $total;
 
             $sale->paying_amount = $payingAmount;
-            $sale->admin_id      = getAdmin('id');
+            // $sale->admin_id      = getAdmin('id');
             $sale->note          = $request->note ?? null;
             $sale->coupon_id     = $request->coupon_id ?? 0;
+
             $sale->save();
 
             SaleDetails::insert($saleDetails);
@@ -217,25 +218,25 @@ trait SaleOperation
             $this->insertSalePayment($request, $sale, $changesAmount);
 
             if (isApiRequest()) {
-                Cart::where('admin_id', $sale->admin_id)->delete();
+                Cart::where('user_id', $sale->user_id)->delete();
             }
 
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             $notify[] = $e->getMessage();
-            adminActivity("sale", get_class($sale), 0, "Try the new sale, but failed for: " . $e->getMessage());
+            // adminActivity("sale", get_class($sale), 0, "Try the new sale, but failed for: " . $e->getMessage());
             return jsonResponse('exception', 'error', $notify);
         }
 
         $sale->load('customer', 'saleDetails', 'saleDetails.product', 'saleDetails.productDetail');
-        adminActivity("sale-add", get_class($sale), $sale->id);
+        // adminActivity("sale-add", get_class($sale), $sale->id);
 
         $html      = "";
         $message[] = "Sale added successfully";
 
         if ($request->save_action_type == 'save_and_print') {
-            $html = view($request->invoice_type == 'regular' ? 'admin.sale.invoice' : 'admin.sale.pos_invoice', compact('sale'))->render();
+            $html = view($request->invoice_type == 'regular' ? 'Template::user.sale.invoice' : 'Template::user.sale.pos_invoice', compact('sale'))->render();
         }
 
         return jsonResponse('sale', 'success', $message, [
@@ -254,7 +255,7 @@ trait SaleOperation
         }
 
 
-        $sale = Sale::where("id", $id)->firstOrFailWithApi("sale");
+        $sale = Sale::where('user_id', auth()->id())->where("id", $id)->firstOrFailWithApi("sale");
 
         if ($sale->status == Status::SALE_FINAL && $request->status == Status::SALE_QUOTATION) {
             $message[] = "Cannot change sale final to quotation";
@@ -385,17 +386,17 @@ trait SaleOperation
         } catch (Exception $e) {
             DB::rollBack();
             $notify[] = $e->getMessage();
-            adminActivity("sale", get_class($sale), $sale->id, "Try the update sale, but failed for: " . $e->getMessage());
+            // adminActivity("sale", get_class($sale), $sale->id, "Try the update sale, but failed for: " . $e->getMessage());
             return jsonResponse('exception', 'error', $notify);
         }
 
-        adminActivity("sale-add", get_class($sale), $sale->id);
+        // adminActivity("sale-add", get_class($sale), $sale->id);
         $message[] = "Sale updated successfully";
 
         $sale->load('customer', 'saleDetails', 'saleDetails.product', 'saleDetails.productDetail');
 
         if ($request->save_action_type == 'save_and_print') {
-            $html = view($request->invoice_type == 'regular' ? 'admin.sale.invoice' : 'admin.sale.pos_invoice', compact('sale'))->render();
+            $html = view($request->invoice_type == 'regular' ? 'Template::user.sale.invoice' : 'Template::user.sale.pos_invoice', compact('sale'))->render();
         } else {
             $html = "";
         }
