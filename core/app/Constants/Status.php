@@ -66,7 +66,12 @@ class Status
     Const APPROVED = 1;
     Const REJECTED = 2;
 
-    
+    const DAILY = 1;
+    const WEEKLY = 2;
+    const MONTHLY = 3;
+    const HALF_YEARLY = 4;
+    const YEARLY = 5;
+
 
 
 }

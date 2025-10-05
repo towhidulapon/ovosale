@@ -18,7 +18,7 @@
                                     <tr>
                                         <td>{{ __($paymentType->name) }}</td>
                                         <td>
-                                            <x-admin.other.status_switch :status="$paymentType->status" :action="route('user.payment.type.status.change', $paymentType->id)"
+                                            <x-user.other.status_switch :status="$paymentType->status" :action="route('user.payment.type.status.change', $paymentType->id)"
                                                 title="payment type" />
                                         </td>
                                         <td>

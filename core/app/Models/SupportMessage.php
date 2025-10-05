@@ -8,7 +8,7 @@ class SupportMessage extends Model
 {
 
     protected $guarded  = ['id'];
-    
+
     public function ticket()
     {
         return $this->belongsTo(SupportTicket::class, 'support_ticket_id', 'id');

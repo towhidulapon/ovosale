@@ -128,6 +128,50 @@
                     "menu_active": "admin.users.notification.all"
                 }
             ]
+        },
+        {
+            "title": "Subscription Plans",
+            "icon": "las la-book",
+            "menu_active": "admin.subscription*",
+            "submenu": [
+                {
+                    "keyword": [
+                        "subscription plans",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription status",
+                        "Subscription analytics"
+                    ],
+                    "title": "All Plans",
+                    "route_name": "admin.subscription.plan.list",
+                    "menu_active": "admin.subscription.plan.list"
+                },
+                {
+                    "keyword": [
+                        "subscription features",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Plan Features",
+                    "route_name": "admin.subscription.plan.features",
+                    "menu_active": "admin.subscription.plan.features"
+                },
+                {
+                    "keyword": [
+                        "plan orders",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Plan Orders",
+                    "route_name": "admin.subscription.plan.orders",
+                    "menu_active": "admin.subscription.plan.orders"
+                }
+            ]
         }
     ],
     "utilities & report": [
@@ -571,7 +615,7 @@
         {
             "title": "Support Ticket",
             "icon": "la la-ticket",
-            "menu_active": "admin.ticket.*",
+            "menu_active": "admin0.ticket.*",
             "submenu": [
                 {
                     "title": "Pending Ticket",

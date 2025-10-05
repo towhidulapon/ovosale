@@ -697,31 +697,11 @@
 
     "other": [
         {
-            "title": "Support Ticket",
+            "title": "My Ticket",
             "icon": "la la-ticket",
-            "menu_active": "ticket.*",
-            "submenu": [
-                {
-                    "title": "All Ticket",
-                    "icon": "las la-dot-circle",
-                    "route_name": "ticket.index",
-                    "menu_active": "ticket.index",
-                    "keyword": [
-                        "all tickets",
-                        "ticket management",
-                        "support tickets",
-                        "ticket overview",
-                        "ticket status",
-                        "customer inquiries",
-                        "ticket tracking",
-                        "ticket history",
-                        "ticket filtering",
-                        "ticket categorization",
-                        "open tickets",
-                        "closed tickets"
-                    ]
-                }
-            ]
+            "route_name": "ticket.index",
+            "menu_active": "ticket.index",
+            "permission": ["application information"]
         }
     ]
 }

@@ -210,6 +210,31 @@ Route::middleware('admin')->group(function () {
         });
     });
 
+    Route::controller('SubscriptionController')->prefix('subscription/plan')->name('subscription.plan.')->group(function () {
+        Route::get('/', 'plans')->name('list');
+        Route::get('add', 'add')->name('add');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('save/{id?}', 'save')->name('save');
+        Route::get('orders', 'orders')->name('orders');
+        Route::get('features', 'features')->name('features');
+        Route::post('save-feature/{id?}', 'saveFeature')->name('feature.save');
+        Route::post('feature-status/{id?}', 'featureStatus')->name('feature.status');
+        Route::post('status/{id}', 'status')->name('status');
+    });
+
+    // Admin Support
+    Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function () {
+        Route::get('/', 'tickets')->name('index');
+        Route::get('pending', 'pendingTicket')->name('pending');
+        Route::get('closed', 'closedTicket')->name('closed');
+        Route::get('answered', 'answeredTicket')->name('answered');
+        Route::get('view/{id}', 'ticketReply')->name('view');
+        Route::post('reply/{id}', 'replyTicket')->name('reply');
+        Route::post('close/{id}', 'closeTicket')->name('close');
+        Route::get('download/{attachment_id}', 'ticketDownload')->name('download');
+        Route::post('delete/{id}', 'ticketDelete')->name('delete');
+    });
+
     // SEO
     Route::get('seo', 'FrontendController@seoEdit')->name('seo');
 

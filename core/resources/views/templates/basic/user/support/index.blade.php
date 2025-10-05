@@ -1,5 +1,5 @@
 @extends($activeTemplate.'layouts.master')
-@section('content')
+@section('panel')
     <div class="container">
         <div class="row justify-content-center mt-4">
             <div class="col-md-12">

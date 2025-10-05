@@ -1,5 +1,5 @@
 @extends($activeTemplate.'layouts.'.$layout)
-@section('content')
+@section('panel')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
@@ -10,7 +10,7 @@
                             [@lang('Ticket')#{{ $myTicket->ticket }}] {{ $myTicket->subject }}
                         </h5>
                         @if($myTicket->status != Status::TICKET_CLOSE && $myTicket->user)
-                        <button class="btn btn-danger close-button  confirmationBtn" type="button" data-question="@lang('Are you sure to close this ticket?')" data-action="{{ route('ticket.close', $myTicket->id) }}"><i class="fas fa-lg fa-times-circle"></i>
+                        <button class="btn btn--danger close-button  confirmationBtn" type="button" data-question="@lang('Are you sure to close this ticket?')" data-action="{{ route('ticket.close', $myTicket->id) }}"><i class="fas fa-lg fa-times-circle"></i>
                         </button>
                         @endif
                     </div>
@@ -25,7 +25,7 @@
                                 </div>
 
                                 <div class="col-md-9">
-                                    <button type="button" class="btn btn-dark  addAttachment my-2"> <i class="fas fa-plus"></i> @lang('Add Attachment') </button>
+                                    <button type="button" class="btn btn--dark  addAttachment my-2"> <i class="fas fa-plus"></i> @lang('Add Attachment') </button>
                                     <p class="mb-2"><span class="text--info">@lang('Max 5 files can be uploaded | Maximum upload size is '.convertToReadableSize(ini_get('upload_max_filesize')) .' | Allowed File Extensions: .jpg, .jpeg, .png, .pdf, .doc, .docx')</span></p>
                                     <div class="row fileUploadsContainer">
                                     </div>
