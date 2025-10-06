@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\PlanFeature;
+use App\Models\PlanOrder;
+use App\Models\PlanPurchase;
 use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 
@@ -14,36 +17,10 @@ class SubscriptionController extends Controller {
         return view('admin.subscription.index', compact('pageTitle', 'subscriptionPlans'));
     }
 
-    public function add() {
+    public function create() {
         $pageTitle = 'Add Plan';
         $planFeatures = PlanFeature::orderBy('id', 'desc')->get();
         return view('admin.subscription.add', compact('pageTitle', 'planFeatures'));
-    }
-
-    public function features() {
-        $pageTitle = 'Plan Features';
-        $planFeatures = PlanFeature::orderBy('id', 'desc')->paginate(getPaginate());
-        return view('admin.subscription.features', compact('pageTitle', 'planFeatures'));
-    }
-
-    public function saveFeature(Request $request, $id = 0) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        if ($id) {
-            $feature = PlanFeature::findOrFail($id);
-            $feature->name = $request->name;
-            $message = "Feature updated successfully";
-        } else {
-            $feature = new PlanFeature();
-            $feature->name = $request->name;
-            $message = "Feature created successfully";
-        }
-        $feature->save();
-
-        $notify[] = ['success', $message];
-        return back()->withNotify($notify);
     }
 
     public function save(Request $request, $id = 0) {
@@ -90,11 +67,13 @@ class SubscriptionController extends Controller {
         return view('admin.subscription.edit', compact('pageTitle', 'plan', 'planFeatures'));
     }
 
-    public function status($id) {
-        return SubscriptionPlan::changeStatus($id);
+    public function purchase(){
+        $pageTitle = 'Purchased Subscriptions';
+        $purchasedPlans = PlanPurchase::where('status', Status::PLAN_PURCHASE_SUCCESS)->orderBy('id', 'desc')->paginate(getPaginate());
+        return view('admin.subscription.purchase', compact('pageTitle', 'purchasedPlans'));
     }
 
-    public function featureStatus($id) {
-        return PlanFeature::changeStatus($id);
+    public function status($id) {
+        return SubscriptionPlan::changeStatus($id);
     }
 }

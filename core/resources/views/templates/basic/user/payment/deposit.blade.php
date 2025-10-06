@@ -1,9 +1,9 @@
 @extends($activeTemplate . 'layouts.master')
-@section('content')
+@section('panel')
     <div class="container ">
         <div class="row justify-content-center">
             <div class="col-lg-9">
-                <form action="{{ route('user.deposit.insert') }}" method="post" class="deposit-form">
+                <form action="{{ route('user.deposit.insert') }}" method="post" class="deposit-form no-submit-loader">
                     @csrf
                     <input type="hidden" name="currency">
                     <div class="gateway-card">

@@ -7,8 +7,8 @@
                     <x-admin.ui.table.header>
                         <tr>
                             <th>@lang('Name')</th>
-                            <th>@lang('frequency')</th>
-                            <th>@lang('warehouse_number')</th>
+                            <th>@lang('Frequency')</th>
+                            <th>@lang('Number of Warehouse')</th>
                             <th>@lang('Price')</th>
                             <th>@lang('Trial Days')</th>
                             <th>@lang('Status')</th>
@@ -65,6 +65,6 @@
 
 @push('breadcrumb-plugins')
     <x-permission_check permission="add sale">
-        <x-admin.ui.btn.add href="{{ route('admin.subscription.plan.add') }}" text="New Plan" />
+        <x-admin.ui.btn.add href="{{ route('admin.subscription.plan.create') }}" text="New Plan" />
     </x-permission_check>
 @endpush

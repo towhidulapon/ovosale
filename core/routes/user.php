@@ -71,9 +71,6 @@ Route::middleware('auth')->name('user.')->group(function () {
 
                 Route::post('add-device-token', 'addDeviceToken')->name('add.device.token');
 
-
-                //TODO :: functionality
-
                 Route::get('chart/sales-purchase', 'saleAndPurchaseChart')->name('chart.sales.purchase');
                 Route::get('low-stock-product', 'lowStockProduct')->name('low.stock.product');
 
@@ -93,6 +90,13 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('profile-setting', 'submitProfile');
                 Route::get('change-password', 'changePassword')->name('change.password');
                 Route::post('change-password', 'submitPassword');
+            });
+
+            Route::controller('PlanSubscribeController')->prefix('subscription/plan')->name('subscription.')->group(function () {
+                Route::get('list', 'list')->name('plan.list');
+                Route::get('purchase/{id}', 'planPurchase')->name('plan.purchase');
+                Route::post('purchase/insert', 'planPurchaseInsert')->name('plan.purchase.insert');
+                Route::get('purchased/list', 'purchasedList')->name('plan.purchased.list');
             });
 
             //sale

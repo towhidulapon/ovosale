@@ -37,6 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->prefix('admin')
                     ->name('admin.')
                     ->group(base_path('routes/admin.php'));
+                Route::middleware(['web', 'maintenance'])
+                    ->namespace('Gateway')
+                    ->prefix('ipn')
+                    ->name('ipn.')
+                    ->group(base_path('routes/ipn.php'));
 
                 Route::middleware(['web', 'maintenance'])->prefix('user')->group(base_path('routes/user.php'));
                 Route::middleware(['web', 'maintenance'])->group(base_path('routes/web.php'));

@@ -27,6 +27,37 @@
             "route_name": "user.home"
         },
         {
+            "title": "Manage Subscription",
+            "icon": "la la-list",
+            "menu_active": ["user.subscription.plan.*"],
+            "submenu": [
+                {
+                    "title": "Plans",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.subscription.plan.list",
+                    "menu_active": "user.subscription.plan.list",
+                    "keyword": [
+                        "subscription plans",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control"
+                    ]
+                },
+                {
+                    "title": "Purchased Plans",
+                    "icon": "las la-dot-circle",
+                    "route_name": "user.subscription.plan.purchased.list",
+                    "menu_active": "user.subscription.plan.purchased.list",
+                    "keyword": [
+                        "subscription plans",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control"
+                    ]
+                }
+            ]
+        },
+        {
             "title": "Manage Sale",
             "icon": "la la-list",
             "menu_active": ["user.sale.*"],

@@ -8,7 +8,7 @@ class Transaction extends Model
 {
 
     protected $guarded  = ['id'];
-    
+
     public function exportColumns(): array
     {
         return  [
@@ -36,6 +36,10 @@ class Transaction extends Model
                 }
             ],
         ];
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 
     public function paymentAccount()

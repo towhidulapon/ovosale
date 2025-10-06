@@ -136,6 +136,19 @@
             "submenu": [
                 {
                     "keyword": [
+                        "create plan",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription status",
+                        "Subscription analytics"
+                    ],
+                    "title": "Create Plan",
+                    "route_name": "admin.subscription.plan.create",
+                    "menu_active": "admin.subscription.plan.create"
+                },
+                {
+                    "keyword": [
                         "subscription plans",
                         "Manage Subscription",
                         "Subscription management",
@@ -167,9 +180,9 @@
                         "Subscription control",
                         "Subscription analytics"
                     ],
-                    "title": "Plan Orders",
-                    "route_name": "admin.subscription.plan.orders",
-                    "menu_active": "admin.subscription.plan.orders"
+                    "title": "Purchased Plans",
+                    "route_name": "admin.subscription.plan.purchase",
+                    "menu_active": "admin.subscription.plan.purchase"
                 }
             ]
         }

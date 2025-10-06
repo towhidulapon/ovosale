@@ -73,5 +73,6 @@ class Status
     const YEARLY = 5;
 
 
-
+    const PLAN_PURCHASE_INITIATE = 0;
+    const PLAN_PURCHASE_SUCCESS  = 1;
 }

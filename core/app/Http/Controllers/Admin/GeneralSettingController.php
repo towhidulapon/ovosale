@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Rules\FileTypeValidate;
 use Exception;
@@ -40,7 +41,7 @@ class GeneralSettingController extends Controller {
         $gs->save();
 
         $notify[] = ['success', 'Company information updated successfully'];
-        adminActivity("company-information-updated", get_class($gs), $gs->id);
+        // adminActivity("company-information-updated", get_class($gs), $gs->id);
         return back()->withNotify($notify);
     }
     public function generalUpdate(Request $request) {
@@ -77,7 +78,7 @@ class GeneralSettingController extends Controller {
         file_put_contents($timezoneFile, $content);
         $notify[] = ['success', 'General setting updated successfully'];
 
-        adminActivity("generate-setting-updated", get_class($general), $general->id);
+        // adminActivity("generate-setting-updated", get_class($general), $general->id);
         return back()->withNotify($notify);
     }
 
@@ -100,7 +101,7 @@ class GeneralSettingController extends Controller {
         $general->prefix_setting = $prefixSetting;
         $general->save();
 
-        adminActivity("prefix-setting-updated", get_class($general), $general->id);
+        // adminActivity("prefix-setting-updated", get_class($general), $general->id);
         $notify[] = ['success', 'Prefix setting updated successfully'];
         return back()->withNotify($notify);
     }
@@ -124,7 +125,7 @@ class GeneralSettingController extends Controller {
                 'success'    => true,
                 'new_status' => $newStatus
             ]);
-            adminActivity("system-configuration-updated", get_class($general), $general->id);
+            // adminActivity("system-configuration-updated", get_class($general), $general->id);
         } catch (Exception $ex) {
             return response()->json([
                 'success' => false,
@@ -208,6 +209,43 @@ class GeneralSettingController extends Controller {
             }
         }
         $notify[] = ['success', 'PWA images updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function socialiteCredentials() {
+        $pageTitle = 'Social Login Setting';
+        return view('admin.setting.social_credential', compact('pageTitle'));
+    }
+
+    public function updateSocialiteCredentialStatus($key) {
+        $general     = gs();
+        $credentials = $general->socialite_credentials;
+        try {
+            $credentials->$key->status = $credentials->$key->status == Status::ENABLE ? Status::DISABLE : Status::ENABLE;
+        } catch (\Throwable $th) {
+            abort(404);
+        }
+
+        $general->socialite_credentials = $credentials;
+        $general->save();
+
+        $notify[] = ['success', 'Status changed successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function updateSocialiteCredential(Request $request, $key) {
+        $general     = gs();
+        $credentials = $general->socialite_credentials;
+        try {
+            @$credentials->$key->client_id     = $request->client_id;
+            @$credentials->$key->client_secret = $request->client_secret;
+        } catch (\Throwable $th) {
+            abort(404);
+        }
+        $general->socialite_credentials = $credentials;
+        $general->save();
+
+        $notify[] = ['success', ucfirst($key) . ' credential updated successfully'];
         return back()->withNotify($notify);
     }
 }

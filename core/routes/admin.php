@@ -212,14 +212,18 @@ Route::middleware('admin')->group(function () {
 
     Route::controller('SubscriptionController')->prefix('subscription/plan')->name('subscription.plan.')->group(function () {
         Route::get('/', 'plans')->name('list');
-        Route::get('add', 'add')->name('add');
+        Route::get('create', 'create')->name('create');
         Route::get('edit/{id}', 'edit')->name('edit');
         Route::post('save/{id?}', 'save')->name('save');
-        Route::get('orders', 'orders')->name('orders');
+        Route::get('purchase', 'purchase')->name('purchase');
+        Route::get('order/details/{id}', 'orderDetails')->name('order.details');
+        Route::post('status/{id}', 'status')->name('status');
+    });
+
+    Route::controller('PlanFeatureController')->prefix('plan')->name('subscription.plan.')->group(function () {
         Route::get('features', 'features')->name('features');
         Route::post('save-feature/{id?}', 'saveFeature')->name('feature.save');
         Route::post('feature-status/{id?}', 'featureStatus')->name('feature.status');
-        Route::post('status/{id}', 'status')->name('status');
     });
 
     // Admin Support
