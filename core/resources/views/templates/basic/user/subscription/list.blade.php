@@ -1,5 +1,4 @@
 @extends($activeTemplate . 'layouts.master')
-
 @section('panel')
     <div class="row gy-4">
         @forelse ($subscriptionPlans as $subscriptionPlan)
@@ -27,7 +26,13 @@
                                 {{ $subscriptionPlan->trial_days }}
                             </li>
                         </ul>
-                        <a href="{{ route('user.subscription.plan.purchase', $subscriptionPlan->id) }}" class="btn btn--primary w-100">@lang('Select Plan')</a>
+                        <a href="{{ route('user.subscription.plan.trial', $subscriptionPlan->id) }}" class="btn btn--warning w-100 mb-2 @if ($trialPlan?->subscription_plan_id == $subscriptionPlan->id) disabled
+                        @endif">@lang('Start Trial')
+                        </a>
+                        @if($subscribedPlan?->subscription_plan_id != $subscriptionPlan->id)
+                            <a href="{{ route('user.subscription.plan.purchase', $subscriptionPlan->id) }}" class="btn btn--primary w-100">@lang('Select Plan')
+                            </a>
+                        @endif
                     </x-user.ui.card.body>
                 </x-user.ui.card>
             </div>

@@ -27,7 +27,7 @@
                             <div class="form-group col-sm-6">
                                 <label>@lang('Price')</label>
                                 <div class="input-group">
-                                    <input class="form-control" type="text" step="any" name="price" value="{{ old('price', $plan->price ?? '') }}" required>
+                                    <input class="form-control" type="text" step="any" name="price" value="{{ old('price', getAmount($plan->price) ?? '') }}" required>
                                     <span class="input-group-text">
                                         {{ gs('cur_text') }}
                                     </span>

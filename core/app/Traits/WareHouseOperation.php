@@ -2,16 +2,16 @@
 
 namespace App\Traits;
 
+use App\Constants\Status;
+use App\Models\PlanPurchase;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
-trait WareHouseOperation
-{
+trait WareHouseOperation {
 
     public $modelName = "Warehouse";
 
-    public function list()
-    {
+    public function list() {
         $baseQuery = Warehouse::where('user_id', auth()->id())->searchable(['name', 'contact_number'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Warehouse';
         $view      = "Template::user.warehouse.list";
@@ -24,8 +24,7 @@ trait WareHouseOperation
         return responseManager("warehouse", $pageTitle, 'success', compact('warehouses', 'view', 'pageTitle'));
     }
 
-    public function save(Request $request, $id = 0)
-    {
+    public function save(Request $request, $id = 0) {
         $request->validate([
             'name'           => 'required|string|unique:warehouses,name,' . $id,
             'address'        => 'required|string',
@@ -45,6 +44,18 @@ trait WareHouseOperation
             $remark    = "warehouse-added";
         }
 
+        $purchasedPlan = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_PURCHASE_SUCCESS)->first();
+
+        if ($purchasedPlan) {
+            if ($purchasedPlan->subscriptionPlan->warehouse_number <= $warehouse->count()) {
+                $notify[] = ['error', 'You have reached your warehouse limit'];
+                return back()->withNotify($notify);
+            }
+        } else {
+            $notify[] = ['error', 'Please subscribe a plan to add warehouse'];
+            return back()->withNotify($notify);
+        }
+
         $user = auth()->user();
 
         $warehouse->user_id        = $user->id;
@@ -61,8 +72,7 @@ trait WareHouseOperation
         return responseManager("warehouse", $message, 'success', compact('warehouse'));
     }
 
-    public function status($id)
-    {
+    public function status($id) {
         return Warehouse::changeStatus($id);
     }
 }

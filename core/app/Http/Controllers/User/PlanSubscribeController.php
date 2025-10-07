@@ -17,7 +17,9 @@ class PlanSubscribeController extends Controller
     {
         $pageTitle = "Subscription Plans";
         $subscriptionPlans = SubscriptionPlan::orderBy('id', 'desc')->active()->paginate(getPaginate());
-        return view('Template::user.subscription.list', compact('pageTitle', 'subscriptionPlans'));
+        $subscribedPlan = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_PURCHASE_SUCCESS)->first();
+        $trialPlan = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_ON_TRIAL)->first();
+        return view('Template::user.subscription.list', compact('pageTitle', 'subscriptionPlans', 'subscribedPlan','trialPlan'));
     }
 
     public function purchasedList()
@@ -35,6 +37,30 @@ class PlanSubscribeController extends Controller
         })->with('method')->orderby('name')->get();
 
         return view('Template::user.subscription.purchase', compact('pageTitle', 'plan', 'gatewayCurrency'));
+    }
+
+    public function planTrial($id){
+        $trialPlan = SubscriptionPlan::findOrFail($id);
+        $user = auth()->user();
+
+        if($user->planPurchases()->where('status', Status::PLAN_PURCHASE_SUCCESS)->first()){
+            $notify[] = ['error', 'You already subscribed to a plan'];
+            return back()->withNotify($notify);
+        }
+
+        if($user->planPurchases()->where('status', Status::PLAN_ON_TRIAL)->first()){
+            $notify[] = ['error', 'You are already on trial'];
+            return back()->withNotify($notify);
+        }
+
+        $planPurchase = new PlanPurchase();
+        $planPurchase->user_id = $user->id;
+        $planPurchase->subscription_plan_id = $trialPlan->id;
+        $planPurchase->status = Status::PLAN_ON_TRIAL;
+        $planPurchase->save();
+
+        $notify[] = ['success', 'Plan trial started successfully'];
+        return back()->withNotify($notify);
     }
 
     public function planPurchaseInsert(Request $request){

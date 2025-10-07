@@ -63,53 +63,43 @@
                                             @endif
                                         </td>
                                         <td class="dropdown">
-                                            <button class=" btn btn-outline--primary" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <button class=" btn btn-outline--primary" data-bs-toggle="dropdown" aria-expanded="false">
                                                 @lang('Action')<i class="las la-ellipsis-v ms-1"></i>
                                             </button>
                                             <div class="dropdown-menu dropdown">
-                                                <a class="dropdown-list d-block"
-                                                    href="{{ route('cron') }}?alias={{ $cron->alias }}">
+                                                <a class="dropdown-list d-block" href="{{ route('cron') }}?alias={{ $cron->alias }}">
                                                     <span class="me-2">
                                                         <i class="fas fa-check-circle text--success"></i>
                                                     </span>
                                                     @lang('Run Now')
                                                 </a>
                                                 @if ($cron->is_running)
-                                                    <a href="{{ route('admin.cron.schedule.pause', $cron->id) }}"
-                                                        class="dropdown-list d-block">
+                                                    <a href="{{ route('admin.cron.schedule.pause', $cron->id) }}" class="dropdown-list d-block">
                                                         <span class="me-2">
                                                             <i class="fas fa-pause text--info"></i>
                                                         </span>
                                                         @lang('Pause')
                                                     </a>
                                                 @else
-                                                    <a href="{{ route('admin.cron.schedule.pause', $cron->id) }}"
-                                                        class="dropdown-list d-block">
+                                                    <a href="{{ route('admin.cron.schedule.pause', $cron->id) }}" class="dropdown-list d-block">
                                                         <span class="me-2">
                                                             <i class="fas fa-play text--info"></i>
                                                         </span>
                                                         @lang('Play')
                                                     </a>
                                                 @endif
-                                                <a href="javascript:void(0)" data-cron='@json($cron)'
-                                                    class="dropdown-list d-block" data-next-run="{{ $formattedDateTime }}"
-                                                    class="editBtn">
+                                                <a type="button" data-cron='@json($cron)' class="dropdown-list d-block editBtn" data-next-run="{{ $formattedDateTime }}" class="editBtn">
                                                     <span class="me-2"><i class="fas fa-pen text--primary"></i></span>
                                                     @lang('Edit')
                                                 </a>
-                                                <a href="{{ route('admin.cron.schedule.logs', $cron->id) }}"
-                                                    class="dropdown-list d-block">
+                                                <a href="{{ route('admin.cron.schedule.logs', $cron->id) }}" class="dropdown-list d-block">
                                                     <span class="me-2">
                                                         <i class="fas fa-history text--info"></i>
                                                     </span>
                                                     @lang('Logs')
                                                 </a>
                                                 @if (!$cron->is_default)
-                                                    <a type="button" class="dropdown-list d-block confirmationBtn"
-                                                        href="javascript:void(0)"
-                                                        data-action="{{ route('admin.cron.delete', $cron->id) }}"
-                                                        data-question="@lang('Are you sure to delete this cron?')">
+                                                    <a type="button" class="dropdown-list d-block confirmationBtn" href="javascript:void(0)" data-action="{{ route('admin.cron.delete', $cron->id) }}" data-question="@lang('Are you sure to delete this cron?')">
                                                         <span class="me-2">
                                                             <i class="fas fa-trash text--danger"></i>
                                                         </span>
@@ -152,8 +142,7 @@
                 </div>
                 <div class="form-group">
                     <label>@lang('Schedule')</label>
-                    <select name="cron_schedule_id" class="form-control select2" data-minimum-results-for-search="-1"
-                        required>
+                    <select name="cron_schedule_id" class="form-control select2" data-minimum-results-for-search="-1" required>
                         @foreach ($schedules as $schedule)
                             <option value="{{ $schedule->id }}">{{ $schedule->name }}</option>
                         @endforeach
@@ -185,10 +174,10 @@
 
 @push('script')
     <script>
-        (function($) {
+        (function ($) {
             "use strict";
 
-            $('.addCron').on('click', function() {
+            $('.addCron').on('click', function () {
                 const $modal = $('#cronModal');
                 const action = "{{ route('admin.cron.store') }}";
                 $modal.find(".modal-title").text("@lang('Add Cron Job')");
@@ -197,7 +186,7 @@
                 $modal.modal('show');
             });
 
-            $('.editBtn').on('click', function(e) {
+            $('.editBtn').on('click', function (e) {
                 const $modal = $('#cronModal');
                 const cron = $(this).data('cron');
                 const nextRun = $(this).data('nextRun');

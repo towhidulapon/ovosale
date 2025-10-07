@@ -7,6 +7,9 @@ Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
+Route::get('cron', 'CronController@cron')->name('cron');
+
+
 Route::name('pos.')->prefix('pos')->group(function () {
     Route::controller('Pos\PosController')->group(function () {
         Route::get('', 'index')->name('index');

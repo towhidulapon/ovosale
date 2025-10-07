@@ -28,7 +28,7 @@
                                 <td>
                                     <div>
                                         <span class="fw-bold">
-                                            {{ $subscriptionPlan->frequency }}
+                                            {{ showFrequency($subscriptionPlan->frequency) }}
                                         </span>
                                     </div>
                                 </td>

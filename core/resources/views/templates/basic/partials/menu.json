@@ -28,7 +28,7 @@
         },
         {
             "title": "Manage Subscription",
-            "icon": "la la-list",
+            "icon": "las la-book",
             "menu_active": ["user.subscription.plan.*"],
             "submenu": [
                 {

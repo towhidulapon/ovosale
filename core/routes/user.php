@@ -95,6 +95,7 @@ Route::middleware('auth')->name('user.')->group(function () {
             Route::controller('PlanSubscribeController')->prefix('subscription/plan')->name('subscription.')->group(function () {
                 Route::get('list', 'list')->name('plan.list');
                 Route::get('purchase/{id}', 'planPurchase')->name('plan.purchase');
+                Route::get('trial/{id}', 'planTrial')->name('plan.trial');
                 Route::post('purchase/insert', 'planPurchaseInsert')->name('plan.purchase.insert');
                 Route::get('purchased/list', 'purchasedList')->name('plan.purchased.list');
             });

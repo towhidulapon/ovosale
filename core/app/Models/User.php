@@ -80,6 +80,10 @@ class User extends Authenticatable
         return $this->hasMany(SupportTicket::class);
     }
 
+    public function planPurchases(){
+        return $this->hasMany(PlanPurchase::class);
+    }
+
     protected function getDefaultGuardName(): string
     {
         return 'admin';
