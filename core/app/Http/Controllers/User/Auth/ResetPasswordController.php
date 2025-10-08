@@ -9,28 +9,40 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-class ResetPasswordController extends Controller
-{
-    public function showResetForm(Request $request, $token = null)
-    {
+class ResetPasswordController extends Controller {
 
-        $email         = session('fpass_email');
-        $token         = session()->has('token') ? session('token') : $token;
-        $resetPassword = PasswordReset::where('token', $token)?->where('mobile', $mobile)->orderBy('id', 'desc')->first();
+    public function showResetForm(Request $request, $token = null) {
 
-
-        if (!$resetPassword || @$resetPassword->token != $token || !$token) {
+        $email = session('fpass_email');
+        $token = session()->has('token') ? session('token') : $token;
+        if (PasswordReset::where('token', $token)->where('email', $email)->count() != 1) {
             $notify[] = ['error', 'Invalid token'];
             return to_route('user.password.request')->withNotify($notify);
         }
-
         return view('Template::user.auth.passwords.reset')->with(
             ['token' => $token, 'email' => $email, 'pageTitle' => 'Reset Password']
         );
     }
 
-    public function reset(Request $request)
-    {
+    // public function showResetForm(Request $request, $token = null)
+    // {
+
+    //     $email         = session('fpass_email');
+    //     $token         = session()->has('token') ? session('token') : $token;
+    //     $resetPassword = PasswordReset::where('token', $token)?->where('mobile', $mobile)->orderBy('id', 'desc')->first();
+
+
+    //     if (!$resetPassword || @$resetPassword->token != $token || !$token) {
+    //         $notify[] = ['error', 'Invalid token'];
+    //         return to_route('user.password.request')->withNotify($notify);
+    //     }
+
+    //     return view('Template::user.auth.passwords.reset')->with(
+    //         ['token' => $token, 'email' => $email, 'pageTitle' => 'Reset Password']
+    //     );
+    // }
+
+    public function reset(Request $request) {
         $request->validate($this->rules());
         $reset = PasswordReset::where('token', $request->token)->orderBy('created_at', 'desc')->first();
         if (!$reset) {
@@ -59,8 +71,7 @@ class ResetPasswordController extends Controller
     }
 
 
-    protected function rules()
-    {
+    protected function rules() {
         $passwordValidation = Password::min(6);
         if (gs('secure_password')) {
             $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();

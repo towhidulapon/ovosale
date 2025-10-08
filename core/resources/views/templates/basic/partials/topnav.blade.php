@@ -1,5 +1,5 @@
 @php
-    $user = auth()->user();
+$user = auth()->user();
 @endphp
 
 <x-user.other.header_search :menus=$menus />
@@ -37,8 +37,8 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     @php
-                        $language = App\Models\Language::all();
-                        $appLocal = strtoupper(config('app.locale')) ?? 'en';
+$language = App\Models\Language::all();
+$appLocal = strtoupper(config('app.locale')) ?? 'en';
                     @endphp
                     @foreach ($language as $item)
                         <li class="dropdown-menu__item  align-items-center gap-2 justify-content-between langSel">
@@ -78,13 +78,12 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end user__area">
                     <div class="user__header">
-                        <a href="{{ route('admin.profile') }}" class="user__info">
+                        <a href="{{ route('user.profile.setting') }}" class="user__info">
                             <div class="user__thumb">
                                 <img src="{{ @$user->image_src }}">
                             </div>
                             <div class="user__details">
                                 <h6 class="user__name">{{ @$user->username }}</h6>
-                                {{-- <p class="user__roll">@lang('Admin')</p> --}}
                             </div>
                         </a>
                     </div>

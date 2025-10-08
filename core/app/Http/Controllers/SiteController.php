@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Frontend;
 use App\Models\Language;
 
 
@@ -68,5 +69,13 @@ class SiteController extends Controller
         imagettftext($image, $fontSize, 0, $textX, $textY, $colorFill, $fontFile, $text);
         imagejpeg($image);
         imagedestroy($image);
+    }
+
+    public function policyPages($slug) {
+        $policy      = Frontend::where('slug', $slug)->where('data_keys', 'policy_pages.element')->firstOrFail();
+        $pageTitle   = $policy->data_values->title;
+        $seoContents = $policy->seo_content;
+        $seoImage    = @$seoContents->image ? frontendImage('policy_pages', $seoContents->image, getFileSize('seo'), true) : null;
+        return view('Template::policy', compact('policy', 'pageTitle', 'seoContents', 'seoImage'));
     }
 }

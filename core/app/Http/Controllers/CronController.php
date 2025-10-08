@@ -65,6 +65,7 @@ class CronController extends Controller {
     }
 
     public function fetchSubscriptions() {
+
         $now = Carbon::now();
 
         $purchasePlans = PlanPurchase::where('status', Status::PLAN_PURCHASE_SUCCESS)->get();
