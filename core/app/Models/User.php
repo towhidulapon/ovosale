@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Constants\Status;
+use App\Traits\ApiQuery;
 use App\Traits\UserNotify;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use UserNotify, HasApiTokens;
+    use UserNotify, HasApiTokens,ApiQuery;
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -78,6 +79,11 @@ class User extends Authenticatable
     public function tickets()
     {
         return $this->hasMany(SupportTicket::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function planPurchases(){
@@ -166,5 +172,10 @@ class User extends Authenticatable
     public function deviceTokens()
     {
         return $this->hasMany(DeviceToken::class);
+    }
+
+    public function scopeStaff($query)
+    {
+        return $query->whereHas('parent')->where('is_staff', Status::YES);
     }
 }

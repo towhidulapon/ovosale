@@ -131,6 +131,18 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('remove/single/item/{id}', 'removeSingleItem')->name('remove.single.item');
             });
 
+            // Manage agent
+            Route::controller('ManageStaffController')->prefix('staff')->name('staff.')->group(function () {
+                Route::get('list', 'list')->name('list');
+                Route::get('create', 'create')->name('create');
+                Route::get('edit/{id}', 'edit')->name('edit');
+                Route::post('save', 'save')->name('save');
+                Route::post('update/{id}', 'update')->name('update');
+                Route::post('delete/{id}', 'delete')->name('delete');
+                Route::get('permissions/{id}', 'permissions')->name('permissions');
+                Route::post('permissions/save/{id}', 'updatePermissions')->name('permissions.update');
+            });
+
 
             //product
             Route::controller('ProductController')->name('product.')->prefix('product')->group(function () {

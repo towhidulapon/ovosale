@@ -714,26 +714,6 @@
             ]
         },
         {
-            "title": "Manage Subscriber",
-            "icon": "las la-inbox",
-            "route_name": "admin.subscriber.index",
-            "menu_active": "admin.subscriber.index",
-            "keyword": [
-                "subscriber management",
-                "manage subscribers",
-                "subscriber list",
-                "email subscribers",
-                "subscriber segmentation",
-                "subscription status",
-                "subscriber details",
-                "newsletter subscribers",
-                "subscriber preferences",
-                "unsubscribe management",
-                "subscriber analytics",
-                "contact management"
-            ]
-        },
-        {
             "title": "Application Information",
             "icon": "las la-folder-plus",
             "route_name": "admin.system.info",

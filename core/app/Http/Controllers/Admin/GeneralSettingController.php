@@ -4,30 +4,36 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Frontend;
 use App\Rules\FileTypeValidate;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class GeneralSettingController extends Controller {
+class GeneralSettingController extends Controller
+{
 
-    public function general() {
+    public function general()
+    {
         $pageTitle       = 'General Setting';
         $timezones       = timezone_identifiers_list();
         $currentTimezone = array_search(config('app.timezone'), $timezones);
         return view('admin.setting.general', compact('pageTitle', 'timezones', 'currentTimezone'));
     }
 
-    public function prefixSetting() {
+    public function prefixSetting()
+    {
         $pageTitle = 'Prefix Setting';
         return view('admin.setting.prefix', compact('pageTitle'));
     }
-    public function companySetting() {
+    public function companySetting()
+    {
         $pageTitle = 'Company Setting';
         return view('admin.setting.company', compact('pageTitle'));
     }
 
-    public function companySettingUpdate(Request $request) {
+    public function companySettingUpdate(Request $request)
+    {
         $request->validate([
             'company_information'         => 'required|array',
             'company_information.name'    => 'required',
@@ -44,7 +50,8 @@ class GeneralSettingController extends Controller {
         // adminActivity("company-information-updated", get_class($gs), $gs->id);
         return back()->withNotify($notify);
     }
-    public function generalUpdate(Request $request) {
+    public function generalUpdate(Request $request)
+    {
         $request->validate([
             'site_name'          => 'required|string|max:40',
             'cur_text'           => 'required|string|max:40',
@@ -55,7 +62,7 @@ class GeneralSettingController extends Controller {
             'time_format'        => ['required', Rule::in(supportedTimeFormats())],
             'date_format'        => ['required', Rule::in(supportedDateFormats())],
             'thousand_separator' => ['required', Rule::in(array_keys(supportedThousandSeparator()))],
-            'allow_precision'    => 'required|integer|gt:0|lte:8'
+            'allow_precision'    => 'required|integer|gt:0|lte:8',
         ]);
 
         $timezones = timezone_identifiers_list();
@@ -82,7 +89,8 @@ class GeneralSettingController extends Controller {
         return back()->withNotify($notify);
     }
 
-    public function prefixSettingUpdate(Request $request) {
+    public function prefixSettingUpdate(Request $request)
+    {
         $request->validate([
             'product_code_prefix'           => 'required',
             'purchase_invoice_prefix'       => 'required',
@@ -106,14 +114,15 @@ class GeneralSettingController extends Controller {
         return back()->withNotify($notify);
     }
 
-    public function systemConfiguration() {
+    public function systemConfiguration()
+    {
         $pageTitle      = 'System Configuration';
         $configurations = json_decode(file_get_contents(resource_path('views/admin/setting/configuration.json')));
         return view('admin.setting.configuration', compact('pageTitle', 'configurations'));
     }
 
-
-    public function systemConfigurationUpdate($key) {
+    public function systemConfigurationUpdate($key)
+    {
         try {
             $general   = gs();
             $newStatus = !$general->$key;
@@ -123,24 +132,25 @@ class GeneralSettingController extends Controller {
 
             return response()->json([
                 'success'    => true,
-                'new_status' => $newStatus
+                'new_status' => $newStatus,
             ]);
             // adminActivity("system-configuration-updated", get_class($general), $general->id);
         } catch (Exception $ex) {
             return response()->json([
                 'success' => false,
-                'message' => $ex->getMessage()
+                'message' => $ex->getMessage(),
             ]);
         }
     }
 
-
-    public function logoIcon() {
+    public function logoIcon()
+    {
         $pageTitle = 'Brand Setting';
         return view('admin.setting.logo_icon', compact('pageTitle'));
     }
 
-    public function logoIconUpdate(Request $request) {
+    public function logoIconUpdate(Request $request)
+    {
         $request->validate([
             'logo'    => ['image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
             'favicon' => ['image', new FileTypeValidate(['png'])],
@@ -176,13 +186,14 @@ class GeneralSettingController extends Controller {
         return back()->withNotify($notify);
     }
 
-
-    public function pwaIcon() {
+    public function pwaIcon()
+    {
         $pageTitle = 'PWA Setting';
         return view('admin.setting.pwa', compact('pageTitle'));
     }
 
-    public function pwaIconUpdate(Request $request) {
+    public function pwaIconUpdate(Request $request)
+    {
 
         $request->validate([
             'pwa_small_icon' => ['image', new FileTypeValidate(['png']), "dimensions:width=192,height=192"],
@@ -212,12 +223,134 @@ class GeneralSettingController extends Controller {
         return back()->withNotify($notify);
     }
 
-    public function socialiteCredentials() {
+    public function maintenanceMode()
+    {
+        $pageTitle   = 'Maintenance Mode';
+        $maintenance = Frontend::where('data_keys', 'maintenance.data')->firstOrFail();
+        return view('admin.setting.maintenance', compact('pageTitle', 'maintenance'));
+    }
+
+    public function maintenanceModeSubmit(Request $request)
+    {
+        $request->validate([
+            'description' => 'required',
+            'image'       => ['nullable', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
+        ]);
+        $general                   = gs();
+        $general->maintenance_mode = $request->status ? Status::ENABLE : Status::DISABLE;
+        $general->save();
+
+        $maintenance = Frontend::where('data_keys', 'maintenance.data')->firstOrFail();
+        $image       = @$maintenance->data_values->image;
+        if ($request->hasFile('image')) {
+            try {
+                $old   = $image;
+                $image = fileUploader($request->image, getFilePath('maintenance'), getFileSize('maintenance'), $old);
+            } catch (\Exception $exp) {
+                $notify[] = ['error', 'Couldn\'t upload your image'];
+                return back()->withNotify($notify);
+            }
+        }
+
+        $maintenance->data_values = [
+            'description' => $request->description,
+            'image'       => $image,
+        ];
+        $maintenance->save();
+
+        $notify[] = ['success', 'Maintenance mode updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function customCss()
+    {
+        $pageTitle   = 'Custom CSS';
+        $file        = activeTemplate(true) . 'css/custom.css';
+        $fileContent = @file_get_contents($file);
+        return view('admin.setting.custom_css', compact('pageTitle', 'fileContent'));
+    }
+    public function customCssSubmit(Request $request)
+    {
+        $file = activeTemplate(true) . 'css/custom.css';
+        if (!file_exists($file)) {
+            fopen($file, "w");
+        }
+        file_put_contents($file, $request->css);
+        $notify[] = ['success', 'CSS updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function sitemap()
+    {
+        $pageTitle   = 'Sitemap XML';
+        $file        = 'sitemap.xml';
+        $fileContent = @file_get_contents($file);
+        return view('admin.setting.sitemap', compact('pageTitle', 'fileContent'));
+    }
+
+    public function sitemapSubmit(Request $request)
+    {
+        $file = 'sitemap.xml';
+        if (!file_exists($file)) {
+            fopen($file, "w");
+        }
+        file_put_contents($file, $request->sitemap);
+        $notify[] = ['success', 'Sitemap updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function robot()
+    {
+        $pageTitle   = 'Robots TXT';
+        $file        = 'robots.xml';
+        $fileContent = @file_get_contents($file);
+        return view('admin.setting.robots', compact('pageTitle', 'fileContent'));
+    }
+
+    public function robotSubmit(Request $request)
+    {
+        $file = 'robots.xml';
+        if (!file_exists($file)) {
+            fopen($file, "w");
+        }
+        file_put_contents($file, $request->robots);
+        $notify[] = ['success', 'Robots txt updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function cookie()
+    {
+        $pageTitle = 'GDPR Cookie';
+        $cookie    = Frontend::where('data_keys', 'cookie.data')->firstOrFail();
+        return view('admin.setting.cookie', compact('pageTitle', 'cookie'));
+    }
+
+    public function cookieSubmit(Request $request)
+    {
+
+        $request->validate([
+            'short_desc'  => 'required|string|max:255',
+            'description' => 'required',
+        ]);
+        $cookie              = Frontend::where('data_keys', 'cookie.data')->firstOrFail();
+        $cookie->data_values = [
+            'short_desc'  => $request->short_desc,
+            'description' => $request->description,
+            'status'      => $request->status ? Status::ENABLE : Status::DISABLE,
+        ];
+        $cookie->save();
+        $notify[] = ['success', 'Cookie policy updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function socialiteCredentials()
+    {
         $pageTitle = 'Social Login Setting';
         return view('admin.setting.social_credential', compact('pageTitle'));
     }
 
-    public function updateSocialiteCredentialStatus($key) {
+    public function updateSocialiteCredentialStatus($key)
+    {
         $general     = gs();
         $credentials = $general->socialite_credentials;
         try {
@@ -233,7 +366,8 @@ class GeneralSettingController extends Controller {
         return back()->withNotify($notify);
     }
 
-    public function updateSocialiteCredential(Request $request, $key) {
+    public function updateSocialiteCredential(Request $request, $key)
+    {
         $general     = gs();
         $credentials = $general->socialite_credentials;
         try {
@@ -247,5 +381,40 @@ class GeneralSettingController extends Controller {
 
         $notify[] = ['success', ucfirst($key) . ' credential updated successfully'];
         return back()->withNotify($notify);
+    }
+
+    public function inAppPurchase()
+    {
+        $pageTitle  = 'In App Purchase Configuration - Google Play Store';
+        $data       = null;
+        $fileExists = file_exists(getFilePath('appPurchase') . '/google_pay.json');
+        return view('admin.setting.in_app_purchase.google', compact('pageTitle', 'data', 'fileExists'));
+    }
+
+    public function inAppPurchaseConfigure(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', new FileTypeValidate(['json'])],
+        ]);
+
+        try {
+            fileUploader($request->file, getFilePath('appPurchase'), filename: 'google_pay.json');
+        } catch (\Exception $exp) {
+            $notify[] = ['error', 'Couldn\'t upload your file'];
+            return back()->withNotify($notify);
+        }
+
+        $notify[] = ['success', 'Configuration file uploaded successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function inAppPurchaseFileDownload()
+    {
+        $filePath = getFilePath('appPurchase') . '/google_pay.json';
+        if (!file_exists(getFilePath('appPurchase') . '/google_pay.json')) {
+            $notify[] = ['success', "File not found"];
+            return back()->withNotify($notify);
+        }
+        return response()->download($filePath);
     }
 }

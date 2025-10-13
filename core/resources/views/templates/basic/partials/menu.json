@@ -361,7 +361,21 @@
                     "permission": ["view profit loss report"]
                 }
             ]
+        },
+        {
+            "title": "Manage Staff",
+            "icon": "las la-users",
+            "route_name": "user.staff.list",
+            "menu_active": "user.staff.list",
+            "permission": [
+                "view staff",
+                "manage staff",
+                "edit staff",
+                "export staff",
+                "add staff"
+            ]
         }
+
     ],
     "accounting": [
         {

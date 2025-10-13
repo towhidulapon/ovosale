@@ -51,6 +51,6 @@ Route::controller('SiteController')->group(function () {
     Route::get('/', 'index')->name('home');
 
     Route::get('/', function () {
-        return to_route('admin.dashboard');
+        return to_route('user.login');
     })->name('home');
 });

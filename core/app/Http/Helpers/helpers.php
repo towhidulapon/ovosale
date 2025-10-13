@@ -838,3 +838,13 @@ function subscriptionEndDate($startDate, $frequency) {
         return $start->copy()->addDay();
     }
 }
+
+function getParentUser()
+{
+    $user = auth()->user();
+    if ($user) {
+        return $user->is_staff ? $user->parent : $user;
+    } else {
+        return null;
+    }
+}
