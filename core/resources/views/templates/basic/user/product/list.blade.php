@@ -60,7 +60,7 @@
                                                     @lang('Action') <i class="las la-angle-down"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown">
-                                                    <x-permission_check permission="edit product">
+                                                    <x-staff_permission_check permission="edit product">
                                                         <a class="dropdown-list d-block"
                                                             href="{{ route('user.product.edit', $product->id) }}">
                                                             <span class="me-2">
@@ -68,8 +68,8 @@
                                                             </span>
                                                             @lang('Edit Product')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="view product">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="view product">
                                                         <a class="dropdown-list d-block"
                                                             href="{{ route('user.product.view', $product->id) }}">
                                                             <span class="me-2">
@@ -77,8 +77,8 @@
                                                             </span>
                                                             @lang('View Product')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="add purchase">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="add purchase">
                                                         <a class="dropdown-list d-block"
                                                             href="{{ route('user.purchase.add') }}?product_code={{ $product->product_code }}">
                                                             <span class="me-2">
@@ -86,8 +86,8 @@
                                                             </span>
                                                             @lang('Add Stock')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="print product barcode">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="print product barcode">
                                                         <a class="dropdown-list d-block"
                                                             href="{{ route('user.product.print.label') }}?product_code={{ $product->product_code }}">
                                                             <span class="me-2">
@@ -95,8 +95,8 @@
                                                             </span>
                                                             @lang('Print Label')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="trash product">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="trash product">
                                                         <button type="button" class="dropdown-list d-block confirmationBtn"
                                                             data-question='@lang('Are you sure to move this product to trash?')'
                                                             data-action="{{ route('user.product.trash.temporary', $product->id) }}">
@@ -105,7 +105,7 @@
                                                             </span>
                                                             @lang('Trash Product')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 </div>
                                             @endif
                                         </td>
@@ -131,9 +131,9 @@
 
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add product">
+    <x-staff_permission_check permission="add product">
         <x-user.ui.btn.add href="{{ route('user.product.create') }}" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush
 
 @push('style')

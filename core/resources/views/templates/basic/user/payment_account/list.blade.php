@@ -43,7 +43,7 @@
                                                     @lang('Action') <i class="las la-angle-down"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown">
-                                                    <x-permission_check permission="edit payment account">
+                                                    <x-staff_permission_check permission="edit payment account">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start edit-btn"
                                                             data-paymenttype='@json($paymentAccount)'>
@@ -52,8 +52,8 @@
                                                             </span>
                                                             @lang('Edit')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="adjust payment account balance">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="adjust payment account balance">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start add-balance"
                                                             data-id="{{ $paymentAccount->id }}">
@@ -78,22 +78,22 @@
                                                             </span>
                                                             @lang('Transfer Balance')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="trash payment account">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="trash payment account">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.report.transaction') }}?payment_account_id={{ $paymentAccount->id }}">
                                                             <i class="las la-exchange-alt text--info"></i>
                                                             @lang('Transaction History')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="trash payment account">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="trash payment account">
                                                         <button
                                                             class="dropdown-list d-block w-100 text-start confirmationBtn"
                                                             data-question='@lang('Are you sure to move this payment account to trash?')'
                                                             data-action="{{ route('user.payment.account.trash.temporary', $paymentAccount->id) }}">
                                                             <i class="las la-trash text--danger"></i> @lang('Trash')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 </div>
                                             @endif
                                         </td>
@@ -314,7 +314,7 @@
 @endpush
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add payment account">
+    <x-staff_permission_check permission="add payment account">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

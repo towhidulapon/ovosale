@@ -1,7 +1,7 @@
 @extends($activeTemplate . 'layouts.master')
 @section('panel')
 
-    <form action="{{ route('user.staff.save') }}" method="POST" id="staff-form" class="no-submit-loader">
+    <form action="{{ route('user.staff.update', $staff->id) }}" method="POST" id="staff-form" class="no-submit-loader">
         @csrf
         <div class="row responsive-row">
             <div class="col-12">
@@ -14,23 +14,23 @@
                         <div class="row gy-3">
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('First Name')</label>
-                                <input type="text" class="form-control" name="firstname" placeholder="@lang('Enter firstname')" value="{{ old('firstname') }}" required>
+                                <input type="text" class="form-control" name="firstname" placeholder="@lang('Enter firstname')" value="{{ $staff->firstname ?? old('firstname') }}" required>
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Last Name')</label>
-                                <input type="text" class="form-control" name="lastname" placeholder="@lang('Enter lastname')" required value="{{ old('lastname') }}">
+                                <input type="text" class="form-control" name="lastname" placeholder="@lang('Enter lastname')" required value="{{ $staff->lastname ?? old('lastname') }}">
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Username')</label>
-                                <input type="text" class="form-control checkUser" name="username" placeholder="@lang('Enter username')" required value="{{ old('username') }}">
+                                <input type="text" class="form-control checkUser" name="username" placeholder="@lang('Enter username')" required value="{{ $staff->username ?? old('username') }}">
                                 <span class="username-exists-error d-none"></span>
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Email Address')</label>
-                                <input type="email" class="form-control checkUser" name="email" placeholder="@lang('Enter email')" required value="{{ old('email') }}">
+                                <input type="email" class="form-control checkUser" name="email" placeholder="@lang('Enter email')" required value="{{ $staff->email ?? old('email') }}">
                                 <span class="email-exists-error d-none"></span>
                             </div>
 
@@ -38,7 +38,7 @@
                                 <label class="form-label">@lang('Country')</label>
                                 <select name="country" class="form-control select2" required>
                                     @foreach ($countries as $key => $country)
-                                        <option data-mobile_code="{{ $country->dial_code }}" value="{{ $country->country }}" data-code="{{ $key }}">
+                                        <option data-mobile_code="{{ $country->dial_code }}" value="{{ $country->country }}" data-code="{{ $key }}" @if(isset($staff->country_name) && $staff->country_name == $country->country) selected @endif>
                                             {{ __($country->country) }}
                                         </option>
                                     @endforeach
@@ -51,29 +51,29 @@
                                     <span class="input-group-text mobile-code"></span>
                                     <input type="hidden" name="mobile_code">
                                     <input type="hidden" name="country_code">
-                                    <input type="number" name="mobile" value="{{ old('mobile') }}" class="form-control checkUser" required>
+                                    <input type="number" name="mobile" value="{{ $staff->mobile ?? old('mobile') }}" class="form-control checkUser" required>
                                 </div>
                                 <span class="mobile-exists-error d-none"></span>
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('City')</label>
-                                <input type="text" class="form-control" name="city" placeholder="@lang('Enter city')" value="{{ old('city') }}">
+                                <input type="text" class="form-control" name="city" placeholder="@lang('Enter city')" value="{{ $staff->city ?? old('city') }}">
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('State')</label>
-                                <input type="text" class="form-control" name="state" placeholder="@lang('Enter state')" value="{{ old('state') }}">
+                                <input type="text" class="form-control" name="state" placeholder="@lang('Enter state')" value="{{ $staff->state ?? old('state') }}">
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Zip Code')</label>
-                                <input type="text" class="form-control" name="zip" placeholder="@lang('Enter zip')" value="{{ old('zip') }}">
+                                <input type="text" class="form-control" name="zip" placeholder="@lang('Enter zip')" value="{{ $staff->zip ?? old('zip') }}">
                             </div>
 
                             <div class="col-sm-6 form-group">
                                 <label class="form-label">@lang('Address')</label>
-                                <input type="text" class="form-control" name="address" placeholder="@lang('Enter address')" value="{{ old('address') }}">
+                                <input type="text" class="form-control" name="address" placeholder="@lang('Enter address')" value="{{ $staff->address ?? old('address') }}">
                             </div>
                         </div>
                     </x-user.ui.card.body>

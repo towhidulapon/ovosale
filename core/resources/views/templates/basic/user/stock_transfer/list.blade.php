@@ -46,7 +46,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown">
 
-                                                <x-permission_check permission="edit sale">
+                                                <x-staff_permission_check permission="edit sale">
                                                     <a class="dropdown-list d-block w-100 text-start"
                                                         href="{{ route('user.stock.transfer.edit', $transfer->id) }}">
                                                         <span class="me-1">
@@ -54,9 +54,9 @@
                                                         </span>
                                                         @lang('Edit')
                                                     </a>
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
 
-                                                <x-permission_check permission="view sale">
+                                                <x-staff_permission_check permission="view sale">
                                                     <a class="dropdown-list d-block w-100 text-start"
                                                         href="{{ route('user.stock.transfer.view', $transfer->id) }}">
                                                         <span class="me-1">
@@ -64,9 +64,9 @@
                                                         </span>
                                                         @lang('View Invoice')
                                                     </a>
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
 
-                                                <x-permission_check permission="print sale invoice">
+                                                <x-staff_permission_check permission="print sale invoice">
                                                     <button type="button"
                                                         class="dropdown-list d-block w-100 text-start print-btn"
                                                         data-action="{{ route('user.stock.transfer.print', $transfer->id) }}">
@@ -75,10 +75,10 @@
                                                         </span>
                                                         @lang('Print Invoice')
                                                     </button>
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
 
 
-                                                <x-permission_check permission="download sale invoice">
+                                                <x-staff_permission_check permission="download sale invoice">
                                                     <a class="dropdown-list d-block w-100 text-start"
                                                         href="{{ route('user.stock.transfer.pdf', $transfer->id) }}">
                                                         <span class="me-1">
@@ -86,7 +86,7 @@
                                                         </span>
                                                         @lang('Download')
                                                     </a>
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
 
                                             </div>
                                         </td>
@@ -109,9 +109,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add sale">
+    <x-staff_permission_check permission="add sale">
         <x-user.ui.btn.add href="{{ route('user.stock.transfer.add') }}" text="Add Transfer" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush
 
 

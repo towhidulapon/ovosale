@@ -13,7 +13,7 @@
                                 </tr>
                             </x-user.ui.table.header>
                             <x-user.ui.table.body>
-                                @forelse($staff as $staff)
+                                @forelse($staffs as $staff)
                                     <tr>
                                         <td>
                                             <div>
@@ -21,7 +21,14 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary">@lang('Action')</button>
+                                            <x-user.ui.btn.table_action module="staff" :id="$staff->id">
+                                                <x-staff_permission_check permission="edit staff">
+                                                    <x-user.ui.btn.edit tag="a" href="{{ route('user.staff.edit', $staff->id) }}" />
+                                                    <a href="{{ route('user.staff.permissions', $staff->id) }}" class="btn btn-outline--info">
+                                                        <i class="fas fa-user-check"></i> @lang('Permissions')
+                                                    </a>
+                                                </x-staff_permission_check>
+                                            </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
                                 @empty
@@ -29,9 +36,9 @@
                                 @endforelse
                             </x-user.ui.table.body>
                         </x-user.ui.table>
-                        @if ($staff->hasPages())
+                        @if ($staffs->hasPages())
                             <x-user.ui.table.footer>
-                                {{ paginateLinks($staff) }}
+                                {{ paginateLinks($staffs) }}
                             </x-user.ui.table.footer>
                         @endif
                     </x-user.ui.table.layout>
@@ -44,7 +51,7 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add sale">
+    <x-staff_permission_check permission="add sale">
         <x-user.ui.btn.add href="{{ route('user.staff.create') }}" text="New Staff" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

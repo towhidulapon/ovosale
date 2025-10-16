@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Traits\RecycleBinManager;
 use App\Traits\StaffManager;
 
 class ManageStaffController extends Controller
 {
-    use StaffManager;
+    use StaffManager, RecycleBinManager;
+
+    protected $modelName = "User";
 
     public function create()
     {

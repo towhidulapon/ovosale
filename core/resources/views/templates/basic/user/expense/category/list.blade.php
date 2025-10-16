@@ -24,9 +24,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="expense_category" :id="$expenseCategory->id">
-                                                <x-permission_check permission="edit expense category">
+                                                <x-staff_permission_check permission="edit expense category">
                                                     <x-user.ui.btn.edit tag="btn" :data-expense-category="$expenseCategory" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
 
                                         </td>
@@ -102,7 +102,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-<x-permission_check permission="add expense category">
+<x-staff_permission_check permission="add expense category">
     <x-user.ui.btn.add tag="btn" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush

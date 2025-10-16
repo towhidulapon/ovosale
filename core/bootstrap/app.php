@@ -20,6 +20,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use App\Http\Middleware\LanguageMiddleware;
 use App\Http\Middleware\ActiveTemplateMiddleware;
 use App\Http\Middleware\Demo;
+use App\Http\Middleware\HasStaffPermission;
+use App\Http\Middleware\IsParentUser;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\VerifyCsrfToken;
 
@@ -71,6 +73,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.status' => CheckStatus::class,
             'kyc'          => KycMiddleware::class,
             'guest'        => RedirectIfAuthenticated::class,
+
+            'staff.permission' => HasStaffPermission::class,
+            'parent.user'      => IsParentUser::class,
             'permission'   => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         ]);
 

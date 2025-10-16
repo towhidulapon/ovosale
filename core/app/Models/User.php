@@ -6,12 +6,13 @@ use App\Constants\Status;
 use App\Traits\ApiQuery;
 use App\Traits\UserNotify;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use UserNotify, HasApiTokens,ApiQuery;
+    use UserNotify, HasApiTokens, ApiQuery, SoftDeletes;
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -22,7 +23,7 @@ class User extends Authenticatable
         'remember_token',
         'ver_code',
         'balance',
-        'kyc_data'
+        'kyc_data',
     ];
 
     /**
@@ -33,7 +34,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'kyc_data'          => 'object',
-        'ver_code_send_at'  => 'datetime'
+        'ver_code_send_at'  => 'datetime',
     ];
 
     /**
@@ -41,8 +42,9 @@ class User extends Authenticatable
      *
      * @var array
      */
-    public function exportColumns(): array {
-        return  [
+    public function exportColumns(): array
+    {
+        return [
             'firstname',
             'lastname',
             'username',
@@ -50,30 +52,33 @@ class User extends Authenticatable
             'mobile',
             "country_name",
             "created_at" => [
-                'name' => "Joined At",
+                'name'     => "Joined At",
                 'callback' => function ($item) {
                     return showDateTime($item->created_at, lang: 'en');
-                }
+                },
             ],
-            "balance" => [
+            "balance"    => [
                 'callback' => function ($item) {
                     return showAmount($item->balance);
-                }
-            ]
+                },
+            ],
         ];
     }
 
-    protected $guarded  = ['id'];
+    protected $guarded = ['id'];
 
-    public function loginLogs() {
+    public function loginLogs()
+    {
         return $this->hasMany(UserLogin::class);
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class)->orderBy('id', 'desc');
     }
 
-    public function deposits() {
+    public function deposits()
+    {
         return $this->hasMany(Deposit::class)->where('status', '!=', Status::PAYMENT_INITIATE);
     }
     public function tickets()
@@ -86,7 +91,8 @@ class User extends Authenticatable
         return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function planPurchases(){
+    public function planPurchases()
+    {
         return $this->hasMany(PlanPurchase::class);
     }
 
@@ -177,5 +183,26 @@ class User extends Authenticatable
     public function scopeStaff($query)
     {
         return $query->whereHas('parent')->where('is_staff', Status::YES);
+    }
+
+    public function staffPermissions()
+    {
+        return $this->belongsToMany(StaffPermission::class, 'staff_has_permissions', 'staff_id', 'staff_permission_id');
+    }
+
+    public function hasStaffPermission($permission)
+    {
+        if ($this->is_staff) {
+            return $this->staffPermissions()->where('name', $permission)->exists();
+        }
+        return true;
+    }
+
+    public function hasAnyStaffPermission($permissions = [])
+    {
+        if ($this->is_staff) {
+            return $this->staffPermissions()->whereIn('name', $permissions)->exists();
+        }
+        return true;
     }
 }

@@ -56,7 +56,7 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown">
 
-                                                    <x-permission_check permission="edit leave request">
+                                                    <x-staff_permission_check permission="edit leave request">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start edit-btn"
                                                             data-request='@json($request)'>
@@ -65,9 +65,9 @@
                                                             </span>
                                                             @lang('Edit')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="view leave request">
+                                                    <x-staff_permission_check permission="view leave request">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('admin.download.attachment', encrypt(getFilePath('leaveAttachment') . '/' . $request->attachment)) }}">
                                                             <span class="me-1">
@@ -75,7 +75,7 @@
                                                             </span>
                                                             @lang('Attachment')
                                                         </a>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
                                                 </div>
                                             @endif
@@ -292,7 +292,7 @@
 @endpush
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add leave request">
+    <x-staff_permission_check permission="add leave request">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

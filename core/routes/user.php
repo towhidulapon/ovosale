@@ -74,14 +74,13 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::get('chart/sales-purchase', 'saleAndPurchaseChart')->name('chart.sales.purchase');
                 Route::get('low-stock-product', 'lowStockProduct')->name('low.stock.product');
 
-
                 //Report Bugs
                 Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
 
-                Route::get('list', 'list')->name('list')->middleware('permission:view admin,admin');
-                Route::post('store', 'save')->name('store')->middleware('permission:add admin,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit admin,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit admin,admin');
+                Route::get('list', 'list')->name('list');
+                Route::post('store', 'save')->name('store');
+                Route::post('update/{id}', 'save')->name('update');
+                Route::post('status-change/{id}', 'status')->name('status.change');
             });
 
             //Profile setting
@@ -115,19 +114,18 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::get('top-selling-product', 'topSellingProduct')->name('top.selling.product');
             });
 
-
             //purchase
             Route::controller('PurchaseController')->name('purchase.')->prefix('purchase')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view purchase,admin');
-                Route::get('add', 'add')->name('add')->middleware('permission:add purchase,admin');
-                Route::post('store', 'store')->name('store')->middleware('permission:add purchase,admin');
-                Route::get('edit/{id}', 'edit')->name('edit')->middleware('permission:edit purchase,admin');
-                Route::post('update/{id}', 'update')->name('update')->middleware('permission:edit purchase,admin');
-                Route::post('ad/payment/{id}', 'addPayment')->name('ad.payment')->middleware('permission:add purchase payment,admin');
-                Route::get('view/{id}', 'view')->name('view')->middleware('permission:view purchase,admin');
-                Route::get('pdf/{id}', 'pdf')->name('pdf')->middleware('permission:download purchase invoice,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view purchase');
+                Route::get('add', 'add')->name('add')->middleware('staff.permission:add purchase');
+                Route::post('store', 'store')->name('store')->middleware('staff.permission:add purchase');
+                Route::get('edit/{id}', 'edit')->name('edit')->middleware('staff.permission:edit purchase');
+                Route::post('update/{id}', 'update')->name('update')->middleware('staff.permission:edit purchase');
+                Route::post('ad/payment/{id}', 'addPayment')->name('ad.payment')->middleware('staff.permission:add purchase payment');
+                Route::get('view/{id}', 'view')->name('view')->middleware('staff.permission:view purchase');
+                Route::get('pdf/{id}', 'pdf')->name('pdf')->middleware('staff.permission:download purchase invoice');
                 Route::get('print/{id}', 'print')->name('print');
-                Route::post('update-status/{id}', 'updateStatus')->name('update.status')->middleware('permission:update purchase status,admin');
+                Route::post('update-status/{id}', 'updateStatus')->name('update.status')->middleware('staff.permission:update purchase status');
                 Route::post('remove/single/item/{id}', 'removeSingleItem')->name('remove.single.item');
             });
 
@@ -141,25 +139,31 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('delete/{id}', 'delete')->name('delete');
                 Route::get('permissions/{id}', 'permissions')->name('permissions');
                 Route::post('permissions/save/{id}', 'updatePermissions')->name('permissions.update');
-            });
 
+                Route::prefix('trash')->name('trash.')->group(function () {
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash staff');
+                    Route::post('restore/{id}', 'restoreTrash')->name('restore');
+                    Route::get('list', 'listTrash')->name('list');
+                });
+
+            });
 
             //product
             Route::controller('ProductController')->name('product.')->prefix('product')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view product,admin');
-                Route::get('create', 'create')->name('create')->middleware('permission:add product,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add product,admin');
-                Route::get('edit/{id}', 'edit')->name('edit')->middleware('permission:edit product,admin');
-                Route::get('view/{id}', 'view')->name('view')->middleware('permission:view product,admin');
-                Route::post('update/{id}', 'update')->name('update')->middleware('permission:edit product,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit product,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view product');
+                Route::get('create', 'create')->name('create')->middleware('staff.permission:add product');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add product');
+                Route::get('edit/{id}', 'edit')->name('edit')->middleware('staff.permission:edit product');
+                Route::get('view/{id}', 'view')->name('view')->middleware('staff.permission:view product');
+                Route::post('update/{id}', 'update')->name('update')->middleware('staff.permission:edit product');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit product');
                 Route::get('product-code-generate', 'generateProductCode')->name('code.generate');
-                Route::get('print-label', 'printLabel')->name('print.label')->middleware('permission:print product barcode,admin');
+                Route::get('print-label', 'printLabel')->name('print.label')->middleware('staff.permission:print product barcode');
                 Route::get('search', 'search')->name('search');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash product,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash product');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -167,13 +171,13 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             // Stock Transfer
 
-            Route::controller('StockTransferController')->name('stock.transfer.')->prefix('stock-transfer')->middleware("permission:view stock transfer,admin")->group(function () {
-                Route::get('add', 'add')->name('add')->middleware("permission:add stock transfer,admin");
+            Route::controller('StockTransferController')->name('stock.transfer.')->prefix('stock-transfer')->middleware("staff.permission:view stock transfer")->group(function () {
+                Route::get('add', 'add')->name('add')->middleware("staff.permission:add stock transfer");
                 Route::get('list', 'list')->name('list');
-                Route::post('store', 'store')->name('store')->middleware("permission:add stock transfer,admin");
+                Route::post('store', 'store')->name('store')->middleware("staff.permission:add stock transfer");
                 Route::get('view/{id}', 'view')->name('view');
-                Route::get('edit/{id}', 'edit')->name('edit')->middleware("permission:edit stock transfer,admin");
-                Route::post('update/{id}', 'update')->name('update')->middleware("permission:edit stock transfer,admin");
+                Route::get('edit/{id}', 'edit')->name('edit')->middleware("staff.permission:edit stock transfer");
+                Route::post('update/{id}', 'update')->name('update')->middleware("staff.permission:edit stock transfer");
                 Route::get('pdf/{id}', 'pdf')->name('pdf');
                 Route::get('print/{id}', 'print')->name('print');
                 Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
@@ -182,14 +186,14 @@ Route::middleware('auth')->name('user.')->group(function () {
             //Report
 
             Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
-                Route::get('invoice-wise', 'invoiceWiseReport')->name('profit.invoice_wise')->middleware('permission:view profit loss report,admin');
-                Route::get('product-wise', 'productWiseReport')->name('profit.product_wise')->middleware('permission:view profit loss report,admin');
-                Route::get('sale', 'saleReport')->name('sale')->middleware('permission:view sale report,admin');
-                Route::get('purchase', 'purchaseReport')->name('purchase')->middleware('permission:view purchase report,admin');
-                Route::get('stock', 'stockReport')->name('stock')->middleware('permission:view stock report,admin');
-                Route::get('expense', 'expenseReport')->name('expense')->middleware('permission:view expense report,admin');
-                Route::get('notification/history', 'notificationHistory')->name('notification.history')->middleware('permission:notification setting,admin');
-                Route::get('email/detail/{id}', 'emailDetails')->name('email.details')->middleware('permission:notification setting,admin');
+                Route::get('invoice-wise', 'invoiceWiseReport')->name('profit.invoice_wise')->middleware('staff.permission:view profit loss report');
+                Route::get('product-wise', 'productWiseReport')->name('profit.product_wise')->middleware('staff.permission:view profit loss report');
+                Route::get('sale', 'saleReport')->name('sale')->middleware('staff.permission:view sale report');
+                Route::get('purchase', 'purchaseReport')->name('purchase')->middleware('staff.permission:view purchase report');
+                Route::get('stock', 'stockReport')->name('stock')->middleware('staff.permission:view stock report');
+                Route::get('expense', 'expenseReport')->name('expense')->middleware('staff.permission:view expense report');
+                Route::get('notification/history', 'notificationHistory')->name('notification.history')->middleware('staff.permission:notification setting');
+                Route::get('email/detail/{id}', 'emailDetails')->name('email.details')->middleware('staff.permission:notification setting');
                 Route::get('transaction', 'transaction')->name('transaction');
                 Route::get('login/history', 'loginHistory')->name('login.history');
                 Route::get('login/ipHistory/{ip}', 'loginIpHistory')->name('login.ipHistory');
@@ -199,14 +203,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //customer
             Route::controller('CustomerController')->name('customer.')->prefix('customer')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view customer,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add customer,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit customer,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit customer,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view customer');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add customer');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit customer');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit customer');
                 Route::get('lazy-loading', 'lazyLoadingData')->name('lazy.loading');
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash customer,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash customer');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -216,14 +220,14 @@ Route::middleware('auth')->name('user.')->group(function () {
             Route::name('expense.')->prefix('expense')->group(function () {
                 //expense category
                 Route::controller('ExpenseCategoryController')->name('category.')->prefix("category")->group(function () {
-                    Route::get('list', 'list')->name('list')->middleware('permission:view expense category,admin');
-                    Route::post('create', 'save')->name('create')->middleware('permission:add expense category,admin');
-                    Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit expense category,admin');
-                    Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit expense category,admin');
+                    Route::get('list', 'list')->name('list')->middleware('staff.permission:view expense category');
+                    Route::post('create', 'save')->name('create')->middleware('staff.permission:add expense category');
+                    Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit expense category');
+                    Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit expense category');
 
                     //trash
                     Route::prefix('trash')->name('trash.')->group(function () {
-                        Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash expense category,admin');
+                        Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash expense category');
                         Route::post('restore/{id}', 'restoreTrash')->name('restore');
                         Route::get('list', 'listTrash')->name('list');
                     });
@@ -231,14 +235,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
                 //expense
                 Route::controller('ExpenseController')->group(function () {
-                    Route::get('list', 'list')->name('list')->middleware('permission:view expense,admin');
-                    Route::post('create', 'save')->name('create')->middleware('permission:add expense,admin');
-                    Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit expense,admin');
-                    Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit expense,admin');
+                    Route::get('list', 'list')->name('list')->middleware('staff.permission:view expense');
+                    Route::post('create', 'save')->name('create')->middleware('staff.permission:add expense');
+                    Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit expense');
+                    Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit expense');
 
                     //trash
                     Route::prefix('trash')->name('trash.')->group(function () {
-                        Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash expense,admin');
+                        Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash expense');
                         Route::post('restore/{id}', 'restoreTrash')->name('restore');
                         Route::get('list', 'listTrash')->name('list');
                     });
@@ -247,14 +251,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //Payment type
             Route::controller('PaymentTypeController')->name('payment.type.')->prefix('payment-type')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view payment type,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add payment type,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit payment type,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit payment type,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view payment type');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add payment type');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit payment type');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit payment type');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash payment type,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash payment type');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -262,16 +266,16 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //Payment account
             Route::controller('PaymentAccountController')->name('payment.account.')->prefix('payment-account')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view payment account,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add payment account,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit payment account,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit payment account,admin');
-                Route::post('adjust-balance/{id}', 'adjustBalance')->name('adjust.balance')->middleware('permission:adjust payment account balance,admin');
-                Route::post('transfer-balance/{id}', 'transferBalance')->name('transfer.balance')->middleware('permission:edit payment account,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view payment account');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add payment account');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit payment account');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit payment account');
+                Route::post('adjust-balance/{id}', 'adjustBalance')->name('adjust.balance')->middleware('staff.permission:adjust payment account balance');
+                Route::post('transfer-balance/{id}', 'transferBalance')->name('transfer.balance')->middleware('staff.permission:edit payment account');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash payment type,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash payment type');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -279,14 +283,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //warehouse
             Route::controller('WareHoseController')->name('warehouse.')->prefix('warehouse')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view warehouse,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add warehouse,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit warehouse,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit warehouse,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view warehouse');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add warehouse');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit warehouse');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit warehouse');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash warehouse,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash warehouse');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -294,14 +298,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //category
             Route::controller('CategoryController')->name('category.')->prefix('category')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view category,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add category,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit category,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit category,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view category');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add category');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit category');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit category');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash category,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash category');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -309,14 +313,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //brand
             Route::controller('BrandController')->name('brand.')->prefix('brand')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view brand,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add brand,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit brand,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit brand,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view brand');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add brand');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit brand');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit brand');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash brand,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash brand');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -324,30 +328,29 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //unit
             Route::controller('UnitController')->name('unit.')->prefix('unit')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view unit,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add unit,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit unit,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit unit,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view unit');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add unit');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit unit');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit unit');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash unit,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash unit');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
 
-
             //attribute
             Route::controller('AttributeController')->name('attribute.')->prefix('attribute')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view attribute,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add attribute,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit attribute,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit attribute,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view attribute');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add attribute');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit attribute');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit attribute');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash attribute,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash attribute');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -355,30 +358,29 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //variant
             Route::controller('VariantController')->name('variant.')->prefix('variant')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view variant,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add variant,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit variant,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit variant,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view variant');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add variant');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit variant');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit variant');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash variant,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash variant');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
 
-
             //tax
             Route::controller('TaxController')->name('tax.')->prefix('tax')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view tax,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add tax,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit tax,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit tax,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view tax');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add tax');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit tax');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit tax');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash tax,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash tax');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -386,14 +388,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //coupon
             Route::controller('CouponController')->name('coupon.')->prefix('coupon')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view coupon,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add coupon,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit coupon,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit coupon,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view coupon');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add coupon');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit coupon');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit coupon');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash coupon,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash coupon');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -401,14 +403,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //customer
             Route::controller('CustomerController')->name('customer.')->prefix('customer')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view customer,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add customer,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit customer,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit customer,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view customer');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add customer');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit customer');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit customer');
                 Route::get('lazy-loading', 'lazyLoadingData')->name('lazy.loading');
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash customer,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash customer');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -416,17 +418,17 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //supplier
             Route::controller('SupplierController')->name('supplier.')->prefix('supplier')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view supplier,admin');
-                Route::get('view/{id}', 'view')->name('view')->middleware('permission:view supplier,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add supplier,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit supplier,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit supplier,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view supplier');
+                Route::get('view/{id}', 'view')->name('view')->middleware('staff.permission:view supplier');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add supplier');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit supplier');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit supplier');
                 Route::get('lazy-loading', 'lazyLoadingData')->name('lazy.loading');
-                Route::post('add-payment/{id}', 'addPayment')->name('add.payment')->middleware('permission:add purchase payment,admin');
+                Route::post('add-payment/{id}', 'addPayment')->name('add.payment')->middleware('staff.permission:add purchase payment');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash supplier,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash supplier');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -434,27 +436,26 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //role
             Route::controller('RoleController')->name('role.')->prefix('role')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view role,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add role,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit role,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit role,admin');
-                Route::get('permission/{id}', 'permission')->name('permission')->middleware('permission:assign permission,admin');
-                Route::post('permission/update/{id}', 'permissionUpdate')->name('permission.update')->middleware('permission:assign permission,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view role');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add role');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit role');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit role');
+                Route::get('permission/{id}', 'permission')->name('permission')->middleware('staff.permission:assign permission');
+                Route::post('permission/update/{id}', 'permissionUpdate')->name('permission.update')->middleware('staff.permission:assign permission');
             });
-
 
             // HRM Modules
 
             // Company
             Route::controller('CompanyController')->name('company.')->prefix('company')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view company,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add company,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit company,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit company,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view company');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add company');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit company');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit company');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash company,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash company');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -462,14 +463,14 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             // Department
             Route::controller('DepartmentController')->name('department.')->prefix('department')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view department,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add department,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit department,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit department,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view department');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add department');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit department');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit department');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash department,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash department');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
@@ -477,126 +478,117 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             // Designation
             Route::controller('DesignationController')->name('designation.')->prefix('designation')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view designation,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add designation,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit designation,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit designation,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view designation');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add designation');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit designation');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit designation');
                 Route::get('get-department/{companyId}', 'getDepartment')->name('get.departments');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash designation,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash designation');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
 
             // Shift
             Route::controller('ShiftController')->name('shift.')->prefix('shift')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view shift,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add shift,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit shift,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit shift,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view shift');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add shift');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit shift');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit shift');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash shift,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash shift');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
 
             // Employee
             Route::controller('EmployeeController')->name('employee.')->prefix('employee')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view employee,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add employee,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit employee,admin');
-                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('permission:edit employee,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view employee');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add employee');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit employee');
+                Route::post('status-change/{id}', 'status')->name('status.change')->middleware('staff.permission:edit employee');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash employee,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash employee');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
 
             // Leave Request
             Route::controller('LeaveController')->name('leave.')->prefix('leave')->group(function () {
-                Route::get('request/list', 'list')->name('request.list')->middleware('permission:view leave request,admin');
-                Route::post('request/create', 'save')->name('request.create')->middleware('permission:add leave request,admin');
-                Route::post('request/update/{id}', 'save')->name('request.update')->middleware('permission:edit leave request,admin');
+                Route::get('request/list', 'list')->name('request.list')->middleware('staff.permission:view leave request');
+                Route::post('request/create', 'save')->name('request.create')->middleware('staff.permission:add leave request');
+                Route::post('request/update/{id}', 'save')->name('request.update')->middleware('staff.permission:edit leave request');
 
                 //Request trash
                 Route::prefix('request/trash')->name('request.trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash leave request,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash leave request');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
 
-                Route::get('type/list', 'typeList')->name('type.list')->middleware('permission:view leave type,admin');
-                Route::post('type/create', 'typeSave')->name('type.create')->middleware('permission:add leave type,admin');
-                Route::post('type/update/{id}', 'typeSave')->name('type.update')->middleware('permission:edit leave type,admin');
-                Route::post('type-status-change/{id}', 'typeStatus')->name('type.status.change')->middleware('permission:edit leave type,admin');
+                Route::get('type/list', 'typeList')->name('type.list')->middleware('staff.permission:view leave type');
+                Route::post('type/create', 'typeSave')->name('type.create')->middleware('staff.permission:add leave type');
+                Route::post('type/update/{id}', 'typeSave')->name('type.update')->middleware('staff.permission:edit leave type');
+                Route::post('type-status-change/{id}', 'typeStatus')->name('type.status.change')->middleware('staff.permission:edit leave type');
 
                 //Type trash
                 Route::prefix('type/trash')->name('type.trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash leave type,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash leave type');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
 
             // Attendance
             Route::controller('AttendanceController')->name('attendance.')->prefix('attendance')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view attendance,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add attendance,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit attendance,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view attendance');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add attendance');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit attendance');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash attendance,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash attendance');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
 
             // Holidays
             Route::controller('HolidayController')->name('holiday.')->prefix('holiday')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view holiday,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add holiday,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit holiday,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view holiday');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add holiday');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit holiday');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash holiday,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash holiday');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
-
 
             // Payroll
             Route::controller('PayrollController')->name('payroll.')->prefix('payroll')->group(function () {
-                Route::get('list', 'list')->name('list')->middleware('permission:view payroll,admin');
-                Route::post('create', 'save')->name('create')->middleware('permission:add payroll,admin');
-                Route::post('update/{id}', 'save')->name('update')->middleware('permission:edit payroll,admin');
+                Route::get('list', 'list')->name('list')->middleware('staff.permission:view payroll');
+                Route::post('create', 'save')->name('create')->middleware('staff.permission:add payroll');
+                Route::post('update/{id}', 'save')->name('update')->middleware('staff.permission:edit payroll');
 
                 //trash
                 Route::prefix('trash')->name('trash.')->group(function () {
-                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('permission:trash payroll,admin');
+                    Route::post('temporary/{id}', 'temporaryTrash')->name('temporary')->middleware('staff.permission:trash payroll');
                     Route::post('restore/{id}', 'restoreTrash')->name('restore');
                     Route::get('list', 'listTrash')->name('list');
                 });
             });
-
-
 
             // Withdraw
             Route::controller('WithdrawController')->prefix('withdraw')->name('withdraw')->group(function () {

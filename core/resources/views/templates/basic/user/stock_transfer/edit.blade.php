@@ -385,11 +385,11 @@
 
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="view sale">
+    <x-staff_permission_check permission="view sale">
         <a class="btn btn--primary" href="{{ route('user.stock.transfer.list') }}">
             <i class="las la-list me-1"></i>@lang('Transfer List')
         </a>
-        </x-permission-check>
+        </x-staff_permission_check>
     @endpush
 
     @push('style')

@@ -23,10 +23,10 @@
                                         </td>
                                         <td>
                                             <div class="btn--group">
-                                                <x-permission_check permission="edit role">
+                                                <x-staff_permission_check permission="edit role">
                                                 <x-admin.ui.btn.edit tag="btn" :data-role="$role" />
-                                                </x-permission_check>
-                                                <x-permission_check permission="assign permission">
+                                                </x-staff_permission_check>
+                                                <x-staff_permission_check permission="assign permission">
                                                 <a href="{{ route('admin.role.permission', $role->id) }}"
                                                     class="btn btn-outline--success">
                                                     <span class="me-1">
@@ -34,7 +34,7 @@
                                                     </span>
                                                     @lang('Permissions')
                                                 </a>
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </div>
                                         </td>
                                     </tr>
@@ -104,7 +104,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-<x-permission_check permission="add role">
+<x-staff_permission_check permission="add role">
     <x-admin.ui.btn.add tag="btn" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush

@@ -114,14 +114,14 @@
 
 @push('breadcrumb-plugins')
     <div class=" d-flex gap-2 flex-wrap">
-        <x-permission_check permission="edit product">
+        <x-staff_permission_check permission="edit product">
             <a class="btn btn--primary" href="{{ route('user.product.edit', $product->id) }}">
                 <i class="las la-pencil-alt"></i>
                 @lang('Edit')
             </a>
-        </x-permission_check>
-        <x-permission_check permission="view product">
+        </x-staff_permission_check>
+        <x-staff_permission_check permission="view product">
             <x-back_btn route="{{ route('user.product.list') }}" />
-        </x-permission_check>
+        </x-staff_permission_check>
     </div>
 @endpush

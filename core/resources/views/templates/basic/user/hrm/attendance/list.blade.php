@@ -40,9 +40,9 @@
                                         <td>{{ $attendance->duration }}</td>
                                         <td>
                                             <x-user.ui.btn.table_action module="attendance" :id="$attendance->id">
-                                                <x-permission_check permission="edit attendance">
+                                                <x-staff_permission_check permission="edit attendance">
                                                     <x-user.ui.btn.edit tag="btn" :data-attendance="$attendance" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -227,7 +227,7 @@
 
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add attendance">
+    <x-staff_permission_check permission="add attendance">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

@@ -23,9 +23,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="attribute" :id="$attribute->id">
-                                                <x-permission_check permission="edit attribute">
+                                                <x-staff_permission_check permission="edit attribute">
                                                 <x-user.ui.btn.edit tag="btn" :data-attribute="$attribute" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -94,7 +94,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-<x-permission_check permission="add attribute">
+<x-staff_permission_check permission="add attribute">
     <x-user.ui.btn.add tag="btn" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush

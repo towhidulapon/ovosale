@@ -16,7 +16,7 @@
                     @foreach ($menu as $parentMenu)
                         @if (@$parentMenu->submenu)
                             @foreach (@$parentMenu->submenu as $subMenu)
-                            <x-permission_check :permission="@$subMenu->permission">
+                            <x-staff_permission_check :permission="@$subMenu->permission">
                                 <li class="search-card__item" data-keyword='@json(@$subMenu->keyword ?? [])'>
                                     <a href="{{ route($subMenu->route_name) }}" class="search-card__link">
                                         <div class="search-card__text">
@@ -25,10 +25,10 @@
                                         </div>
                                     </a>
                                 </li>
-                            </x-permission_check>
+                            </x-staff_permission_check>
                             @endforeach
                         @else
-                        <x-permission_check :permission="@$parentMenu->permission">
+                        <x-staff_permission_check :permission="@$parentMenu->permission">
                             <li class="search-card__item" data-keyword='@json(@$parentMenu->keyword ?? [])'>
                                 <a href="{{ route($parentMenu->route_name) }}" class="search-card__link">
                                     <div class="search-card__text">
@@ -52,7 +52,7 @@
                                     </li>
                                 @endforeach
                             @endif
-                        </x-permission_check>
+                        </x-staff_permission_check>
                         @endif
                     @endforeach
                 @endforeach

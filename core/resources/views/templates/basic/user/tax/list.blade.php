@@ -25,9 +25,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="tax" :id="$tax->id">
-                                                <x-permission_check permission="edit tax">
+                                                <x-staff_permission_check permission="edit tax">
                                                 <x-user.ui.btn.edit tag="btn" :data-tax="$tax" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -110,7 +110,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-<x-permission_check permission="add tax">
+<x-staff_permission_check permission="add tax">
     <x-user.ui.btn.add tag="btn" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush

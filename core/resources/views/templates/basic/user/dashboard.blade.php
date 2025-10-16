@@ -41,68 +41,68 @@
             <div class="row responsive-row">
                 <div class="col-xl-12 col-xxl-12">
                     <div class="row responsive-row mb-0">
-                        <x-permission_check permission="view sale">
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.sale.list') }}?date={{ $today }}" variant="success" title="Today sale" :value="$widget['today_sale']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view sale">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.sale.list') }}?date={{ now()->startOfWeek()->format('Y-m-d') }}to{{ $today }}" variant="success" title="This Week sale" :value="$widget['this_week_sale']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view sale">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.sale.list') }}?date={{ now()->startOfMonth()->format('Y-m-d') }}to{{ $today }}" variant="success" title="This Month sale" :value="$widget['this_month_sale']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view sale">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.sale.list') }}" variant="success" title="All sale" :value="$widget['all_sale']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view purchase">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.purchase.list') }}?date={{ $today }}" variant="danger" title="Today Purchase" :value="$widget['today_purchase']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view purchase">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.purchase.list') }}?date={{ now()->startOfWeek()->format('Y-m-d') }}to{{ $today }}" variant="danger" title="This Week Purchase" :value="$widget['this_week_purchase']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view purchase">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.purchase.list') }}?date={{ now()->startOfMonth()->format('Y-m-d') }}to{{ $today }}" variant="danger" title="This Month Purchase" :value="$widget['this_month_purchase']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view purchase">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.purchase.list') }}" variant="danger" title="All Purchase" :value="$widget['all_purchase']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view expense">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view expense">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.expense.list') }}?date={{ $today }}" variant="primary" title="Today Expense" :value="$widget['today_expense']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view expense">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view expense">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.expense.list') }}?date={{ now()->startOfWeek()->format('Y-m-d') }}to{{ $today }}" variant="primary" title="This Week Expense" :value="$widget['this_week_expense']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view expense">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view expense">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.expense.list') }}?date={{ now()->startOfMonth()->format('Y-m-d') }}to{{ $today }}" variant="primary" title="This Month Expense" :value="$widget['this_month_expense']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view expense">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view expense">
                             <div class="col-xxl-3 col-sm-6">
                                 <x-user.ui.widget.four url="{{ route('user.expense.list') }}" variant="primary" title="All Expense" :value="$widget['all_expense']" icon="las la-calendar" />
                             </div>
-                        </x-permission_check>
+                        </x-staff_permission_check>
 
-                        <x-permission_check permission="view product">
+                        <x-staff_permission_check permission="view product">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="mh-420">
                                     <x-user.ui.card.header>
@@ -162,8 +162,8 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view product">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view product">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="mh-420">
                                     <x-user.ui.card.header class="d-flex align-items-center gap-2 flex-wrap justify-content-between">
@@ -191,8 +191,8 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
-                        <x-permission_check permission="view sale">
+                        </x-staff_permission_check>
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="h-100">
                                     <x-user.ui.card.header>
@@ -235,17 +235,17 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
+                        </x-staff_permission_check>
 
 
-                        <x-permission_check permission="view purchase">
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="h-100">
                                     <x-user.ui.card.header>
                                         <h4 class="card-title">@lang('Recent Purchases')
-                                            <x-permission_check permission="view purchase">
+                                            <x-staff_permission_check permission="view purchase">
                                                 <x-user.ui.btn.list href="{{ route('user.purchase.list') }}" text="View More" />
-                                            </x-permission_check>
+                                            </x-staff_permission_check>
                                         </h4>
                                     </x-user.ui.card.header>
                                     <x-user.ui.card.body class="p-0">
@@ -286,10 +286,10 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
+                        </x-staff_permission_check>
 
 
-                        <x-permission_check permission="view sale">
+                        <x-staff_permission_check permission="view sale">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="h-100">
                                     <x-user.ui.card.header>
@@ -300,9 +300,9 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
+                        </x-staff_permission_check>
 
-                        <x-permission_check permission="view purchase">
+                        <x-staff_permission_check permission="view purchase">
                             <div class="col-xl-12 col-xxl-6">
                                 <x-user.ui.card class="h-100">
                                     <x-user.ui.card.header>
@@ -313,7 +313,7 @@
                                     </x-user.ui.card.body>
                                 </x-user.ui.card>
                             </div>
-                        </x-permission_check>
+                        </x-staff_permission_check>
 
                     </div>
                 </div>
@@ -339,21 +339,21 @@
 
 @push('breadcrumb-plugins')
     <div class="d-flex gap-2 flex-wrap">
-        <x-permission_check permission="add sale">
+        <x-staff_permission_check permission="add sale">
             <a class="btn btn--success" href="{{ route('user.sale.add') }}">
                 <i class="las la-list"></i> @lang('New Sale')
             </a>
-        </x-permission_check>
-        <x-permission_check permission="add purchase">
+        </x-staff_permission_check>
+        <x-staff_permission_check permission="add purchase">
             <a class="btn btn--warning" href="{{ route('user.purchase.add') }}">
                 <i class="las la-th-list"></i> @lang('New Purchase')
             </a>
-        </x-permission_check>
-        <x-permission_check permission="add expense">
+        </x-staff_permission_check>
+        <x-staff_permission_check permission="add expense">
             <a class="btn btn--danger" href="{{ route('user.expense.list') }}?popup=yes">
                 <i class="las la-file-invoice-dollar"></i> @lang('New Expense')
             </a>
-        </x-permission_check>
+        </x-staff_permission_check>
     </div>
 @endpush
 

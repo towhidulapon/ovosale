@@ -139,7 +139,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                            {{-- <div class="col-sm-6">
                                 <div class="widget-card widget--warning">
                                     <a href="{{ route('admin.withdraw.data.all') }}?user_id={{ $user->id }}"
                                         class="widget-card-link"></a>
@@ -161,7 +161,7 @@
                                         <i class="fas fa-chevron-right"></i>
                                     </span>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-sm-6">
                                 <div class="widget-card widget--primary">
                                     <a href="{{ route('admin.report.transaction') }}?user_id={{ $user->id }}"

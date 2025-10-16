@@ -23,9 +23,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="leave.type" :id="$type->id">
-                                                <x-permission_check permission="edit leave type">
+                                                <x-staff_permission_check permission="edit leave type">
                                                     <x-user.ui.btn.edit tag="btn" :data-type="$type" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -100,7 +100,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add leave type">
+    <x-staff_permission_check permission="add leave type">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

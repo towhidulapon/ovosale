@@ -2,34 +2,64 @@
 namespace App\Traits;
 
 use App\Constants\Status;
+use App\Models\StaffPermission;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Validation\Rule;
 
 trait StaffManager
 {
 
     public function list()
     {
-        $pageTitle = "Agent List";
         $user      = getParentUser();
-        $staff     = User::staff()
-            ->where('is_deleted', Status::NO) // add is_deleted to users table
-            ->where('parent_id', $user->id)
-            ->searchable(['firstname', 'lastname', 'email', 'username'])
-            ->apiQuery();
+        $pageTitle = "Staff List";
+        $view      = "Template::user.staff.list";
 
-        $view = "Template::user.staff.list";
+        $baseQuery = User::staff()
+            ->where('is_deleted', Status::NO)
+            ->where('parent_id', $user->id);
+
+        if (request()->export) {
+            return exportData($baseQuery, request()->export, "User");
+        }
+
+        $staffs = (clone $baseQuery)
+            ->searchable(['firstname', 'lastname', 'email', 'username'])
+            ->dateFilter('created_at')
+            ->trashFilter()
+            ->apiQuery();
 
         return responseManager("staff", $pageTitle, "success", [
             "pageTitle"   => $pageTitle,
-            'view'        => $view,
-            'staff'       => $staff,
-            'profilePath' => getFilePath('userProfile'),
+            "view"        => $view,
+            "staffs"      => $staffs,
+            "profilePath" => getFilePath('userProfile'),
         ]);
     }
+
+    // public function list()
+    // {
+    //     $pageTitle = "Staff List";
+    //     $user      = getParentUser();
+    //     $staffs    = User::staff()
+    //         ->where('is_deleted', Status::NO)
+    //         ->where('parent_id', $user->id)
+    //         ->searchable(['firstname', 'lastname', 'email', 'username'])
+    //         ->dateFilter('created_at')
+    //         ->trashFilter()
+    //         ->apiQuery();
+
+    //     $view = "Template::user.staff.list";
+
+    //     return responseManager("staff", $pageTitle, "success", [
+    //         "pageTitle"   => $pageTitle,
+    //         'view'        => $view,
+    //         'staffs'      => $staffs,
+    //         'profilePath' => getFilePath('userProfile'),
+    //     ]);
+    // }
 
     public function save(Request $request)
     {
@@ -54,56 +84,62 @@ trait StaffManager
 
         $oneTimePassword = getNumber(10);
 
-        $agent                   = new User();
-        $agent->firstname        = $request->firstname;
-        $agent->lastname         = $request->lastname;
-        $agent->username         = $request->username;
-        $agent->email            = $request->email;
-        $agent->country_code     = $request->country_code;
-        $agent->country_name     = @$request->country;
-        $agent->dial_code        = $request->mobile_code;
-        $agent->mobile           = $request->mobile;
-        $agent->city             = $request->city;
-        $agent->state            = $request->state;
-        $agent->zip              = $request->zip;
-        $agent->address          = $request->address;
-        $agent->parent_id        = $user->id;
-        $agent->password         = Hash::make($oneTimePassword);
-        $agent->kv               = Status::KYC_VERIFIED;
-        $agent->ev               = Status::VERIFIED;
-        $agent->sv               = Status::VERIFIED;
-        $agent->tv               = Status::VERIFIED;
-        $agent->profile_complete = Status::YES;
-        $agent->is_staff         = Status::YES;
-        $agent->save();
+        $staff                   = new User();
+        $staff->firstname        = $request->firstname;
+        $staff->lastname         = $request->lastname;
+        $staff->username         = $request->username;
+        $staff->email            = $request->email;
+        $staff->country_code     = $request->country_code;
+        $staff->country_name     = @$request->country;
+        $staff->dial_code        = $request->mobile_code;
+        $staff->mobile           = $request->mobile;
+        $staff->city             = $request->city;
+        $staff->state            = $request->state;
+        $staff->zip              = $request->zip;
+        $staff->address          = $request->address;
+        $staff->parent_id        = $user->id;
+        $staff->password         = Hash::make($oneTimePassword);
+        $staff->kv               = Status::KYC_VERIFIED;
+        $staff->ev               = Status::VERIFIED;
+        $staff->sv               = Status::VERIFIED;
+        $staff->tv               = Status::VERIFIED;
+        $staff->profile_complete = Status::YES;
+        $staff->is_staff         = Status::YES;
+        $staff->save();
 
-        notify($agent, 'AGENT_REGISTERED', [
-            'user'        => $agent->fullname,
+        notify($staff, 'STAFF_REGISTERED', [
+            'user'        => $staff->fullname,
             'parent_user' => $user->username,
-            'username'    => $agent->username,
-            'email'       => $agent->email,
+            'username'    => $staff->username,
+            'email'       => $staff->email,
             'password'    => $oneTimePassword,
             'login_url'   => route('user.login'),
         ]);
 
-        $message = "Agent created successfully";
-        return responseManager("agent", $message, "success");
+        $message = "Staff created successfully";
+        return responseManager("staff", $message, "success");
     }
 
     public function edit($id)
     {
         $user  = getParentUser();
-        $agent = User::agent()
+        $staff = User::staff()
             ->where('is_deleted', Status::NO)
             ->where('parent_id', $user->id)
-            ->findOrFailWithApi("agent", $id);
+            ->findOrFailWithApi("staff", $id);
 
-        $pageTitle = "Edit Agent - " . $agent->username;
-        $view      = "Template::user.agent.edit";
-        return responseManager("agent", $pageTitle, "success", [
-            "pageTitle" => $pageTitle,
-            "view"      => $view,
-            "agent"     => $agent,
+        $info       = json_decode(json_encode(getIpInfo()), true);
+        $mobileCode = @implode(',', $info['code']);
+        $countries  = json_decode(file_get_contents(resource_path('views/partials/country.json')));
+
+        $pageTitle = "Edit Staff - " . $staff->username;
+        $view      = "Template::user.staff.edit";
+        return responseManager("staff", $pageTitle, "success", [
+            "pageTitle"  => $pageTitle,
+            "view"       => $view,
+            "staff"      => $staff,
+            "countries"  => $countries,
+            "mobileCode" => $mobileCode,
         ]);
     }
 
@@ -114,39 +150,39 @@ trait StaffManager
             'lastname'  => 'required',
         ]);
         $user  = getParentUser();
-        $agent = User::agent()
+        $staff = User::staff()
             ->where('is_deleted', Status::NO)
             ->where('parent_id', $user->id)
-            ->findOrFailWithApi("agent", $id);
+            ->findOrFailWithApi("staff", $id);
 
-        $agent->firstname = $request->firstname;
-        $agent->lastname  = $request->lastname;
-        $agent->city      = $request->city;
-        $agent->state     = $request->state;
-        $agent->zip       = $request->zip;
-        $agent->address   = $request->address;
-        $agent->save();
+        $staff->firstname = $request->firstname;
+        $staff->lastname  = $request->lastname;
+        $staff->city      = $request->city;
+        $staff->state     = $request->state;
+        $staff->zip       = $request->zip;
+        $staff->address   = $request->address;
+        $staff->save();
 
-        $message = "Agent updated successfully";
-        return responseManager("agent", $message, "success");
+        $message = "Staff updated successfully";
+        return responseManager("staff", $message, "success");
     }
 
     public function permissions($id)
     {
         $user  = getParentUser();
-        $agent = User::agent()
+        $staff = User::staff()
             ->where('is_deleted', Status::NO)
             ->where('parent_id', $user->id)
-            ->findOrFailWithApi("agent", $id);
+            ->findOrFailWithApi("staff", $id);
 
-        $permissions         = AgentPermission::get();
-        $existingPermissions = $agent->agentPermissions;
-        $pageTitle           = "Agent Permissions - " . $agent->fullName;
-        $view                = "Template::user.agent.permissions";
-        return responseManager("agent", $pageTitle, "success", [
+        $permissions         = StaffPermission::get();
+        $existingPermissions = $staff->staffPermissions;
+        $pageTitle           = "Staff Permissions - " . $staff->fullName;
+        $view                = "Template::user.staff.permissions";
+        return responseManager("staff", $pageTitle, "success", [
             "pageTitle"           => $pageTitle,
             "view"                => $view,
-            "agent"               => $agent,
+            "staff"               => $staff,
             "permissions"         => $permissions,
             "existingPermissions" => $existingPermissions,
         ]);
@@ -160,31 +196,31 @@ trait StaffManager
         ]);
 
         $user  = getParentUser();
-        $agent = User::agent()
+        $staff = User::staff()
             ->where('is_deleted', Status::NO)
             ->where('parent_id', $user->id)
-            ->findOrFailWithApi("agent", $id);
+            ->findOrFailWithApi("staff", $id);
 
-        $permissions = AgentPermission::whereIn('id', $request->permissions ?? [])->pluck('id')->toArray();
-        $agent->agentPermissions()->sync($permissions);
+        $permissions = StaffPermission::whereIn('id', $request->permissions ?? [])->pluck('id')->toArray();
+        $staff->staffPermissions()->sync($permissions);
 
-        $message = "Agent permissions updated successfully";
-        return responseManager("agent", $message, "success");
+        $message = "Staff permissions updated successfully";
+        return responseManager("staff", $message, "success");
     }
 
     public function delete($id)
     {
         $user  = getParentUser();
-        $agent = User::agent()
+        $staff = User::staff()
             ->where('is_deleted', Status::NO)
             ->where('parent_id', $user->id)
-            ->findOrFailWithApi("agent", $id);
+            ->find($id);
 
-        $agent->is_deleted = Status::YES;
-        $agent->save();
+        $staff->is_deleted = Status::YES;
+        $staff->save();
 
-        $message = "Agent deleted successfully";
-        return responseManager("agent", $message, "success");
+        $message = "Staff deleted successfully";
+        return responseManager("staff", $message, "success");
     }
 
 }

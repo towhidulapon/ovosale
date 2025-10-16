@@ -51,16 +51,16 @@
             </span>
             <span class="text">@lang('Shortcut')</span>
         </button>
-        <x-permission_check permission="view sale">
+        <x-staff_permission_check permission="view sale">
             <a class="pos-btn pos-btn--sm pos-btn-outline--info"  href="{{ route('user.sale.list') }}">
                 <span class="icon">
                     <i class="fas fa-list"></i>
                 </span>
                 <span class="text">@lang('Sale List')</span>
             </a>
-        </x-permission_check>
+        </x-staff_permission_check>
 
-        <x-permission_check permission="view dashboard">
+        <x-staff_permission_check permission="view dashboard">
             <a class="pos-btn pos-btn--sm pos-btn-outline--primary"
                 href="{{ route('user.home') }}">
                 <span class="icon">
@@ -68,7 +68,7 @@
                 </span>
                 <span class="text">@lang('Dashboard')</span>
             </a>
-        </x-permission_check>
+        </x-staff_permission_check>
         <button class="pos-btn pos-btn--sm pos-btn-outline--primary pos-sidebar-toggle ms-auto d-lg-none" type="button"
             data-toggle="pos-sidebar" data-target="#pos-sidebar">
             <span class="text">

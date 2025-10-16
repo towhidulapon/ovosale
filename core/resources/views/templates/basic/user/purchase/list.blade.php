@@ -63,7 +63,7 @@
                                                     @lang('Action') <i class="las la-angle-down"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown">
-                                                    <x-permission_check permission="edit purchase">
+                                                    <x-staff_permission_check permission="edit purchase">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.purchase.edit', $purchase->id) }}">
                                                             <span class="me-2">
@@ -71,8 +71,8 @@
                                                             </span>
                                                             @lang('Edit Purchase')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="view purchase">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="view purchase">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.purchase.view', $purchase->id) }}">
                                                             <span class="me-2">
@@ -80,8 +80,8 @@
                                                             </span>
                                                             @lang('View Invoice')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="print purchase invoice">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="print purchase invoice">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start print-btn"
                                                             target="_blank"
@@ -91,8 +91,8 @@
                                                             </span>
                                                             @lang('Print Invoice')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="download purchase invoice">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="download purchase invoice">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.purchase.pdf', $purchase->id) }}">
                                                             <span class="me-2">
@@ -100,8 +100,8 @@
                                                             </span>
                                                             @lang('Download Invoice')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="update purchase status">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="update purchase status">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start update-status"
                                                             data-id="{{ $purchase->id }}" @disabled($purchase->status == Status::PURCHASE_RECEIVED)>
@@ -110,8 +110,8 @@
                                                             </span>
                                                             @lang('Update Status')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="add purchase payment">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="add purchase payment">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start add-payment"
                                                             data-purchase='@json($purchase)'
@@ -121,8 +121,8 @@
                                                             </span>
                                                             @lang('Add Payment')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="view purchase payment">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="view purchase payment">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start payment-history"
                                                             data-purchase='@json($purchase)'>
@@ -131,9 +131,9 @@
                                                             </span>
                                                             @lang('Payment History')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="view purchase">
+                                                    <x-staff_permission_check permission="view purchase">
                                                         @if ($purchase->attachment)
                                                             <a class="dropdown-list d-block w-100 text-start"
                                                                 href="{{ route('user.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}">
@@ -151,7 +151,7 @@
                                                                 @lang('Attachment')
                                                             </a>
                                                         @endif
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
                                                 </div>
                                             @endif
@@ -285,9 +285,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add purchase">
+    <x-staff_permission_check permission="add purchase">
         <x-user.ui.btn.add href="{{ route('user.purchase.add') }}" text="Add Purchase" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush
 
 @push('script-lib')

@@ -62,7 +62,7 @@
                                                     @lang('Action') <i class="las la-angle-down"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown">
-                                                    <x-permission_check permission="edit sale">
+                                                    <x-staff_permission_check permission="edit sale">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.sale.edit', $sale->id) }}">
                                                             <span class="me-1">
@@ -70,8 +70,8 @@
                                                             </span>
                                                             @lang('Edit Sale')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="view sale">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="view sale">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.sale.view', $sale->id) }}">
                                                             <span class="me-1">
@@ -79,9 +79,9 @@
                                                             </span>
                                                             @lang('View Invoice')
                                                         </a>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="print sale invoice">
+                                                    <x-staff_permission_check permission="print sale invoice">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start print-btn"
                                                             data-action="{{ route('user.sale.print', $sale->id) }}?invoice_type=regular">
@@ -90,9 +90,9 @@
                                                             </span>
                                                             @lang('Print Invoice')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="print pos sale invoice">
+                                                    <x-staff_permission_check permission="print pos sale invoice">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start print-btn"
                                                             data-action="{{ route('user.sale.print', $sale->id) }}?invoice_type=pos">
@@ -101,9 +101,9 @@
                                                             </span>
                                                             @lang('Print POS Invoice')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="download sale invoice">
+                                                    <x-staff_permission_check permission="download sale invoice">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.sale.pdf', $sale->id) }}">
                                                             <span class="me-1">
@@ -111,9 +111,9 @@
                                                             </span>
                                                             @lang('Download Invoice')
                                                         </a>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
 
-                                                    <x-permission_check permission="view sale payment">
+                                                    <x-staff_permission_check permission="view sale payment">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start payment-history"
                                                             data-sale='@json($sale)'>
@@ -122,7 +122,7 @@
                                                             </span>
                                                             @lang('Payment History')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 </div>
                                             @endif
                                         </td>
@@ -160,9 +160,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add sale">
+    <x-staff_permission_check permission="add sale">
         <x-user.ui.btn.add href="{{ route('user.sale.add') }}" text="New Sale" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush
 
 

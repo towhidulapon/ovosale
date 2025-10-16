@@ -1101,9 +1101,9 @@
 
 
 @push('breadcrumb-plugins')
- <x-permission_check permission="view product">
+ <x-staff_permission_check permission="view product">
     <a class="btn  btn-outline--primary" href="{{ route('user.product.list') }}">
         <i class="las la-list me-1"></i>@lang('Product List')
     </a>
- </x-permission_check>
+ </x-staff_permission_check>
 @endpush

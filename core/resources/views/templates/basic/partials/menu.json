@@ -61,6 +61,15 @@
             "title": "Manage Sale",
             "icon": "la la-list",
             "menu_active": ["user.sale.*"],
+            "permission": [
+                "view sale",
+                "add sale",
+                "edit sale",
+                "print sale invoice",
+                "print pos sale invoice",
+                "download sale invoice",
+                "view sale payment"
+            ],
             "submenu": [
                 {
                     "title": "POS Sale",
@@ -81,7 +90,8 @@
                         "Sales Transactions",
                         "Checkout System",
                         "Sales Management"
-                    ]
+                    ],
+                    "permission": ["add sale"]
                 },
                 {
                     "title": "Add Sale",
@@ -101,7 +111,8 @@
                         "Input Sale",
                         "Generate Sale",
                         "Make Sale"
-                    ]
+                    ],
+                    "permission": ["add sale"]
                 },
                 {
                     "title": "Sale List",
@@ -121,7 +132,8 @@
                         "Sales Listings",
                         "Sales Information",
                         "Sales Details"
-                    ]
+                    ],
+                    "permission": ["view sale"]
                 }
             ]
         },
@@ -366,7 +378,7 @@
             "title": "Manage Staff",
             "icon": "las la-users",
             "route_name": "user.staff.list",
-            "menu_active": "user.staff.list",
+            "menu_active": "user.staff.*",
             "permission": [
                 "view staff",
                 "manage staff",
@@ -375,7 +387,6 @@
                 "add staff"
             ]
         }
-
     ],
     "accounting": [
         {

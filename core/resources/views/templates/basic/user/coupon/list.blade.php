@@ -62,9 +62,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="coupon" :id="$coupon->id">
-                                                <x-permission_check permission="edit coupon">
+                                                <x-staff_permission_check permission="edit coupon">
                                                 <x-user.ui.btn.edit tag="button" : :data-resource="$coupon" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -251,9 +251,9 @@
 @endpush
 
 @push('breadcrumb-plugins')
-<x-permission_check permission="add coupon">
+<x-staff_permission_check permission="add coupon">
     <x-user.ui.btn.add tag="button" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush
 
 

@@ -1,30 +1,31 @@
 <?php
 
 use App\Constants\Status;
-use App\Lib\GoogleAuthenticator;
-use App\Models\GeneralSetting;
-use Carbon\Carbon;
 use App\Lib\Captcha;
 use App\Lib\ClientInfo;
 use App\Lib\CurlRequest;
 use App\Lib\Export\ExportManager;
 use App\Lib\FileManager;
+use App\Lib\GoogleAuthenticator;
 use App\Models\AdminActivity;
 use App\Models\Cart;
 use App\Models\Extension;
 use App\Models\Frontend;
+use App\Models\GeneralSetting;
 use App\Models\ProductDetail;
 use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Tax;
 use App\Models\Transaction;
 use App\Notify\Notify;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Picqer\Barcode\Types\TypeCode128;
 
-function systemDetails() {
+function systemDetails()
+{
     $system['name']                = 'ovosale';
     $system['web_version']         = '1.0';
     $system['admin_panel_version'] = '1.0.1';
@@ -36,18 +37,24 @@ function systemDetails() {
     return $system;
 }
 
-function slug($string) {
+function slug($string)
+{
     return Str::slug($string);
 }
 
-function verificationCode($length) {
-    if ($length == 0) return 0;
+function verificationCode($length)
+{
+    if ($length == 0) {
+        return 0;
+    }
+
     $min = pow(10, $length - 1);
     $max = (int) ($min - 1) . '9';
     return random_int($min, $max);
 }
 
-function getNumber($length = 8) {
+function getNumber($length = 8)
+{
     $characters       = '1234567890';
     $charactersLength = strlen($characters);
     $randomString     = '';
@@ -57,40 +64,49 @@ function getNumber($length = 8) {
     return $randomString;
 }
 
-
-function activeTemplate($asset = false) {
+function activeTemplate($asset = false)
+{
     $template = session('template') ?? gs('active_template');
-    if ($asset) return 'assets/templates/' . $template . '/';
+    if ($asset) {
+        return 'assets/templates/' . $template . '/';
+    }
+
     return 'templates.' . $template . '.';
 }
 
-function activeTemplateName() {
+function activeTemplateName()
+{
     $template = session('template') ?? gs('active_template');
     return $template;
 }
 
-function siteLogo($type = null) {
+function siteLogo($type = null)
+{
     $name = $type ? "/logo_$type.png" : '/logo.png';
     return getImage(getFilePath('logoIcon') . $name);
 }
-function siteFavicon() {
+function siteFavicon()
+{
     return getImage(getFilePath('logoIcon') . '/favicon.png');
 }
 
-function loadReCaptcha() {
+function loadReCaptcha()
+{
     return Captcha::reCaptcha();
 }
 
-function loadCustomCaptcha($width = '100%', $height = 46, $bgColor = '#003') {
+function loadCustomCaptcha($width = '100%', $height = 46, $bgColor = '#003')
+{
     return Captcha::customCaptcha($width, $height, $bgColor);
 }
 
-function verifyCaptcha() {
+function verifyCaptcha()
+{
     return Captcha::verify();
 }
 
-
-function getTrx($length = 12) {
+function getTrx($length = 12)
+{
     $characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
     $charactersLength = strlen($characters);
     $randomString     = '';
@@ -100,16 +116,17 @@ function getTrx($length = 12) {
     return $randomString;
 }
 
-function getAmount($amount, $length = 2) {
+function getAmount($amount, $length = 2)
+{
     $amount = round($amount ?? 0, $length);
     return $amount + 0;
 }
 
-function showAmount($amount, $decimal = null, $separate = true, $exceptZeros = false, $currencyFormat = true, $separator = '') {
+function showAmount($amount, $decimal = null, $separate = true, $exceptZeros = false, $currencyFormat = true, $separator = '')
+{
     if (!$decimal) {
         $decimal = gs('allow_precision');
     }
-
 
     if ($separate && !$separator) {
         $separator = str_replace(['space', 'none'], [' ', ''], gs('thousand_separator'));
@@ -136,43 +153,45 @@ function showAmount($amount, $decimal = null, $separate = true, $exceptZeros = f
     return $printAmount;
 }
 
-
-function removeElement($array, $value) {
+function removeElement($array, $value)
+{
     return array_diff($array, (is_array($value) ? $value : array($value)));
 }
 
-function cryptoQR($wallet) {
+function cryptoQR($wallet)
+{
     return "https://api.qrserver.com/v1/create-qr-code/?data=$wallet&size=300x300&ecc=m";
 }
 
-function keyToTitle($text) {
+function keyToTitle($text)
+{
     return ucfirst(preg_replace("/[^A-Za-z0-9 ]/", ' ', $text));
 }
 
-
-function titleToKey($text) {
+function titleToKey($text)
+{
     return strtolower(str_replace(' ', '_', $text));
 }
 
-
-function strLimit($title = null, $length = 10) {
+function strLimit($title = null, $length = 10)
+{
     return Str::limit($title, $length);
 }
 
-
-function getIpInfo() {
+function getIpInfo()
+{
     $ipInfo = ClientInfo::ipInfo();
     return $ipInfo;
 }
 
-
-function osBrowser() {
+function osBrowser()
+{
     $osBrowser = ClientInfo::osBrowser();
     return $osBrowser;
 }
 
-
-function getTemplates() {
+function getTemplates()
+{
     $param['purchasecode'] = env("PURCHASECODE");
     $param['website']      = @$_SERVER['HTTP_HOST'] . @$_SERVER['REQUEST_URI'] . ' - ' . env("APP_URL");
     $url                   = "#";
@@ -184,8 +203,8 @@ function getTemplates() {
     }
 }
 
-
-function getPageSections($arr = false) {
+function getPageSections($arr = false)
+{
     $jsonUrl  = resource_path('views/') . str_replace('.', '/', activeTemplate()) . 'sections.json';
     $sections = json_decode(file_get_contents($jsonUrl));
     if ($arr) {
@@ -195,8 +214,8 @@ function getPageSections($arr = false) {
     return $sections;
 }
 
-
-function getImage($image, $size = null, $isAvatar = false) {
+function getImage($image, $size = null, $isAvatar = false)
+{
     $clean = '';
     if (file_exists($image) && is_file($image)) {
         return asset($image) . $clean;
@@ -210,8 +229,8 @@ function getImage($image, $size = null, $isAvatar = false) {
     return asset('assets/images/default.png');
 }
 
-
-function notify($user, $templateName, $shortCodes = null, $sendVia = null, $createLog = true, $pushImage = null) {
+function notify($user, $templateName, $shortCodes = null, $sendVia = null, $createLog = true, $pushImage = null)
+{
     $globalShortCodes = [
         'site_name'       => gs('site_name'),
         'site_currency'   => gs('cur_text'),
@@ -234,44 +253,54 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->send();
 }
 
-function getPaginate($paginate = null) {
+function getPaginate($paginate = null)
+{
     if (!$paginate) {
-        $paginate = request()->paginate ??   gs('paginate_number');
+        $paginate = request()->paginate ?? gs('paginate_number');
     }
     return $paginate;
 }
 
-function getOrderBy($orderBy = null) {
+function getOrderBy($orderBy = null)
+{
     if (!$orderBy) {
         $orderBy = request()->order_by ?? 'desc';
     }
     return $orderBy;
 }
 
-function paginateLinks($data, $view = null) {
+function paginateLinks($data, $view = null)
+{
     $paginationHtml = $data->appends(request()->all())->links($view);
     echo '<div class="pagination-wrapper w-100">' . $paginationHtml . '</div>';
 }
 
-
-function menuActive($routeName, $param = null, $className = 'active') {
+function menuActive($routeName, $param = null, $className = 'active')
+{
 
     if (is_array($routeName)) {
         foreach ($routeName as $key => $value) {
-            if (request()->routeIs($value)) return $className;
+            if (request()->routeIs($value)) {
+                return $className;
+            }
+
         }
     } elseif (request()->routeIs($routeName)) {
         if ($param) {
             $routeParam = array_values(@request()->route()->parameters ?? []);
-            if (strtolower(@$routeParam[0]) == strtolower($param)) return $className;
-            else return;
+            if (strtolower(@$routeParam[0]) == strtolower($param)) {
+                return $className;
+            } else {
+                return;
+            }
+
         }
         return $className;
     }
 }
 
-
-function fileUploader($file, $location, $size = null, $old = null, $thumb = null, $filename = null) {
+function fileUploader($file, $location, $size = null, $old = null, $thumb = null, $filename = null)
+{
     $fileManager           = new FileManager($file);
     $fileManager->path     = $location;
     $fileManager->size     = $size;
@@ -282,23 +311,28 @@ function fileUploader($file, $location, $size = null, $old = null, $thumb = null
     return $fileManager->filename;
 }
 
-function fileManager() {
+function fileManager()
+{
     return new FileManager();
 }
 
-function getFilePath($key) {
+function getFilePath($key)
+{
     return fileManager()->$key()->path;
 }
 
-function getFileSize($key) {
+function getFileSize($key)
+{
     return fileManager()->$key()->size;
 }
 
-function getFileExt($key) {
+function getFileExt($key)
+{
     return fileManager()->$key()->extensions;
 }
 
-function diffForHumans($date) {
+function diffForHumans($date)
+{
     $lang = session()->get('lang');
     if (!$lang) {
         $lang = getDefaultLang();
@@ -308,12 +342,14 @@ function diffForHumans($date) {
     return Carbon::parse($date)->diffForHumans();
 }
 
-function checkSpecialRegex($string) {
+function checkSpecialRegex($string)
+{
     $regex = '/[+\-*\/%==!=<>]=?|&&|\|\||\.\.|::|->|@|\$|\^|~|\[|\]|\{|\}|\(|\)|;|,|=>|:]/';
     return preg_match($regex, $string);
 }
 
-function showDateTime($date, $format = null, $lang = null) {
+function showDateTime($date, $format = null, $lang = null)
+{
     if (!$date) {
         return '-';
     }
@@ -332,12 +368,13 @@ function showDateTime($date, $format = null, $lang = null) {
     return Carbon::parse($date)->translatedFormat($format);
 }
 
-function getDefaultLang() {
+function getDefaultLang()
+{
     return config('app.local') ?? 'en';
 }
 
-
-function verifyG2fa($user, $code, $secret = null) {
+function verifyG2fa($user, $code, $secret = null)
+{
     $authenticator = new GoogleAuthenticator();
     if (!$secret) {
         $secret = $user->tsc;
@@ -353,7 +390,8 @@ function verifyG2fa($user, $code, $secret = null) {
     }
 }
 
-function getContent($dataKeys, $singleQuery = false, $limit = null, $orderById = false) {
+function getContent($dataKeys, $singleQuery = false, $limit = null, $orderById = false)
+{
 
     $templateName = activeTemplateName();
     if ($singleQuery) {
@@ -372,7 +410,8 @@ function getContent($dataKeys, $singleQuery = false, $limit = null, $orderById =
     return $content;
 }
 
-function urlPath($routeName, $routeParam = null) {
+function urlPath($routeName, $routeParam = null)
+{
     if ($routeParam == null) {
         $url = route($routeName);
     } else {
@@ -383,19 +422,20 @@ function urlPath($routeName, $routeParam = null) {
     return $path;
 }
 
-
-function showMobileNumber($number) {
+function showMobileNumber($number)
+{
     $length = strlen($number);
     return substr_replace($number, '***', 2, $length - 4);
 }
 
-function showEmailAddress($email) {
+function showEmailAddress($email)
+{
     $endPosition = strpos($email, '@') - 1;
     return substr_replace($email, '***', 1, $endPosition);
 }
 
-
-function getRealIP() {
+function getRealIP()
+{
     $ip = $_SERVER["REMOTE_ADDR"];
     //Deep detect ip
     if (filter_var(@$_SERVER['HTTP_FORWARDED'], FILTER_VALIDATE_IP)) {
@@ -423,36 +463,44 @@ function getRealIP() {
     return $ip;
 }
 
-
-function appendQuery($key, $value) {
+function appendQuery($key, $value)
+{
     return request()->fullUrlWithQuery([$key => $value]);
 }
 
-function dateSort($a, $b) {
+function dateSort($a, $b)
+{
     return strtotime($a) - strtotime($b);
 }
 
-function dateSorting($arr) {
+function dateSorting($arr)
+{
     usort($arr, "dateSort");
     return $arr;
 }
 
-function gs($key = null) {
+function gs($key = null)
+{
     $general = Cache::get('GeneralSetting');
     if (!$general) {
         $general = GeneralSetting::first();
         Cache::put('GeneralSetting', $general);
     }
-    if ($key) return @$general->$key;
+    if ($key) {
+        return @$general->$key;
+    }
+
     return $general;
 }
-function isImage($string) {
+function isImage($string)
+{
     $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
     $fileExtension     = pathinfo($string, PATHINFO_EXTENSION);
     return in_array($fileExtension, $allowedExtensions);
 }
 
-function isHtml($string) {
+function isHtml($string)
+{
     if (preg_match('/<.*?>/', $string)) {
         return true;
     } else {
@@ -460,10 +508,10 @@ function isHtml($string) {
     }
 }
 
-
-function convertToReadableSize($size) {
+function convertToReadableSize($size)
+{
     preg_match('/^(\d+)([KMG])$/', $size, $matches);
-    $size = (int)$matches[1];
+    $size = (int) $matches[1];
     $unit = $matches[2];
 
     if ($unit == 'G') {
@@ -481,32 +529,40 @@ function convertToReadableSize($size) {
     return $size . $unit;
 }
 
-function loadExtension($key) {
+function loadExtension($key)
+{
     $extension = Extension::where('act', $key)->where('status', Status::ENABLE)->first();
     return $extension ? $extension->generateScript() : '';
 }
 
-
-function frontendImage($sectionName, $image, $size = null, $seo = false) {
+function frontendImage($sectionName, $image, $size = null, $seo = false)
+{
     if ($seo) {
         return getImage('assets/images/frontend/' . $sectionName . '/seo/' . $image, $size);
     }
     return getImage('assets/images/frontend/' . $sectionName . '/' . $image, $size);
 }
 
-function jsonResponse(string $remark, string $status, array $message = [], array $data = [], $statusCode = 200): JsonResponse {
+function jsonResponse(string $remark, string $status, array $message = [], array $data = [], $statusCode = 200): JsonResponse
+{
     $response = [
         'remark' => $remark,
-        'status' => $status
+        'status' => $status,
     ];
 
-    if (count($message)) $response['message'] = $message;
-    if (count($data)) $response['data']       = $data;
+    if (count($message)) {
+        $response['message'] = $message;
+    }
+
+    if (count($data)) {
+        $response['data'] = $data;
+    }
 
     return response()->json($response, $statusCode);
 }
 
-function exportData($baseQuery, $exportType, $modelName, $printPageSize = "A4 portrait") {
+function exportData($baseQuery, $exportType, $modelName, $printPageSize = "A4 portrait")
+{
     try {
         return (new ExportManager($baseQuery, $modelName, $exportType, $printPageSize))->export();
     } catch (Exception $ex) {
@@ -515,7 +571,8 @@ function exportData($baseQuery, $exportType, $modelName, $printPageSize = "A4 po
     }
 }
 
-function os(): array {
+function os(): array
+{
     return [
         'windows',
         'windows 10',
@@ -528,8 +585,9 @@ function os(): array {
     ];
 }
 
-function supportedDateFormats(): array {
-    return  [
+function supportedDateFormats(): array
+{
+    return [
         'Y-m-d',
         'd-m-Y',
         'd/m/Y',
@@ -538,20 +596,22 @@ function supportedDateFormats(): array {
         'D, M j, Y',
         'l, F j, Y',
         'F j, Y',
-        'M j, Y'
+        'M j, Y',
     ];
 }
-function supportedTimeFormats(): array {
-    return  [
+function supportedTimeFormats(): array
+{
+    return [
         'H:i:s',
         'H:i',
         'h:i A',
         'g:i a',
-        'g:i:s a'
+        'g:i:s a',
     ];
 }
-function supportedThousandSeparator(): array {
-    return  [
+function supportedThousandSeparator(): array
+{
+    return [
         ","     => "Comma",
         "."     => "Dot",
         "'"     => "Apostrophe",
@@ -560,11 +620,13 @@ function supportedThousandSeparator(): array {
     ];
 }
 
-function isApiRequest() {
+function isApiRequest()
+{
     return request()->is('api/*');
 }
 
-function responseManager(string $remark, string $message, string $responseType = 'error', array $responseData = [], array $igNoreOnApi = []) {
+function responseManager(string $remark, string $message, string $responseType = 'error', array $responseData = [], array $igNoreOnApi = [])
+{
     $isApi = isApiRequest();
 
     if ($isApi) {
@@ -585,7 +647,8 @@ function responseManager(string $remark, string $message, string $responseType =
     return back()->withNotify($notify);
 }
 
-function makeProductDetails($requestDetails) {
+function makeProductDetails($requestDetails)
+{
 
     $taxTypeExclusive    = Status::TAX_TYPE_EXCLUSIVE;
     $discountTypePercent = Status::DISCOUNT_PERCENT;
@@ -598,7 +661,6 @@ function makeProductDetails($requestDetails) {
     $profitMargin  = $requestDetails['profit_margin'];
     $discountType  = @$requestDetails['discount_type'] ?? 0;
     $discountValue = @$requestDetails['discount'] ?? 0;
-
 
     //calculate the tax  amount
     if (array_key_exists('tax_id', $requestDetails)) {
@@ -653,7 +715,8 @@ function makeProductDetails($requestDetails) {
     ];
 }
 
-function adminActivity(string $remark, string $modelName = null,  $modelId = 0, string $activityMessage = null) {
+function adminActivity(string $remark, string $modelName = null, $modelId = 0, string $activityMessage = null)
+{
     $isApi = isApiRequest();
     $admin = $isApi ? auth()->user() : auth('admin')->user();
 
@@ -661,7 +724,7 @@ function adminActivity(string $remark, string $modelName = null,  $modelId = 0, 
         $activityMessage = 'The ' . strtolower(keyToTitle($remark)) . ' successfully';
     }
 
-    $activity               = new  AdminActivity();
+    $activity               = new AdminActivity();
     $activity->admin_id     = $admin->id;
     $activity->remark       = strtolower($remark);
     $activity->activity     = $activityMessage;
@@ -674,25 +737,30 @@ function adminActivity(string $remark, string $modelName = null,  $modelId = 0, 
     $activity->save();
 }
 
-function getAdmin($column = null) {
+function getAdmin($column = null)
+{
     $admin = isApiRequest() ? auth()->user() : auth('admin')->user();
-    if (is_null($column)) return $admin;
+    if (is_null($column)) {
+        return $admin;
+    }
 
     return $admin->$column;
 }
 
-function productTooltip() {
+function productTooltip()
+{
     return [
         'purchase_price'   => 'Base Price + Tax',
         'sale_price'       => 'Purchase Price + Profit Margin',
-        'final_sale_price' => 'Sale Price - Discount'
+        'final_sale_price' => 'Sale Price - Discount',
     ];
 }
 
-function saleAndPurchaseDataForGraph($maxDate, $dataFormat = "Y-m-d") {
-    $today            = Carbon::today();
-    $saleQuery        = Sale::query();
-    $purchaseQuery    = Purchase::query();
+function saleAndPurchaseDataForGraph($maxDate, $dataFormat = "Y-m-d")
+{
+    $today         = Carbon::today();
+    $saleQuery     = Sale::query();
+    $purchaseQuery = Purchase::query();
 
     $dates    = [];
     $sales    = [];
@@ -713,10 +781,10 @@ function saleAndPurchaseDataForGraph($maxDate, $dataFormat = "Y-m-d") {
     ];
 }
 
+function productForSales()
+{
 
-function productForSales() {
-
-    $search = request()->search;
+    $search    = request()->search;
     $baseQuery = ProductDetail::query();
 
     if ($search) {
@@ -750,8 +818,9 @@ function productForSales() {
     return ['products' => $products, 'hasMore' => $productDetails->hasMorePages()];
 }
 
-function formattedProductDetails($productDetails) {
-    $formattedProductDetails       = [];
+function formattedProductDetails($productDetails)
+{
+    $formattedProductDetails = [];
 
     foreach ($productDetails as $productDetail) {
         $formattedProductDetails[] = [
@@ -765,14 +834,18 @@ function formattedProductDetails($productDetails) {
             'in_stock'       => $productDetail->product_stock_sum_stock ?? 0,
             'unit_name'      => @$productDetail->product->unit->short_name,
             'price'          => $productDetail->final_price,
-            'original'       => $productDetail
+            'original'       => $productDetail,
         ];
     }
     return $formattedProductDetails;
 }
 
-function createTransaction($paymentAccount, $trxType, $amount, $remark, $details, $trx = null) {
-    if ($amount <= 0) return 0;
+function createTransaction($paymentAccount, $trxType, $amount, $remark, $details, $trx = null)
+{
+    if ($amount <= 0) {
+        return 0;
+    }
+
     if ($trxType == "+") {
         $paymentAccount->balance += $amount;
     } else {
@@ -797,8 +870,8 @@ function createTransaction($paymentAccount, $trxType, $amount, $remark, $details
     $transaction->save();
 }
 
-
-function generateBarcodeHtml($code) {
+function generateBarcodeHtml($code)
+{
     $barcode = (new TypeCode128())->getBarcode($code);
 
     $renderer = new Picqer\Barcode\Renderers\SvgRenderer();
@@ -809,7 +882,8 @@ function generateBarcodeHtml($code) {
     return $renderer->render($barcode, 180);
 }
 
-function showFrequency($frequency) {
+function showFrequency($frequency)
+{
     switch ($frequency) {
         case Status::DAILY:
             return __('Daily');
@@ -824,17 +898,18 @@ function showFrequency($frequency) {
     }
 }
 
-function subscriptionEndDate($startDate, $frequency) {
+function subscriptionEndDate($startDate, $frequency)
+{
     $start = Carbon::parse($startDate);
-    if($frequency == Status::YEARLY) {
+    if ($frequency == Status::YEARLY) {
         return $start->copy()->addYear();
-    }elseif($frequency == Status::HALF_YEARLY) {
+    } elseif ($frequency == Status::HALF_YEARLY) {
         return $start->copy()->addMonths(6);
-    }elseif($frequency == Status::MONTHLY) {
+    } elseif ($frequency == Status::MONTHLY) {
         return $start->copy()->addMonth();
-    }elseif($frequency == Status::WEEKLY) {
+    } elseif ($frequency == Status::WEEKLY) {
         return $start->copy()->addWeek();
-    }elseif($frequency == Status::DAILY) {
+    } elseif ($frequency == Status::DAILY) {
         return $start->copy()->addDay();
     }
 }
@@ -847,4 +922,10 @@ function getParentUser()
     } else {
         return null;
     }
+}
+
+function isParentUser()
+{
+    $user = auth()->user();
+    return $user->is_agent ? false : true;
 }

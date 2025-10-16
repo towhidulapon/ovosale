@@ -29,9 +29,9 @@
                                         </td>
                                         <td>
                                             <x-user.ui.btn.table_action module="warehouse" :id="$warehouse->id">
-                                                <x-permission_check permission="edit warehouse">
+                                                <x-staff_permission_check permission="edit warehouse">
                                                     <x-user.ui.btn.edit tag="btn" :data-warehouse="$warehouse" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -133,7 +133,7 @@
 @endpush
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add warehouse">
+    <x-staff_permission_check permission="add warehouse">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

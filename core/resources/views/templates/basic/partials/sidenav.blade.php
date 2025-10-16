@@ -1,5 +1,5 @@
 @php
-    $routeCount = 0;
+$routeCount = 0;
 @endphp
 
 <aside class="dashboard__sidebar  sidebar-menu">
@@ -13,20 +13,23 @@
                 <i class="las la-angle-double-left"></i>
             </span>
         </div>
+        @php
+            $routeCount = 0;
+        @endphp
         <div class="dashboard__sidebar-inner">
             <ul class="dashboard-nav ps-0">
                 @foreach ($menus as $k => $menu)
                     @php
                         $allPermissions = collect($menu)->pluck('permission')->filter()->toArray();
                     @endphp
-                    <x-permission_check :permission="array_merge(...$allPermissions)">
+                    <x-staff_permission_check :permission="array_merge(...$allPermissions)">
                         <li class="dashboard-nav__title">
                             <span class="dashboard-nav__title-text">{{ __(str_replace('_', ' ', $k)) }}</span>
                         </li>
-                    </x-permission_check>
+                    </x-staff_permission_check>
                     @foreach ($menu as $parentMenu)
                         @if (@$parentMenu->submenu)
-                            <x-permission_check :permission="@$parentMenu->permission">
+                            <x-staff_permission_check :permission="@$parentMenu->permission">
                                 <li class="dashboard-nav__items has-dropdown">
                                     <a href="javascript:void(0)" class="dashboard-nav__link {{ menuActive(@$parentMenu->menu_active ?? @$parentMenu->route_name) }}">
                                         <span class="dashboard-nav__link-icon">
@@ -39,13 +42,14 @@
                                                     <span class="nav-badge text--warning fs-16">
                                                         <i class="fa-solid fa-triangle-exclamation"></i>
                                                     </span>
+                                                    @break
                                                 @endif
                                             @endforeach
                                         </span>
                                     </a>
                                     <ul class="dashboard-nav sidebar-submenu">
                                         @foreach ($parentMenu->submenu as $subMenu)
-                                            <x-permission_check :permission="@$subMenu->permission">
+                                            <x-staff_permission_check :permission="@$subMenu->permission">
                                                 <li class="dashboard-nav__items">
                                                     <a href="{{ route($subMenu->route_name) }}" class="dashboard-nav__link {{ menuActive(@$subMenu->menu_active ?? @$subMenu->route_name) }}">
                                                         <span class="dashboard-nav__link-icon"><i class="las la-dot-circle"></i></span>
@@ -60,13 +64,13 @@
                                                         </span>
                                                     </a>
                                                 </li>
-                                            </x-permission_check>
+                                            </x-staff_permission_check>
                                         @endforeach
                                     </ul>
                                 </li>
-                            </x-permission_check>
+                            </x-staff_permission_check>
                         @else
-                            <x-permission_check :permission="@$parentMenu->permission">
+                            <x-staff_permission_check :permission="@$parentMenu->permission">
                                 <li class="dashboard-nav__items">
                                     <a href="{{ route($parentMenu->route_name) }}" class="dashboard-nav__link {{ menuActive(@$parentMenu->menu_active ?? @$parentMenu->route_name) }}">
                                         <span class="dashboard-nav__link-icon">
@@ -75,7 +79,7 @@
                                         <span class="dashboard-nav__link-text">{{ __($parentMenu->title) }}</span>
                                     </a>
                                 </li>
-                            </x-permission_check>
+                            </x-staff_permission_check>
                         @endif
                     @endforeach
                 @endforeach

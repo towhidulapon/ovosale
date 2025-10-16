@@ -28,9 +28,9 @@
                                         <td>{{ $holiday->days }}</td>
                                         <td>
                                             <x-user.ui.btn.table_action module="holiday" :id="$holiday->id">
-                                                <x-permission_check permission="edit holiday">
+                                                <x-staff_permission_check permission="edit holiday">
                                                     <x-user.ui.btn.edit tag="btn" :data-holiday="$holiday" />
-                                                </x-permission_check>
+                                                </x-staff_permission_check>
                                             </x-user.ui.btn.table_action>
                                         </td>
                                     </tr>
@@ -218,7 +218,7 @@
 @endpush
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add holiday">
+    <x-staff_permission_check permission="add holiday">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

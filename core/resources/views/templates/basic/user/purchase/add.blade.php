@@ -820,11 +820,11 @@
 @endpush
 
 @push('breadcrumb-plugins')
-<x-permission_check permission="view purchase">
+<x-staff_permission_check permission="view purchase">
     <a class="btn btn--primary" href="{{ route('user.purchase.list') }}">
         <i class="las la-list me-1"></i>@lang('Purchase List')
     </a>
-</x-permission_check>
+</x-staff_permission_check>
 @endpush
 
 @push('style')

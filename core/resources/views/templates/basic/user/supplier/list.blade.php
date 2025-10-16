@@ -46,7 +46,7 @@
 
                                             <div class="dropdown-menu dropdown">
                                                 @if (request()->trash)
-                                                    <x-permission_check permission="trash supplier">
+                                                    <x-staff_permission_check permission="trash supplier">
                                                         <button type="button"
                                                             class="dropdown-list d-block confirmationBtn  w-100 text-start"
                                                             data-question='@lang('Are you sure to restore this supplier?')'
@@ -56,9 +56,9 @@
                                                             </span>
                                                             @lang('Restore')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 @else
-                                                    <x-permission_check permission="edit supplier">
+                                                    <x-staff_permission_check permission="edit supplier">
                                                         <button type="button"
                                                             class="dropdown-list d-block w-100 text-start edit-btn"
                                                             data-supplier="{{ $supplier }}">
@@ -67,8 +67,8 @@
                                                             </span>
                                                             @lang('Edit')
                                                         </button>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="view supplier">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="view supplier">
                                                         <a class="dropdown-list d-block w-100 text-start"
                                                             href="{{ route('user.supplier.view', $supplier->id) }}">
                                                             <span class="me-1">
@@ -76,8 +76,8 @@
                                                             </span>
                                                             @lang('View')
                                                         </a>
-                                                    </x-permission_check>
-                                                    <x-permission_check permission="trash supplier">
+                                                    </x-staff_permission_check>
+                                                    <x-staff_permission_check permission="trash supplier">
                                                         <button type="button"
                                                             class="dropdown-list d-block confirmationBtn  w-100 text-start"
                                                             data-question='@lang('Are you sure to move this supplier to trash?')'
@@ -87,7 +87,7 @@
                                                             </span>
                                                             @lang('Trash')
                                                         </button>
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 @endif
                                             </div>
                                         </td>
@@ -209,7 +209,7 @@
     </script>
 @endpush
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add supplier">
+    <x-staff_permission_check permission="add supplier">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

@@ -36,9 +36,9 @@
                                         <td>{{ showDateTime($payroll->date) }}</td>
 
                                         <td>
-                                            <x-permission_check permission="edit payroll">
+                                            <x-staff_permission_check permission="edit payroll">
                                                 <x-user.ui.btn.edit tag="btn" :data-payroll="$payroll" />
-                                            </x-permission_check>
+                                            </x-staff_permission_check>
                                         </td>
                                     </tr>
                                 @empty
@@ -188,7 +188,7 @@
 @endpush
 
 @push('breadcrumb-plugins')
-    <x-permission_check permission="add payroll">
+    <x-staff_permission_check permission="add payroll">
         <x-user.ui.btn.add tag="btn" />
-    </x-permission_check>
+    </x-staff_permission_check>
 @endpush

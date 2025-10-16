@@ -187,9 +187,9 @@
 
 @push('breadcrumb-plugins')
     <div class="d-flex gap-2">
-        <x-permission_check permission="add purchase payment">
+        <x-staff_permission_check permission="add purchase payment">
             <x-user.ui.btn.add data-bs-toggle="modal" data-bs-target="#payment-modal" text="Add Payment" />
-        </x-permission_check>
+        </x-staff_permission_check>
         <x-back_btn route="{{ route('admin.supplier.list') }}" />
     </div>
 @endpush

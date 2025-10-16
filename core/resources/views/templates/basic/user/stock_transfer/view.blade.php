@@ -6,33 +6,33 @@
         </div>
         <div class="col-12">
             <div class="d-flex flex-wrap align-items-center  gap-3">
-                <x-permission_check permission="edit stock transfer">
+                <x-staff_permission_check permission="edit stock transfer">
                     <a class="btn btn--primary" href="{{ route('user.stock.transfer.edit', $transfer->id) }}">
                         <i class="las la-pencil-alt"></i>
                         @lang('Edit Transfer')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="view stock transfer">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="view stock transfer">
                     <a class="btn btn--warning" href="{{ route('user.stock.transfer.pdf', $transfer->id) }}">
                         <i class="las la-file-download "></i>
                         @lang('Download PDF')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="view stock transfer">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="view stock transfer">
                     <a class="btn btn--info" href="{{ route('user.download.attachment', encrypt(getFilePath('stock_transfer_attachment') . '/' . $transfer->attachment)) }}">
                         <i class="las la-file-download "></i>
                         @lang('Download Attachment')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="view stock transfer">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="view stock transfer">
                     <button type="button" class="btn btn--success print-btn">
                         <i class="las la-print"></i>
                         @lang('Print Invoice')
                     </button>
-                </x-permission_check>
-                <x-permission_check permission="view stock transfer">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="view stock transfer">
                     <x-back_btn route="{{ route('user.stock.transfer.list') }}" />
-                </x-permission_check>
+                </x-staff_permission_check>
             </div>
         </div>
     </div>

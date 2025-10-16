@@ -6,35 +6,35 @@
         </div>
         <div class="col-12">
             <div class="d-flex gap-3 flex-wrap">
-                <x-permission_check permission="edit purchase">
+                <x-staff_permission_check permission="edit purchase">
                     <a class="btn btn--primary" href="{{ route('user.purchase.edit', $purchase->id) }}">
                         <i class="las la-pencil-alt"></i>
                         @lang('Edit Purchase')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="download purchase invoice">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="download purchase invoice">
                     <a class="btn btn--info" href="{{ route('user.purchase.pdf', $purchase->id) }}">
                         <i class="las  la-file-download "></i>
                         @lang('Download PDF')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="print purchase invoice">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="print purchase invoice">
                     <button type="button" class="btn btn--dark print-btn">
                         <i class="las la-print"></i>
                         @lang('Print Invoice')
                     </button>
-                </x-permission_check>
-                <x-permission_check permission="download purchase invoice">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="download purchase invoice">
                     <a class="btn btn--success"
                         @if ($purchase->attachment) href="{{ route('user.download.attachment', encrypt(getFilePath('purchase_attachment') . '/' . $purchase->attachment)) }}"
                     @else href="javascript:void(0)" @endif>
                         <i class="las la-download"></i>
                         @lang('Attachment')
                     </a>
-                </x-permission_check>
-                <x-permission_check permission="view purchase">
+                </x-staff_permission_check>
+                <x-staff_permission_check permission="view purchase">
                     <x-back_btn route="{{ route('user.purchase.list') }}" />
-                </x-permission_check>
+                </x-staff_permission_check>
             </div>
         </div>
     </div>

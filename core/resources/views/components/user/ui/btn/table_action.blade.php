@@ -14,11 +14,11 @@
 @else
     <div class="btn--group">
         {{ $slot }}
-        <x-permission_check :permission="$trashPermissionName">
+        <x-staff_permission_check :permission="$trashPermissionName">
             <button class="btn btn-outline--danger confirmationBtn" data-question='@lang("Are you sure to move this $moduleNameForMessage to trash?")'
                 data-action="{{ route("user.$moduleNameForRoute.trash.temporary", $id) }}">
                 <i class="las la-trash"></i> @lang('Trash')
             </button>
-        </x-permission_check>
+        </x-staff_permission_check>
     </div>
 @endif

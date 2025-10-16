@@ -24,9 +24,9 @@
                                         <td>
                                             @if ($paymentType->is_default == Status::NO)
                                                 <x-user.ui.btn.table_action module="payment_type" :id="$paymentType->id">
-                                                    <x-permission_check permission="edit payment type">
+                                                    <x-staff_permission_check permission="edit payment type">
                                                     <x-user.ui.btn.edit tag="btn" :data-paymentType="$paymentType" />
-                                                    </x-permission_check>
+                                                    </x-staff_permission_check>
                                                 </x-user.ui.btn.table_action>
                                             @endif
                                         </td>
@@ -108,9 +108,9 @@
 @endpush
 
 @push('breadcrumb-plugins')
-<x-permission_check permission="add payment type">
+<x-staff_permission_check permission="add payment type">
     <x-user.ui.btn.add tag="btn" />
-</x-permission_check>
+</x-staff_permission_check>
 @endpush
 
 

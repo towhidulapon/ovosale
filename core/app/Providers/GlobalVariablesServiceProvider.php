@@ -29,12 +29,12 @@ class GlobalVariablesServiceProvider extends ServiceProvider
 
         view()->composer(['admin.partials.topnav', "Template::partials.header", "Template::partials.auth_header"], function ($view) {
             $view->with([
-                'languages' => Language::get()
+                'languages' => Language::get(),
             ]);
         });
-        view()->composer(['components.permission_check', 'admin.partials.topnav',], function ($view) {
+        view()->composer(['components.permission_check', 'admin.partials.topnav'], function ($view) {
             $view->with([
-                'admin' => Auth::guard('admin')->user()
+                'admin' => Auth::guard('admin')->user(),
             ]);
         });
 
@@ -52,11 +52,10 @@ class GlobalVariablesServiceProvider extends ServiceProvider
 
         view()->composer(['admin.partials.sidenav', 'admin.partials.topnav'], function ($view) {
             $view->with([
-                'menus'                => json_decode(file_get_contents(resource_path('views/admin/partials/menu.json'))),
-                'pendingTicketCount'   => SupportTicket::whereIn('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count()
+                'menus'              => json_decode(file_get_contents(resource_path('views/admin/partials/menu.json'))),
+                'pendingTicketCount' => SupportTicket::whereIn('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
             ]);
         });
-
 
         view()->composer('admin.partials.sidenav', function ($view) {
             $view->with([
@@ -76,7 +75,11 @@ class GlobalVariablesServiceProvider extends ServiceProvider
             ]);
         });
 
-
+        view()->composer('components.staff_permission_check', function ($view) {
+            $view->with([
+                'user' => auth()->user(),
+            ]);
+        });
 
         view()->share($viewShare);
     }

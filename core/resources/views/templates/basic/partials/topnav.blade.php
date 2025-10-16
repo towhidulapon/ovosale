@@ -22,12 +22,12 @@ $user = auth()->user();
     </div>
 
     <div class="dashboard__header-right">
-        {{-- <x-permission_check permission="add sale"> --}}
+        <x-staff_permission_check permission="add sale">
             <a class="btn btn--primary btn--pos" href="{{ route('pos.index') }}" role="button">
                 <i class="las la-qrcode"></i>
                 @lang('POS')
             </a>
-            {{-- </x-permission_check> --}}
+            </x-staff_permission_check>
         <div class="dashboard-info flex-align gap-sm-2 gap-1">
             <div class="language-dropdown header-dropdown">
                 <button class="header-dropdown__icon dropdown-toggle " data-bs-toggle="dropdown">
