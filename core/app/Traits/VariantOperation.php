@@ -3,12 +3,26 @@
 namespace App\Traits;
 
 use App\Models\Attribute;
+use App\Models\User;
 use App\Models\Variant;
 use Illuminate\Http\Request;
 
-trait VariantOperation {
-    public function list() {
-        $baseQuery = Variant::with('attribute')->where('user_id', auth()->id())->searchable(['name', 'attribute:name'])->orderBy('id', getOrderBy())->trashFilter();
+trait VariantOperation
+{
+    public function list()
+    {
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Variant::with('attribute')->whereIn('user_id', $userIds)->searchable(['name', 'attribute:name'])->orderBy('id', getOrderBy())->trashFilter();
+
         $pageTitle = 'Manage Variant';
         $view      = "Template::user.variant.list";
 
@@ -22,13 +36,17 @@ trait VariantOperation {
         return responseManager("variants", $pageTitle, 'success', compact('variants', 'view', 'pageTitle', 'attributes'));
     }
 
-    public function save(Request $request, $id = 0) {
+    public function save(Request $request, $id = 0)
+    {
         $request->validate([
             'name'      => 'required|string|max:40',
             'attribute' => 'required|integer|exists:attributes,id',
         ]);
 
-        $user = auth()->user();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
 
         if ($id) {
             $variant = Variant::where('id', $id)->firstOrFailWithApi('variant');
@@ -43,15 +61,16 @@ trait VariantOperation {
         }
 
         if ($id) {
+            $variant = Variant::where('id', $id)->whereIn('user_id', $userIds)->firstOrFailWithApi('variant');
             $message = "Variant updated successfully";
             $remark  = "variant-updated";
         } else {
-            $variant = new Variant();
-            $message = "Variant saved successfully";
-            $remark  = "variant-updated";
+            $variant          = new Variant();
+            $message          = "Variant saved successfully";
+            $remark           = "variant-updated";
+            $variant->user_id = $user->id;
         }
 
-        $variant->user_id      = $user->id;
         $variant->name         = $request->name;
         $variant->attribute_id = $request->attribute;
         $variant->save();
@@ -60,7 +79,8 @@ trait VariantOperation {
         return responseManager("variant", $message, 'success', compact('variant'));
     }
 
-    public function status($id) {
+    public function status($id)
+    {
         return Variant::changeStatus($id);
     }
 }

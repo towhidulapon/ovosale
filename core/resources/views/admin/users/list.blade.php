@@ -1,6 +1,12 @@
+@php
+    $hasStaff = $users->contains(fn($q) => $q->is_staff == 1);
+@endphp
+
 @extends('admin.layouts.app')
 @section('panel')
-    @include('admin.users.widget')
+    @if(!$hasStaff)
+        @include('admin.users.widget')
+    @endif
     <x-admin.ui.card class="table-has-filter">
         <x-admin.ui.card.body :paddingZero="true">
             <x-admin.ui.table.layout searchPlaceholder="Search users" filterBoxLocation="users.filter">
@@ -8,6 +14,9 @@
                     <x-admin.ui.table.header>
                         <tr>
                             <th>@lang('User')</th>
+                            @if($hasStaff)
+                                <th>@lang('Staff Of')</th>
+                            @endif
                             <th>@lang('Email-Mobile')</th>
                             <th>@lang('Country')</th>
                             <th>@lang('Joined At')</th>
@@ -21,6 +30,11 @@
                                 <td>
                                     <x-admin.other.user_info :user="$user" />
                                 </td>
+                                @if($hasStaff)
+                                    <td>
+                                        {{ $user?->parent?->username }}
+                                    </td>
+                                @endif
                                 <td>
                                     <div>
                                         <strong class="d-block">
@@ -45,18 +59,16 @@
                                 <td>{{ showAmount($user->balance) }}</td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-2 justify-content-end">
-                                        <a href="{{ route('admin.users.detail', $user->id) }}"
-                                            class=" btn btn-outline--primary">
+                                        <a href="{{ route('admin.users.detail', $user->id) }}" class=" btn btn-outline--primary">
                                             <i class="las la-info-circle"></i>
                                             @lang('Details')
                                         </a>
                                         @if (request()->routeIs('admin.users.kyc.pending'))
-                                            <a href="{{ route('admin.users.kyc.details', $user->id) }}" target="_blank"
-                                                class="btn btn-sm btn-outline--dark">
+                                            <a href="{{ route('admin.users.kyc.details', $user->id) }}" target="_blank" class="btn btn-sm btn-outline--dark">
                                                 <i class="las la-user-check"></i> @lang('KYC Data')
                                             </a>
                                         @endif
-                                        
+
                                     </div>
                                 </td>
                             </tr>

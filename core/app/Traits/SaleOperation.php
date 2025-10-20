@@ -7,27 +7,39 @@ use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\PaymentAccount;
 use App\Models\PaymentType;
+use App\Models\Product;
+use App\Models\ProductDetail;
 use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\SaleDetails;
+use App\Models\SalePayment;
+use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Warehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\SalePayment;
-use App\Models\Product;
-use App\Models\ProductDetail;
-use App\Models\Transaction;
-use Exception;
 
 trait SaleOperation
 {
-    public function list() {
+    public function list()
+    {
         $pageTitle = "Sale List";
         $view      = "Template::user.sale.list";
-        $baseQuery      = Sale::where('user_id', auth()->id())->latest('id');
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Sale::whereIn('user_id', $userIds)->latest('id');
 
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Sale");
@@ -56,22 +68,34 @@ trait SaleOperation
         return responseManager("sale", $pageTitle, 'success', compact('pageTitle', 'sales', 'view', 'widget'), ['paymentMethods']);
     }
 
-    public function add() {
+    public function add()
+    {
         $pageTitle = "New Sale";
         $view      = "Template::user.sale.add";
         extract($this->basicDataForSale());
         return responseManager("add_sale", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'paymentMethods', 'view'));
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $pageTitle = "Edit Sale";
-        $sale      = Sale::where('user_id', auth()->id())->where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
-        $view      = "Template::user.sale.edit";
+        $user      = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $sale = Sale::whereIn('user_id', $userIds)->where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
+        $view = "Template::user.sale.edit";
         extract($this->basicDataForSale());
         return responseManager("edit_sale", $pageTitle, 'success', compact('pageTitle', 'warehouses', 'paymentMethods', 'view', 'sale'));
     }
 
-    public function view($id) {
+    public function view($id)
+    {
         $pageTitle          = "Sale Invoice";
         $view               = "Template::user.sale.view";
         $sale               = Sale::where('user_id', auth()->id())->where("id", $id)->with("warehouse", "customer", 'payments', 'saleDetails.productDetail.product')->firstOrFailWithApi("sale");
@@ -79,14 +103,16 @@ trait SaleOperation
         return responseManager("view_sale", $pageTitle, 'success', compact('pageTitle', 'sale', 'view', 'companyInformation'));
     }
 
-    public function pdf($id) {
+    public function pdf($id)
+    {
         $pageTitle = "Sale Invoice";
         $sale      = Sale::where("id", $id)->with("warehouse", "customer", 'payments')->firstOrFailWithApi("sale");
         $pdf       = Pdf::loadView('Template::user.sale.pdf', compact('sale', 'pageTitle'));
         $fileName  = "Sale Invoice - " . $sale->invoice_number . ".pdf";
         return $pdf->download($fileName);
     }
-    public function removeSingleItem($id) {
+    public function removeSingleItem($id)
+    {
         $saleItem = SaleDetails::where("id", $id)->with("sale")->firstOrFailWithApi("SaleDetails");
         $sale     = $saleItem->sale;
 
@@ -106,8 +132,8 @@ trait SaleOperation
         return responseManager("success", "Sale Item deleted successfully.", 'success');
     }
 
-
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $validator = $this->validation($request);
 
@@ -136,9 +162,9 @@ trait SaleOperation
             }
 
             //new sale details
-            $newSaleDetails  = $this->makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId);
-            $saleDetails[]   = $newSaleDetails;
-            $subtotal       += $newSaleDetails['subtotal'];
+            $newSaleDetails = $this->makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId);
+            $saleDetails[]  = $newSaleDetails;
+            $subtotal += $newSaleDetails['subtotal'];
 
             if ($request->status == Status::SALE_FINAL) {
                 $productUpdateStock[] = [
@@ -150,7 +176,6 @@ trait SaleOperation
 
         $saleDiscountAmount = $this->calculateSaleDiscount($request, $subtotal);
         $shippingAmount     = $request->shipping_amount ?? 0;
-
 
         if ($saleDiscountAmount > $subtotal) {
             $message[] = "Maximum discount amount is " . showAmount($subtotal);
@@ -186,7 +211,6 @@ trait SaleOperation
             }
         }
 
-
         DB::beginTransaction();
 
         try {
@@ -207,8 +231,8 @@ trait SaleOperation
 
             $sale->paying_amount = $payingAmount;
             // $sale->admin_id      = getAdmin('id');
-            $sale->note          = $request->note ?? null;
-            $sale->coupon_id     = $request->coupon_id ?? 0;
+            $sale->note      = $request->note ?? null;
+            $sale->coupon_id = $request->coupon_id ?? 0;
 
             $sale->save();
 
@@ -242,18 +266,17 @@ trait SaleOperation
         return jsonResponse('sale', 'success', $message, [
             'html'               => $html,
             'sale'               => $sale->load("warehouse", "customer", 'payments', 'saleDetails.productDetail.product'),
-            'companyInformation' => gs('company_information')
+            'companyInformation' => gs('company_information'),
         ]);
     }
-    public function update(Request $request, $id = 0) {
-
+    public function update(Request $request, $id = 0)
+    {
 
         $validator = $this->validation($request, $id);
 
         if ($validator->fails()) {
             return jsonResponse('validation_error', 'error', $validator->errors()->all());
         }
-
 
         $sale = Sale::where('user_id', auth()->id())->where("id", $id)->firstOrFailWithApi("sale");
 
@@ -267,7 +290,6 @@ trait SaleOperation
         $updatedSaleDetails  = [];
         $productUpdateStock  = [];
         $discountTypePercent = Status::DISCOUNT_PERCENT;
-
 
         foreach ($request->sale_details as $requestSaleDetails) {
 
@@ -325,8 +347,8 @@ trait SaleOperation
                 }
             }
 
-            $subtotal         += $createSaleDetails['subtotal'];
-            $newSaleDetails[]  = $createSaleDetails;
+            $subtotal += $createSaleDetails['subtotal'];
+            $newSaleDetails[] = $createSaleDetails;
         }
 
         $saleDiscountAmount = $this->calculateSaleDiscount($request, $subtotal);
@@ -343,7 +365,6 @@ trait SaleOperation
             return $carry + $payment['amount'];
         }, 0);
 
-
         if ($total <= 0) {
             $message[] = "The total amount must be greater than 0";
             return jsonResponse('limit', 'error', $message);
@@ -359,7 +380,6 @@ trait SaleOperation
             return jsonResponse('limit', 'error', $message);
         }
 
-
         DB::beginTransaction();
         try {
             $sale->sale_date       = $request->sale_date ?? date('Y-m-d');
@@ -372,7 +392,6 @@ trait SaleOperation
             $sale->note            = $request->note ?? null;
             $sale->status          = $request->status;
             $sale->save();
-
 
             SaleDetails::upsert($newSaleDetails, ['id']);
 
@@ -402,27 +421,28 @@ trait SaleOperation
         }
 
         return jsonResponse('sale', 'success', $message, [
-            'html' => $html
+            'html' => $html,
         ]);
     }
 
-    private function validation($request, $id = 0) {
-        $isRequired         = $id ?  'nullable' : "required";
-        $isRequiredOnUpdate = $id ?  'required' : "nullable";
+    private function validation($request, $id = 0)
+    {
+        $isRequired         = $id ? 'nullable' : "required";
+        $isRequiredOnUpdate = $id ? 'required' : "nullable";
 
-        return  Validator::make($request->all(), [
-            'customer_id'      => "$isRequired|exists:customers,id",
-            'warehouse_id'     => "$isRequired|integer|exists:warehouses,id",
-            'save_action_type' => "required|in:save_and_print,only_save",
-            'coupon_id'        => "nullable|exists:coupons,id",
-            'status'           => ['nullable', Rule::in(Status::SALE_FINAL, Status::SALE_QUOTATION)],
-            'is_pos_sale'      => ['nullable', Rule::in(Status::YES, Status::NO)],
+        return Validator::make($request->all(), [
+            'customer_id'                      => "$isRequired|exists:customers,id",
+            'warehouse_id'                     => "$isRequired|integer|exists:warehouses,id",
+            'save_action_type'                 => "required|in:save_and_print,only_save",
+            'coupon_id'                        => "nullable|exists:coupons,id",
+            'status'                           => ['nullable', Rule::in(Status::SALE_FINAL, Status::SALE_QUOTATION)],
+            'is_pos_sale'                      => ['nullable', Rule::in(Status::YES, Status::NO)],
 
-            'discount_type'   => ['nullable', 'integer', Rule::in(Status::DISCOUNT_PERCENT, Status::DISCOUNT_FIXED)],
-            'discount_value'  => 'nullable|numeric|gte:0',
-            'shipping_amount' => 'nullable|numeric|gte:0',
+            'discount_type'                    => ['nullable', 'integer', Rule::in(Status::DISCOUNT_PERCENT, Status::DISCOUNT_FIXED)],
+            'discount_value'                   => 'nullable|numeric|gte:0',
+            'shipping_amount'                  => 'nullable|numeric|gte:0',
 
-            'note' => 'nullable|string|max:255',
+            'note'                             => 'nullable|string|max:255',
 
             'sale_details'                     => "required|array|min:1",
             'sale_details.*.id'                => "nullable|integer|exists:sale_details,id",
@@ -430,14 +450,14 @@ trait SaleOperation
             'sale_details.*.product_detail_id' => "required|integer|exists:product_details,id",
             'sale_details.*.quantity'          => "required|numeric|gt:0",
 
-            "sale_details.*.discount_type"  => ["nullable", Rule::in(Status::DISCOUNT_PERCENT, Status::DISCOUNT_FIXED)],
-            "sale_details.*.discount_value" => "nullable|numeric|gte:0",
+            "sale_details.*.discount_type"     => ["nullable", Rule::in(Status::DISCOUNT_PERCENT, Status::DISCOUNT_FIXED)],
+            "sale_details.*.discount_value"    => "nullable|numeric|gte:0",
 
-            'payment'                      => "required|array|min:1",
-            'payment.*.amount'             => "required|numeric|gt:0",
-            'payment.*.id'                 => "$isRequiredOnUpdate|numeric|gt:0",
-            'payment.*.payment_type'       => "$isRequired|integer|exists:payment_types,id",
-            'payment.*.payment_account_id' => "$isRequired|integer|exists:payment_accounts,id",
+            'payment'                          => "required|array|min:1",
+            'payment.*.amount'                 => "required|numeric|gt:0",
+            'payment.*.id'                     => "$isRequiredOnUpdate|numeric|gt:0",
+            'payment.*.payment_type'           => "$isRequired|integer|exists:payment_types,id",
+            'payment.*.payment_account_id'     => "$isRequired|integer|exists:payment_accounts,id",
         ], [
             'payment.*.amount.required'             => 'The paid amount filed is required',
             'payment.*.payment_type.required'       => 'The payment type filed is required',
@@ -445,19 +465,20 @@ trait SaleOperation
         ]);
     }
 
-    private function invoiceNumber($saleId) {
+    private function invoiceNumber($saleId)
+    {
         $prefix = gs('prefix_setting');
         return $prefix->sale_invoice_prefix . (1000 + $saleId);
     }
 
-    private function makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId): array {
+    private function makeSaleDetails($requestSaleDetails, $productDetails, $product, $saleId): array
+    {
         $discountTypePercent = Status::DISCOUNT_PERCENT;
 
         // Calculate the discount amount based on the discount type
         $discountAmount = 0;
         $discountType   = @$requestSaleDetails['discount_type'] ?? @$productDetails->discount_type;
         $discountValue  = @$requestSaleDetails['discount_value'] ?? @$productDetails->discount_value;
-
 
         if ($discountType == $discountTypePercent && $discountValue > 0) {
             if ($discountValue > 100) {
@@ -469,11 +490,9 @@ trait SaleOperation
             $discountAmount = $discountValue;
         }
 
-
         $unitPrice = $productDetails->sale_price - $productDetails->tax_amount;
         $price     = $productDetails->sale_price - $discountAmount;
         $subtotal  = getAmount($price) * $requestSaleDetails['quantity'];
-
 
         return [
             'product_id'         => $product->id,
@@ -496,7 +515,8 @@ trait SaleOperation
         ];
     }
 
-    private function findProductAndProductDetailsAndProductStock($requestSaleDetails, $warehouseId) {
+    private function findProductAndProductDetailsAndProductStock($requestSaleDetails, $warehouseId)
+    {
         $product        = Product::find($requestSaleDetails['product_id']);
         $productDetails = ProductDetail::find($requestSaleDetails['product_detail_id']);
         $findStock      = ProductStock::where('product_id', $product->id)
@@ -507,15 +527,13 @@ trait SaleOperation
         return compact('product', 'productDetails', 'findStock');
     }
 
-    private function calculateSaleDiscount($request, $subtotal) {
-
+    private function calculateSaleDiscount($request, $subtotal)
+    {
 
         $discountTypePercent = Status::DISCOUNT_PERCENT;
         $saleDiscountAmount  = 0;
         $saleDiscountType    = $request->discount_type ?? 0;
         $saleDiscountValue   = $request->discount_value ?? 0;
-
-
 
         if ($saleDiscountType == $discountTypePercent && $saleDiscountValue > 0) {
             $saleDiscountAmount = $subtotal / 100 * $saleDiscountValue;
@@ -526,10 +544,20 @@ trait SaleOperation
         return $saleDiscountAmount;
     }
 
-    private function basicDataForSale() {
+    private function basicDataForSale()
+    {
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
         return [
-            'warehouses'     => Warehouse::active()->get(),
-            'paymentMethods' => PaymentType::active()->with('paymentAccounts', function ($q) {
+            'warehouses'     => Warehouse::whereIn('user_id', $userIds)->active()->get(),
+            'paymentMethods' => PaymentType::whereIn('user_id', $userIds)->active()->with('paymentAccounts', function ($q) {
                 $q->active();
             })->get(),
         ];
@@ -537,7 +565,8 @@ trait SaleOperation
 
     // Coupon
 
-    public function applyCoupon(Request $request) {
+    public function applyCoupon(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'coupon_code' => 'required',
@@ -587,9 +616,26 @@ trait SaleOperation
         ]);
     }
 
-    public function topSellingProduct() {
+    public function topSellingProduct()
+    {
         $pageTitle = 'Top Selling Product';
         $view      = 'Template::user.sale.top_selling_product';
+
+        // $user = getParentUser();
+
+        // $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+
+        // $userIds = array_merge([$user->id], $staffIds);
+
+        // $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity, product_details_id')
+        //     ->whereHas('sale', function ($q) use ($userIds) {
+        //         $q->whereIn('user_id', $userIds);
+        //     })
+        //     ->groupBy('product_details_id')
+        //     ->with(['productDetail', 'product'])
+        //     ->orderBy('total_quantity', 'desc')
+        //     ->searchable(['product:name', 'productDetail:sku'])
+        //     ->paginate(getPaginate());
 
         $topSellingProducts = SaleDetails::selectRaw('SUM(quantity) as total_quantity,product_details_id')
             ->groupBy('product_details_id')
@@ -601,23 +647,29 @@ trait SaleOperation
         return responseManager("top_selling_product", $pageTitle, 'success', compact('pageTitle', 'topSellingProducts', 'view'));
     }
 
-    private function addBalanceToPaymentAccount($payments, $sale, $trx, $amount) {
+    private function addBalanceToPaymentAccount($payments, $sale, $trx, $amount)
+    {
 
         $details        = "Sale amount added to the payment account: invoice number#" . $sale->invoice_number;
         $paymentAccount = PaymentAccount::where('id', $payments['payment_account_id'])->first();
         createTransaction($paymentAccount, '+', $amount, 'balance_added', $details, $trx);
     }
 
-    private function updateSalePaymentAndAdjustBalance($payments, $sale) {
-        foreach ($payments as  $payment) {
+    private function updateSalePaymentAndAdjustBalance($payments, $sale)
+    {
+        foreach ($payments as $payment) {
             $salePayment = SalePayment::where('id', $payment['id'])->first();
 
-            if (!$salePayment) continue;
+            if (!$salePayment) {
+                continue;
+            }
 
             $saleAmount = $salePayment->amount;
             $paidAmount = $payment['amount'];
 
-            if ($saleAmount == $paidAmount) continue;
+            if ($saleAmount == $paidAmount) {
+                continue;
+            }
 
             $salePayment->amount = $paidAmount;
             $salePayment->date   = $sale->date;
@@ -626,7 +678,9 @@ trait SaleOperation
             if ($sale->status == Status::SALE_FINAL) {
 
                 $paymentAccount = PaymentAccount::where('id', $salePayment->payment_account_id)->first();
-                if (!$paymentAccount) continue;
+                if (!$paymentAccount) {
+                    continue;
+                }
 
                 $findTrx = Transaction::where('trx', $salePayment->trx)->exists();
 
@@ -648,13 +702,13 @@ trait SaleOperation
         }
     }
 
-    private function insertSalePayment($request, $sale, $changesAmount) {
+    private function insertSalePayment($request, $sale, $changesAmount)
+    {
         $salePayments      = [];
         $now               = now();
         $totalPaymentTypes = count($request->payment);
 
-
-        foreach ($request->payment as  $payments) {
+        foreach ($request->payment as $payments) {
 
             if ($totalPaymentTypes == 1 && $changesAmount > 0) {
                 $amount = $payments['amount'] - $changesAmount;
@@ -670,7 +724,7 @@ trait SaleOperation
                 'customer_id' => $request->customer_id,
                 'date'        => $sale->sale_date,
                 'trx'         => $trx,
-                'amount'      => $amount
+                'amount'      => $amount,
             ]);
 
             if ($sale->status == Status::SALE_FINAL) {
@@ -680,9 +734,12 @@ trait SaleOperation
                     $changesPaymentAccountType = @$request->change_payment_type;
                     $changesPaymentAccount     = @$request->change_payment_account;
 
-                    if ($changesPaymentAccountType && $changesPaymentAccount && $changesPaymentAccount == $payments['payment_account_id'] && $changesPaymentAccountType ==  $payments['payment_type'] && $changesAmount > 0) {
+                    if ($changesPaymentAccountType && $changesPaymentAccount && $changesPaymentAccount == $payments['payment_account_id'] && $changesPaymentAccountType == $payments['payment_type'] && $changesAmount > 0) {
                         $changePaymentAccount = PaymentAccount::where('id', $changesPaymentAccount)->first();
-                        if (!$changePaymentAccount) continue;
+                        if (!$changePaymentAccount) {
+                            continue;
+                        }
+
                         $details = "Changes amount return to customer. Sale invoice is: #" . $sale->invoice_number;
                         createTransaction($changePaymentAccount, '-', $changesAmount, "balance_subtract", $details, $trx);
                     }

@@ -7,13 +7,18 @@ use App\Models\PaymentType;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\SupplierPayment;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait SupplierOperation
 {
     public function list()
     {
-        $baseQuery = Supplier::where('user_id', auth()->id())->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
+        $user     = getParentUser();
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Supplier::whereIn('user_id', $userIds)->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Supplier';
         $view      = "Template::user.supplier.list";
 
@@ -48,9 +53,9 @@ trait SupplierOperation
             $supplier = new Supplier();
             $message  = "Supplier saved successfully";
             $remark   = "supplier-added";
+            $supplier->user_id      = auth()->id();
         }
 
-        $supplier->user_id = auth()->id();
         $supplier->company_name = $request->company_name;
         $supplier->name         = $request->name;
         $supplier->email        = $request->email;
@@ -62,7 +67,6 @@ trait SupplierOperation
         $supplier->zip          = $request->zip;
         $supplier->postcode     = $request->postcode;
         $supplier->save();
-
 
         // adminActivity($remark, get_class($supplier), $supplier->id);
 
@@ -86,7 +90,7 @@ trait SupplierOperation
         $widget                   = [];
         $widget['total_purchase'] = Purchase::where('user_id', auth()->id())->where('supplier_id', $supplier->id)->sum('total');
         $widget['total_payment']  = (clone $baseQuery)->sum('amount');
-        $widget['total_due']      = $widget['total_purchase'] -  $widget['total_payment'];
+        $widget['total_due']      = $widget['total_purchase'] - $widget['total_payment'];
         $widget['today_payment']  = (clone $baseQuery)->where('payment_date', now()->format('Y-m-d'))->sum('amount');
 
         $purchases = Purchase::where('supplier_id', $supplier->id)
@@ -98,7 +102,7 @@ trait SupplierOperation
             ->latest('id')
             ->paginate(getPaginate(), ['*'], 'purchases_page');
 
-        $payments  = (clone $baseQuery)
+        $payments = (clone $baseQuery)
             ->when($request->payment_search, function ($query, $paymentSearch) {
                 $query->where('payment_date', 'like', "%{$paymentSearch}%")
                     ->orWhere('amount', 'like', "%{$paymentSearch}%");
@@ -135,18 +139,16 @@ trait SupplierOperation
         $supplierPayment->payment_note    = $request->payment_note;
         $supplierPayment->save();
 
-
         $paymentAccount = PaymentAccount::where('id', $request->payment_account)->first();
 
         $details = "The supplier paid amount subtract from the payment account.";
         createTransaction($paymentAccount, '-', $request->paid_amount, 'balance_subtract', $details);
 
-
         adminActivity("supplier-payment", get_class($supplierPayment), $supplierPayment->id);
-        $notify =  "Supplier payment added successfully";
+        $notify = "Supplier payment added successfully";
 
         return responseManager("supplier_payment", $notify, 'success', [
-            'supplierPayment' => $supplierPayment
+            'supplierPayment' => $supplierPayment,
         ]);
     }
 }

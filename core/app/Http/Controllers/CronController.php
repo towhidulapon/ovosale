@@ -67,9 +67,7 @@ class CronController extends Controller {
     public function fetchSubscriptions() {
 
         $now = Carbon::now();
-
-        $purchasePlans = PlanPurchase::where('status', Status::PLAN_PURCHASE_SUCCESS)->get();
-
+        $purchasePlans = PlanPurchase::where('status', Status::PLAN_ACTIVATE)->get();
         $expiredPlans = [];
 
         foreach ($purchasePlans as $plan) {
@@ -81,7 +79,7 @@ class CronController extends Controller {
         }
 
         foreach ($expiredPlans as $expiredPlan) {
-            $expiredPlan->status = Status::PLAN_PURCHASE_EXPIRED;
+            $expiredPlan->status = Status::PLAN_EXPIRED;
             $expiredPlan->save();
         }
     }
@@ -103,7 +101,7 @@ class CronController extends Controller {
         }
 
         foreach ($expiredPlans as $expiredPlan) {
-            $expiredPlan->status = Status::PLAN_PURCHASE_EXPIRED;
+            $expiredPlan->status = Status::PLAN_EXPIRED;
             $expiredPlan->save();
         }
     }

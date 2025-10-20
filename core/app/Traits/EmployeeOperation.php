@@ -4,13 +4,21 @@ namespace App\Traits;
 
 use App\Models\Company;
 use App\Models\Employee;
+use App\Models\User;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
-trait EmployeeOperation {
-    public function list() {
-        $baseQuery = Employee::whereHas('company', function ($q) {
-            $q->where('user_id', auth()->id());
+trait EmployeeOperation
+{
+    public function list()
+    {
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Employee::whereHas('company', function ($q) use ($userIds) {
+            $q->whereIn('user_id', $userIds);
         })
             ->searchable(['name', 'email', 'phone', 'company:name', 'department:name', 'designation:name'])
             ->with('company', 'department', 'designation')
@@ -22,12 +30,13 @@ trait EmployeeOperation {
         if (request()->export) {
             return exportData($baseQuery, request()->export, "employee", "A4 landscape");
         }
-        $employees    = $baseQuery->paginate(getPaginate());
-        $companies    = Company::with(['departments.designations'])->active()->orderBy('name')->get();
+        $employees = $baseQuery->paginate(getPaginate());
+        $companies = Company::with(['departments.designations'])->whereIn('user_id', $userIds)->active()->orderBy('name')->get();
         return responseManager("employee", $pageTitle, 'success', compact('employees', 'view', 'pageTitle', 'companies'));
     }
 
-    public function save(Request $request, $id = 0) {
+    public function save(Request $request, $id = 0)
+    {
         $request->validate(
             [
                 'name'           => 'required|string|max:40',
@@ -40,7 +49,7 @@ trait EmployeeOperation {
                 'company_id'     => 'required|exists:companies,id',
                 'department_id'  => 'required|exists:departments,id',
                 'designation_id' => 'required|exists:designations,id',
-                'image'          => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
+                'image'          => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
             ],
             [
                 'company_id.required'     => 'Please select a company',
@@ -61,8 +70,8 @@ trait EmployeeOperation {
 
         if ($request->hasFile('image')) {
             try {
-                $old                      = $employee->image;
-                $employee->image          = fileUploader($request->image, getFilePath('employeeImage'), getFileSize('employeeImage'), $old);
+                $old             = $employee->image;
+                $employee->image = fileUploader($request->image, getFilePath('employeeImage'), getFileSize('employeeImage'), $old);
             } catch (\Exception $exp) {
                 $message = 'Couldn\'t upload your image';
                 return responseManager('exception', $message);
@@ -94,7 +103,8 @@ trait EmployeeOperation {
         return responseManager("employee", $message, 'success', compact('employee'));
     }
 
-    public function status($id) {
+    public function status($id)
+    {
         return Employee::changeStatus($id);
     }
 }

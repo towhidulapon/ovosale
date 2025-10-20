@@ -479,8 +479,8 @@
         },
         {
             "title": "Transaction History",
-            "route_name": "user.report.transaction",
-            "menu_active": "user.report.transaction",
+            "route_name": "user.transactions",
+            "menu_active": "user.transactions",
             "icon": "las la-exchange-alt",
             "keyword": [
                 "Transaction Log",

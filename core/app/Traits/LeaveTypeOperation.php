@@ -3,13 +3,19 @@
 namespace App\Traits;
 
 use App\Models\LeaveType;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait LeaveTypeOperation
 {
     public function typeList()
     {
-        $baseQuery = LeaveType::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = LeaveType::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Type';
         $view      = "Template::user.hrm.leave.type.list";
 
@@ -17,14 +23,13 @@ trait LeaveTypeOperation
             return exportData($baseQuery, request()->export, "LeaveType", "A4 landscape");
         }
         $types = $baseQuery->paginate(getPaginate());
-        return responseManager("leave_type", $pageTitle, 'success', compact('view', 'pageTitle','types'));
+        return responseManager("leave_type", $pageTitle, 'success', compact('view', 'pageTitle', 'types'));
     }
-
 
     public function typeSave(Request $request, $id = 0)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
         if ($id) {
             $leaveType = LeaveType::where('id', $id)->firstOrFailWithApi('LeaveType');
@@ -34,9 +39,9 @@ trait LeaveTypeOperation
             $leaveType = new LeaveType();
             $message   = "Leave type saved successfully";
             $remark    = "leave-type-added";
+            $leaveType->user_id = auth()->id();
         }
-        $leaveType->user_id  = auth()->id();
-        $leaveType->name     = $request->name;
+        $leaveType->name    = $request->name;
         $leaveType->save();
 
         // adminActivity($remark, get_class($leaveType), $leaveType->id);

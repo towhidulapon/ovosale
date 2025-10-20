@@ -18,10 +18,10 @@
                                     {{ $planFeature->name }}
                                 </td>
                                 <td>
-                                    <x-admin.other.status_switch :status="$planFeature->status" :action="route('admin.subscription.plan.feature.status', $planFeature->id)" title="Plan" />
+                                    <x-admin.other.status_switch :status="$planFeature->status" :action="route('admin.subscription.feature.status', $planFeature->id)" title="Plan" />
                                 </td>
                                 <td>
-                                    <x-admin.ui.btn.edit tag="btn" data-planfeature="{{ json_encode($planFeature) }}" :href="route('admin.subscription.plan.feature.save', $planFeature->id)" />
+                                    <x-admin.ui.btn.edit tag="btn" data-planfeature="{{ json_encode($planFeature) }}" :href="route('admin.subscription.feature.save', $planFeature->id)" />
                                 </td>
                             </tr>
                         @empty
@@ -77,7 +77,7 @@
             const $form = $modal.find('form');
 
             $('.add-btn').on('click', function () {
-                const action = "{{ route('admin.subscription.plan.feature.save') }}";
+                const action = "{{ route('admin.subscription.feature.save') }}";
 
                 $modal.find('.modal-title').text("@lang('Add Plan Feature')");
                 $form.trigger('reset');
@@ -86,7 +86,7 @@
             });
 
             $('.edit-btn').on('click', function () {
-                const action = "{{ route('admin.subscription.plan.feature.save', ':id') }}";
+                const action = "{{ route('admin.subscription.feature.save', ':id') }}";
                 const planFeature = $(this).data('planfeature');
 
                 $modal.find('.modal-title').text("@lang('Edit Payment Type')");

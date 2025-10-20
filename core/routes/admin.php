@@ -24,12 +24,12 @@ Route::namespace('Auth')->group(function () {
     });
 });
 
-
 Route::middleware('admin')->group(function () {
 
     // Users Manager
     Route::controller('ManageUsersController')->name('users.')->prefix('users')->group(function () {
         Route::get('/', 'allUsers')->name('all');
+        Route::get('/staff', 'allStaff')->name('staff.all');
         Route::get('active', 'activeUsers')->name('active');
         Route::get('banned', 'bannedUsers')->name('banned');
         Route::get('email-verified', 'emailVerifiedUsers')->name('email.verified');
@@ -75,7 +75,6 @@ Route::middleware('admin')->group(function () {
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
     });
 
-
     // Admin Support
     Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function () {
         Route::get('/', 'tickets')->name('index');
@@ -88,7 +87,6 @@ Route::middleware('admin')->group(function () {
         Route::get('download/{attachment_id}', 'ticketDownload')->name('download');
         Route::post('delete/{id}', 'ticketDelete')->name('delete');
     });
-
 
     Route::controller('AdminController')->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
@@ -131,7 +129,6 @@ Route::middleware('admin')->group(function () {
         Route::post('update/key/{id}', 'updateLanguageJson')->name('update.key');
         Route::get('get-keys', 'getKeys')->name('get.key');
     });
-
 
     //Notification Setting
     Route::name('setting.notification.')->controller('NotificationController')->prefix('notification')->group(function () {
@@ -184,7 +181,6 @@ Route::middleware('admin')->group(function () {
         Route::post('approve/{id}', 'approve')->name('approve');
     });
 
-
     // WITHDRAW SYSTEM
     Route::name('withdraw.')->prefix('withdraw')->group(function () {
 
@@ -197,7 +193,6 @@ Route::middleware('admin')->group(function () {
             Route::post('approve', 'approve')->name('approve');
             Route::post('reject', 'reject')->name('reject');
         });
-
 
         // Withdraw Method
         Route::controller('WithdrawMethodController')->prefix('method')->name('method.')->group(function () {
@@ -215,15 +210,23 @@ Route::middleware('admin')->group(function () {
         Route::get('create', 'create')->name('create');
         Route::get('edit/{id}', 'edit')->name('edit');
         Route::post('save/{id?}', 'save')->name('save');
-        Route::get('purchase', 'purchase')->name('purchase');
-        Route::get('order/details/{id}', 'orderDetails')->name('order.details');
         Route::post('status/{id}', 'status')->name('status');
     });
 
-    Route::controller('PlanFeatureController')->prefix('plan')->name('subscription.plan.')->group(function () {
-        Route::get('features', 'features')->name('features');
-        Route::post('save-feature/{id?}', 'saveFeature')->name('feature.save');
-        Route::post('feature-status/{id?}', 'featureStatus')->name('feature.status');
+    Route::controller('ManageSubscriptionController')->prefix('subscription')->name('manage.subscription.')->group(function () {
+        Route::get('purchase', 'purchase')->name('purchase');
+        Route::get('active', 'active')->name('active');
+        Route::get('expired', 'expired')->name('expired');
+        Route::get('pending', 'pending')->name('pending');
+        Route::get('trial', 'trial')->name('trial');
+        Route::get('details/{id}', 'details')->name('details');
+
+    });
+
+    Route::controller('PlanFeatureController')->prefix('plan')->name('subscription.feature.')->group(function () {
+        Route::get('features', 'features')->name('list');
+        Route::post('save-feature/{id?}', 'saveFeature')->name('save');
+        Route::post('feature-status/{id?}', 'featureStatus')->name('status');
     });
 
     // Admin Support
@@ -278,7 +281,6 @@ Route::middleware('admin')->group(function () {
         Route::get('info', 'systemInfo')->name('info');
         Route::get('optimize-clear', 'optimizeClear')->name('optimize.clear');
     });
-
 
     Route::controller('GeneralSettingController')->group(function () {
 
@@ -345,7 +347,6 @@ Route::middleware('admin')->group(function () {
         });
     });
 
-
     //cron
     Route::controller('CronConfigurationController')->name('cron.')->prefix('cron')->group(function () {
         Route::get('index', 'cronJobs')->name('index');
@@ -360,7 +361,6 @@ Route::middleware('admin')->group(function () {
         Route::post('schedule/log/resolved/{id}', 'scheduleLogResolved')->name('schedule.log.resolved');
         Route::post('schedule/log/flush/{id}', 'logFlush')->name('log.flush');
     });
-
 
     Route::controller("ExportController")->group(function () {
         Route::get('export/{model}/{type}', 'export')->name('export');

@@ -3,13 +3,19 @@
 namespace App\Traits;
 
 use App\Models\ExpenseCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait ExpenseCategoryOperation
 {
     public function list()
     {
-        $baseQuery = ExpenseCategory::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = ExpenseCategory::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Expense Category';
         $view      = "Template::user.expense.category.list";
 
@@ -32,9 +38,9 @@ trait ExpenseCategoryOperation
             $message         = "Expense category updated successfully";
             $remark          = "expense-category-updated";
         } else {
-            $expenseCategory = new ExpenseCategory();
-            $message         = "Expense category saved successfully";
-            $remark          = "expense-category-added";
+            $expenseCategory          = new ExpenseCategory();
+            $message                  = "Expense category saved successfully";
+            $remark                   = "expense-category-added";
             $expenseCategory->user_id = auth()->id();
         }
 

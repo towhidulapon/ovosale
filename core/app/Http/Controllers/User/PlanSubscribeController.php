@@ -15,23 +15,24 @@ class PlanSubscribeController extends Controller
 {
     public function list()
     {
-        $pageTitle = "Subscription Plans";
+        $pageTitle         = "Subscription Plans";
         $subscriptionPlans = SubscriptionPlan::orderBy('id', 'desc')->active()->paginate(getPaginate());
-        $subscribedPlan = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_PURCHASE_SUCCESS)->first();
-        $trialPlan = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_ON_TRIAL)->first();
-        return view('Template::user.subscription.list', compact('pageTitle', 'subscriptionPlans', 'subscribedPlan','trialPlan'));
+        $subscribedPlan    = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_ACTIVATE)->first();
+        $trialPlan         = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_ON_TRIAL)->first();
+        return view('Template::user.subscription.list', compact('pageTitle', 'subscriptionPlans', 'subscribedPlan', 'trialPlan'));
     }
 
     public function purchasedList()
     {
-        $pageTitle = "Purchased Plans";
-        $purchasedPlans = PlanPurchase::where('user_id', auth()->id())->where('status', Status::PLAN_PURCHASE_SUCCESS)->orderBy('id', 'desc')->paginate(getPaginate());
+        $pageTitle      = "Purchased Plans";
+        $purchasedPlans = PlanPurchase::where('user_id', auth()->id())->orderBy('id', 'desc')->paginate(getPaginate());
         return view('Template::user.subscription.subscribed', compact('pageTitle', 'purchasedPlans'));
     }
 
-    public function planPurchase($id){
-        $pageTitle = "Plan Purchase";
-        $plan = SubscriptionPlan::findOrFail($id);
+    public function planPurchase($id)
+    {
+        $pageTitle       = "Plan Purchase";
+        $plan            = SubscriptionPlan::findOrFail($id);
         $gatewayCurrency = GatewayCurrency::whereHas('method', function ($gate) {
             $gate->where('status', Status::ENABLE);
         })->with('method')->orderby('name')->get();
@@ -39,50 +40,53 @@ class PlanSubscribeController extends Controller
         return view('Template::user.subscription.purchase', compact('pageTitle', 'plan', 'gatewayCurrency'));
     }
 
-    public function planTrial($id){
+    public function planTrial($id)
+    {
         $trialPlan = SubscriptionPlan::findOrFail($id);
-        $user = auth()->user();
+        $user      = auth()->user();
 
-        if($user->planPurchases()->where('status', Status::PLAN_PURCHASE_SUCCESS)->first()){
+        if ($user->planPurchases()->where('status', Status::PLAN_ACTIVATE)->first()) {
             $notify[] = ['error', 'You already subscribed to a plan'];
             return back()->withNotify($notify);
         }
 
-        if($user->planPurchases()->where('status', Status::PLAN_ON_TRIAL)->first()){
+        if ($user->planPurchases()->where('status', Status::PLAN_ON_TRIAL)->first()) {
             $notify[] = ['error', 'You are already on trial'];
             return back()->withNotify($notify);
         }
 
-        $planPurchase = new PlanPurchase();
-        $planPurchase->user_id = $user->id;
+        $planPurchase                       = new PlanPurchase();
+        $planPurchase->user_id              = $user->id;
         $planPurchase->subscription_plan_id = $trialPlan->id;
-        $planPurchase->status = Status::PLAN_ON_TRIAL;
+        $planPurchase->status               = Status::PLAN_ON_TRIAL;
         $planPurchase->save();
 
         $notify[] = ['success', 'Plan trial started successfully'];
         return back()->withNotify($notify);
     }
 
-    public function planPurchaseInsert(Request $request){
+    public function planPurchaseInsert(Request $request)
+    {
         $request->validate([
-            'amount' => 'required|numeric',
-            'gateway' => 'required',
+            'amount'   => 'required|numeric',
+            'gateway'  => 'required',
             'currency' => 'required',
         ]);
 
         $user = auth()->user();
 
-        $planPurchase = new PlanPurchase();
-        $planPurchase->user_id = $user->id;
+        $planPurchase                       = new PlanPurchase();
+        $planPurchase->user_id              = $user->id;
         $planPurchase->subscription_plan_id = $request->plan_id;
-        $planPurchase->status = Status::PLAN_PURCHASE_INITIATE;
+        // $planPurchase->payment_status       = Status::PLAN_PURCHASE_INITIATE;
         $planPurchase->save();
 
         $gate = GatewayCurrency::whereHas('method', function ($gate) {
             $gate->where('status', Status::ENABLE);
-        })->where('method_code',$request->gateway)->where('currency', $request->currency)->first();
+        })->where('method_code', $request->gateway)->where('currency', $request->currency)->first();
 
-        if(!$gate){
+
+        if (!$gate) {
             $notify[] = ['error', 'Invalid gateway'];
             return back()->withNotify($notify);
         }
@@ -97,10 +101,11 @@ class PlanSubscribeController extends Controller
         return to_route('user.deposit.confirm');
     }
 
-    public function confirmPurchase($user, $planPurchaseId, $amount){
+    public function confirmPurchase($user, $planPurchaseId, $amount)
+    {
 
-        $planPurchase = PlanPurchase::findOrFail($planPurchaseId);
-        $planPurchase->status= Status::PLAN_PURCHASE_SUCCESS;
+        $planPurchase                 = PlanPurchase::findOrFail($planPurchaseId);
+        $planPurchase->status         = Status::PLAN_ACTIVATE;
         $planPurchase->save();
 
         $user->balance -= $amount;

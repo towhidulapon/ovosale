@@ -10,6 +10,7 @@
                             <th>@lang('Plan Name')</th>
                             <th>@lang('Subscribed Date')</th>
                             <th>@lang('End Date')</th>
+                            <th>@lang('Status')</th>
                             <th>@lang('Action')</th>
                         </tr>
                     </x-admin.ui.table.header>
@@ -23,13 +24,18 @@
                                     {{ $purchasedPlan->subscriptionPlan->name }}
                                 </td>
                                 <td>
-                                    {{ $purchasedPlan->created_at }}
+                                    {{ showDateTime($purchasedPlan->created_at) }} <br>
+                                    {{ diffForHumans($purchasedPlan->created_at) }}
                                 </td>
                                 <td>
-                                    {{ showDateTime(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }}
+                                    {{ showDateTime(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }} <br>
+                                    {{ diffForHumans(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }}
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.subscription.plan.order.details', $purchasedPlan->id) }}" class="btn  btn-outline--primary">
+                                    @php echo $purchasedPlan->statusBadge; @endphp
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.manage.subscription.details', $purchasedPlan->id) }}" class="btn  btn-outline--primary">
                                         <i class="las la-pen"></i> @lang('Details')
                                     </a>
                                 </td>
@@ -50,9 +56,3 @@
 
     <x-confirmation-modal />
 @endsection
-
-@push('breadcrumb-plugins')
-    <x-permission_check permission="add sale">
-        <x-admin.ui.btn.add href="{{ route('admin.subscription.plan.create') }}" text="New Plan" />
-    </x-permission_check>
-@endpush

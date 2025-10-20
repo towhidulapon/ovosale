@@ -33,7 +33,6 @@
                 "bannedUsersCount",
                 "emailUnverifiedUsersCount",
                 "mobileUnverifiedUsersCount"
-
             ],
             "menu_active": "admin.users*",
             "submenu": [
@@ -116,6 +115,12 @@
                     "menu_active": "admin.users.all"
                 },
                 {
+                    "keyword": ["all staff users", "Manage Staff"],
+                    "title": "All Staff",
+                    "route_name": "admin.users.staff.all",
+                    "menu_active": "admin.users.staff.all"
+                },
+                {
                     "keyword": [
                         "send notification users",
                         "Manage Users",
@@ -132,57 +137,249 @@
         {
             "title": "Subscription Plans",
             "icon": "las la-book",
-            "menu_active": "admin.subscription*",
+            "route_name": "admin.subscription.plan.list",
+            "menu_active": "admin.subscription.plan*",
+            "keyword": [
+                "create plan",
+                "Manage Subscription",
+                "Subscription management",
+                "Subscription control",
+                "Subscription status",
+                "Subscription analytics"
+            ]
+        },
+        {
+            "keyword": [
+                "subscription features",
+                "Manage Subscription",
+                "Subscription management",
+                "Subscription control",
+                "Subscription analytics"
+            ],
+            "title": "Plan Features",
+            "icon": "las la-feather",
+            "route_name": "admin.subscription.feature.list",
+            "menu_active": "admin.subscription.feature.list"
+        },
+        {
+            "title": "Manage Subscription",
+            "icon": "lar la-folder",
+            "counters": ["pendingPlansCount"],
+            "menu_active": "admin.manage.subscription*",
             "submenu": [
                 {
                     "keyword": [
-                        "create plan",
-                        "Manage Subscription",
-                        "Subscription management",
-                        "Subscription control",
-                        "Subscription status",
-                        "Subscription analytics"
-                    ],
-                    "title": "Create Plan",
-                    "route_name": "admin.subscription.plan.create",
-                    "menu_active": "admin.subscription.plan.create"
-                },
-                {
-                    "keyword": [
-                        "subscription plans",
-                        "Manage Subscription",
-                        "Subscription management",
-                        "Subscription control",
-                        "Subscription status",
-                        "Subscription analytics"
-                    ],
-                    "title": "All Plans",
-                    "route_name": "admin.subscription.plan.list",
-                    "menu_active": "admin.subscription.plan.list"
-                },
-                {
-                    "keyword": [
-                        "subscription features",
-                        "Manage Subscription",
-                        "Subscription management",
-                        "Subscription control",
-                        "Subscription analytics"
-                    ],
-                    "title": "Plan Features",
-                    "route_name": "admin.subscription.plan.features",
-                    "menu_active": "admin.subscription.plan.features"
-                },
-                {
-                    "keyword": [
-                        "plan orders",
+                        "Plan orders",
                         "Manage Subscription",
                         "Subscription management",
                         "Subscription control",
                         "Subscription analytics"
                     ],
                     "title": "Purchased Plans",
-                    "route_name": "admin.subscription.plan.purchase",
-                    "menu_active": "admin.subscription.plan.purchase"
+                    "route_name": "admin.manage.subscription.purchase",
+                    "menu_active": "admin.manage.subscription.purchase"
+                },
+                {
+                    "keyword": [
+                        "Active plans",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Active Plans",
+                    "route_name": "admin.manage.subscription.active",
+                    "menu_active": "admin.manage.subscription.active"
+                },
+                {
+                    "keyword": [
+                        "Pending Orders",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Pending Plans",
+                    "route_name": "admin.manage.subscription.pending",
+                    "counter": "pendingPlansCount",
+                    "menu_active": "admin.manage.subscription.pending"
+                },
+                {
+                    "keyword": [
+                        "Trial Orders",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Trial Plans",
+                    "route_name": "admin.manage.subscription.trial",
+                    "counter": "trialPlansCount",
+                    "menu_active": "admin.manage.subscription.trial"
+                },
+                {
+                    "keyword": [
+                        "Expired Orders",
+                        "Manage Subscription",
+                        "Subscription management",
+                        "Subscription control",
+                        "Subscription analytics"
+                    ],
+                    "title": "Expired Plans",
+                    "route_name": "admin.manage.subscription.expired",
+                    "menu_active": "admin.manage.subscription.expired"
+                }
+            ]
+        }
+    ],
+    "finance": [
+        {
+            "title": "Payments",
+            "icon": "las la-wallet",
+            "counters": ["pendingPaymentsCount"],
+            "menu_active": "admin.deposit*",
+            "submenu": [
+                {
+                    "keyword": [
+                        "Pending Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit control",
+                        "Deposit status",
+                        "Deposit activity"
+                    ],
+                    "title": "Pending Payments",
+                    "route_name": "admin.deposit.pending",
+                    "menu_active": "admin.deposit.pending",
+                    "counter": "pendingPaymentsCount"
+                },
+                {
+                    "keyword": [
+                        "Approved Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit activity"
+                    ],
+                    "title": "Approved Payments",
+                    "route_name": "admin.deposit.approved",
+                    "menu_active": "admin.deposit.approved"
+                },
+                {
+                    "keyword": [
+                        "Successful Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit activity"
+                    ],
+                    "title": "Successful Payments",
+                    "route_name": "admin.deposit.successful",
+                    "menu_active": "admin.deposit.successful"
+                },
+                {
+                    "keyword": [
+                        "Rejected Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit activity"
+                    ],
+                    "title": "Rejected Payments",
+                    "route_name": "admin.deposit.rejected",
+                    "menu_active": "admin.deposit.rejected"
+                },
+                {
+                    "keyword": [
+                        "Initiated Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit activity"
+                    ],
+                    "title": "Initiated Payments",
+                    "route_name": "admin.deposit.initiated",
+                    "menu_active": "admin.deposit.initiated"
+                },
+                {
+                    "keyword": [
+                        "All Payments",
+                        "Payments",
+                        "Deposit management",
+                        "Deposit control",
+                        "Deposit activity"
+                    ],
+                    "title": "All Payments",
+                    "route_name": "admin.deposit.list",
+                    "menu_active": "admin.deposit.list"
+                }
+            ]
+        },
+        {
+            "title": "Gateways",
+            "icon": "las la-credit-card",
+            "menu_active": ["admin.gateway.*", "admin.withdraw.method.*"],
+            "submenu": [
+                {
+                    "title": "Payment Gateway",
+                    "route_name": "admin.gateway.automatic.index",
+                    "menu_active": "admin.gateway.*",
+                    "keyword": [
+                        "gateway",
+                        "payment gateway",
+                        "automatic payment gateway",
+                        "gateway",
+                        "automatic",
+                        "configure payment gateways",
+                        "aamarpay",
+                        "amarpay",
+                        "authorize",
+                        "autorize.net",
+                        "btcpay",
+                        "btc pay",
+                        "binance",
+                        "blockchain",
+                        "cashmaal",
+                        "checkout",
+                        "coinbase commerce",
+                        "coingate",
+                        "coinpayments",
+                        "flutterwave",
+                        "instamojo",
+                        "mercado pago",
+                        "mollie",
+                        "nmi",
+                        "now payments",
+                        "nowpayments",
+                        "payeer",
+                        "paypal",
+                        "paystack",
+                        "paytm",
+                        "perfect money",
+                        "perfectmoney",
+                        "razorpay",
+                        "skrill",
+                        "sslcommerz",
+                        "stripe",
+                        "twocheckout",
+                        "two checkout",
+                        "2checkout",
+                        "manual payment gateway",
+                        "bank transfer",
+                        "mobile money transfer"
+                    ]
+                },
+                {
+                    "keyword": [
+                        "manual withdrawal",
+                        "payout",
+                        "payment withdrawal",
+                        "withdrawal options",
+                        "withdrawal settings",
+                        "payout methods",
+                        "payout settings",
+                        "configure withdrawals",
+                        "configure payouts"
+                    ],
+                    "title": "Withdrawals Methods",
+                    "icon": "la la-wallet",
+                    "route_name": "admin.withdraw.method.index"
                 }
             ]
         }
@@ -529,24 +726,14 @@
             "route_name": "admin.setting.custom.css"
         },
         {
-            "keyword": [
-                "Site map",
-                "sitemap",
-                "xml",
-                "sitemap.xml"
-            ],
+            "keyword": ["Site map", "sitemap", "xml", "sitemap.xml"],
             "title": "Sitemap XML",
             "subtitle": "Insert the sitemap XML here to enhance SEO performance.",
             "icon": "las la-sitemap",
             "route_name": "admin.setting.sitemap"
         },
         {
-            "keyword": [
-                "Robots",
-                "txt",
-                "robots.txt",
-                "robot.txt"
-            ],
+            "keyword": ["Robots", "txt", "robots.txt", "robot.txt"],
             "title": "Robots txt",
             "subtitle": "Insert the robots.txt content here to enhance bot web crawlers and instruct them on how to interact with certain areas of the website.",
             "icon": "las la-robot",
@@ -591,7 +778,11 @@
             "title": "Manage Pages",
             "icon": "las la-list",
             "route_name": "admin.frontend.manage.pages",
-            "menu_active": ["admin.frontend.manage.pages","admin.frontend.manage.section","admin.frontend.manage.pages.seo"],
+            "menu_active": [
+                "admin.frontend.manage.pages",
+                "admin.frontend.manage.section",
+                "admin.frontend.manage.pages.seo"
+            ],
             "keyword": [
                 "page management",
                 "frontend pages",
@@ -609,7 +800,7 @@
             "title": "Manage Sections",
             "icon": "la la-html5",
             "route_name": "admin.frontend.index",
-            "menu_active": ["admin.frontend.index","admin.frontend.sections"],
+            "menu_active": ["admin.frontend.index", "admin.frontend.sections"],
             "keyword": [
                 "section management",
                 "frontend sections",
@@ -709,9 +900,7 @@
                     ]
                 }
             ],
-            "counters": [
-                "pendingTicketCount"
-            ]
+            "counters": ["pendingTicketCount"]
         },
         {
             "title": "Application Information",

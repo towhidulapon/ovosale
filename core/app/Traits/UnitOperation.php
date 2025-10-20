@@ -3,13 +3,24 @@
 namespace App\Traits;
 
 use App\Models\Unit;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait UnitOperation
 {
     public function list()
     {
-        $baseQuery = Unit::where('user_id', auth()->id())->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Unit::whereIn('user_id', $userIds)->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+
         $pageTitle = 'Manage Unit';
         $view      = "Template::user.unit.list";
 
@@ -28,19 +39,22 @@ trait UnitOperation
             'short_name' => 'required|string|max:40|unique:units,short_name,' . $id,
         ]);
 
-        $user = auth()->user();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
 
         if ($id) {
-            $unit    = Unit::where('id', $id)->firstOrFailWithApi('unit');
+            $unit    = Unit::where('id', $id)->whereIn('user_id', $userIds)->firstOrFailWithApi('unit');
             $message = "Unit updated successfully";
             $remark  = "unit-updated";
         } else {
-            $unit    = new Unit();
-            $message = "Unit saved successfully";
-            $remark  = "unit-updated";
+            $unit          = new Unit();
+            $message       = "Unit saved successfully";
+            $remark        = "unit-updated";
+            $unit->user_id = $user->id;
         }
 
-        $unit->user_id    = $user->id;
         $unit->name       = $request->name;
         $unit->short_name = $request->short_name;
         $unit->save();

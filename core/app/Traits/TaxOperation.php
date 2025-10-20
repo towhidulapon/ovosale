@@ -3,13 +3,19 @@
 namespace App\Traits;
 
 use App\Models\Tax;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait TaxOperation
 {
     public function list()
     {
-        $baseQuery = Tax::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Tax::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Tax';
         $view      = "Template::user.tax.list";
 
@@ -36,9 +42,9 @@ trait TaxOperation
             $tax     = new Tax();
             $message = "Tax saved successfully";
             $remark  = "tax-added";
+            $tax->user_id    = auth()->id();
         }
 
-        $tax->user_id    = auth()->id();
         $tax->name       = $request->name;
         $tax->percentage = $request->percentage;
         $tax->save();

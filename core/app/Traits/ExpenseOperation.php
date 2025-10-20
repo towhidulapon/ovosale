@@ -6,6 +6,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\PaymentAccount;
 use App\Models\PaymentType;
+use App\Models\User;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,12 @@ trait ExpenseOperation
 {
     public function list()
     {
-        $baseQuery = Expense::orderBy('id', getOrderBy())->where('user_id', auth()->id())->with('paymentType', 'paymentAccount');
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Expense::orderBy('id', getOrderBy())->whereIn('user_id', $userIds)->with('paymentType', 'paymentAccount');
         $pageTitle = 'Manage Expense';
         $view      = "Template::user.expense.list";
 
@@ -22,7 +28,7 @@ trait ExpenseOperation
         }
 
         $expenses          = (clone $baseQuery)->dateFilter('expense_date')->searchable(['reference_no', 'category:name'])->trashFilter()->paginate(getPaginate());
-        $expenseCategories = ExpenseCategory::active()->get();
+        $expenseCategories = ExpenseCategory::whereIn('user_id', $userIds)->active()->get();
         $widget            = [];
 
         $widget['today_expense']             = (clone $baseQuery)->where('expense_date', now()->format("Y-m-d"))->sum('amount');
@@ -53,7 +59,7 @@ trait ExpenseOperation
             'amount'          => 'required|numeric|gt:0',
             'payment_type'    => "$isRequired|integer|exists:payment_types,id",
             'payment_account' => "$isRequired|integer|exists:payment_accounts,id",
-            'attachment'      => ['nullable', new FileTypeValidate(['jpg', 'jpeg', 'png', 'pdf', 'docx'])]
+            'attachment'      => ['nullable', new FileTypeValidate(['jpg', 'jpeg', 'png', 'pdf', 'docx'])],
         ]);
 
         if ($id) {
@@ -62,7 +68,7 @@ trait ExpenseOperation
             $remark           = "expense-updated";
             $oldExpenseAmount = $expense->amount;
         } else {
-            $expense                     = new Expense();
+            $expense = new Expense();
             // $expense->added_by           = getAdmin('id');
             $message                     = "Expense added successfully";
             $remark                      = "expense-add";
@@ -83,7 +89,6 @@ trait ExpenseOperation
         }
 
         $expense->save();
-
 
         if (!$id) {
             $paymentAccount = PaymentAccount::where('id', $request->payment_account)->first();

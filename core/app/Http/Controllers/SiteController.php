@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Frontend;
 use App\Models\Language;
-
+use App\Models\Page;
 
 class SiteController extends Controller
 {
 
-
     public function changeLanguage($lang = null)
     {
-        $language          = Language::where('code', $lang)->first();
-        if (!$language) $lang = 'en';
+        $language = Language::where('code', $lang)->first();
+        if (!$language) {
+            $lang = 'en';
+        }
+
         session()->put('lang', $lang);
         return back();
     }
@@ -71,7 +73,18 @@ class SiteController extends Controller
         imagedestroy($image);
     }
 
-    public function policyPages($slug) {
+    public function pages($slug)
+    {
+        $page        = Page::where('tempname', activeTemplate())->where('slug', $slug)->firstOrFail();
+        $pageTitle   = $page->name;
+        $sections    = $page->secs;
+        $seoContents = $page->seo_content;
+        $seoImage    = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
+        return view('Template::pages', compact('pageTitle', 'sections', 'seoContents', 'seoImage'));
+    }
+
+    public function policyPages($slug)
+    {
         $policy      = Frontend::where('slug', $slug)->where('data_keys', 'policy_pages.element')->firstOrFail();
         $pageTitle   = $policy->data_values->title;
         $seoContents = $policy->seo_content;

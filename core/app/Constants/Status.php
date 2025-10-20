@@ -2,7 +2,8 @@
 
 namespace App\Constants;
 
-class Status {
+class Status
+{
 
     const ENABLE  = 1;
     const DISABLE = 0;
@@ -59,21 +60,25 @@ class Status {
     const SUPPER_ADMIN_ID     = 1;
     const SUPER_ADMIN_ROLE_ID = 1;
 
-    const TRANSFER_SEND  = 1;
+    const TRANSFER_SEND = 1;
 
-    const PENDING = 0;
+    const PENDING  = 0;
     const APPROVED = 1;
     const REJECTED = 2;
 
-    const DAILY = 1;
-    const WEEKLY = 2;
-    const MONTHLY = 3;
+    const DAILY       = 1;
+    const WEEKLY      = 2;
+    const MONTHLY     = 3;
     const HALF_YEARLY = 4;
-    const YEARLY = 5;
-
+    const YEARLY      = 5;
 
     const PLAN_PURCHASE_INITIATE = 0;
     const PLAN_PURCHASE_SUCCESS  = 1;
     const PLAN_PURCHASE_EXPIRED  = 2;
-    const PLAN_ON_TRIAL = 3;
+
+    const PLAN_ACTIVATE = 1;
+    const PLAN_PENDING  = 2;
+    const PLAN_EXPIRED  = 3;
+    const PLAN_ON_TRIAL = 4;
+
 }

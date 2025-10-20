@@ -9,19 +9,27 @@ use App\Models\ProductDetail;
 use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-trait ReportOperation {
+trait ReportOperation
+{
 
-    public function invoiceWiseReport() {
+    public function invoiceWiseReport()
+    {
         $pageTitle = 'Invoice Wise Report';
         $view      = "Template::user.reports.invoice_wise_profit";
 
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
         $invoicesWise = Sale::query()
             ->with(['customer'])
-            ->where('user_id', auth()->id())
+            ->whereIn('user_id', $userIds)
             ->withSum('saleDetails as total_sales_price', DB::raw('sale_price * quantity'))
             ->withSum('saleDetails as total_purchase_price', DB::raw('purchase_price * quantity'))
             ->withSum('saleDetails as gross_profit', DB::raw('(sale_price - purchase_price) * quantity'))
@@ -37,7 +45,8 @@ trait ReportOperation {
         return responseManager("invoice_wise_report", $pageTitle, 'success', compact('pageTitle', 'view', 'invoicesWise', 'widget'));
     }
 
-    public function productWiseReport() {
+    public function productWiseReport()
+    {
         $pageTitle = 'Product Wise Report';
         $view      = "Template::user.reports.product_wise_profit";
 
@@ -61,11 +70,17 @@ trait ReportOperation {
         return responseManager("product_wise_report", $pageTitle, 'success', compact('pageTitle', 'view', 'productsWise', 'widget'));
     }
 
-    public function saleReport() {
+    public function saleReport()
+    {
         $pageTitle = 'Sales Report';
         $view      = "Template::user.reports.sale";
+        $user      = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
         $baseQuery = Sale::with("warehouse", "customer")
-            ->where('user_id', auth()->id())
+            ->whereIn('user_id', $userIds)
             ->withSum('payments', 'amount')
             ->withSum('saleDetails as total_purchase_value', 'purchase_price')
             ->withCount('saleDetails')
@@ -78,11 +93,18 @@ trait ReportOperation {
         return responseManager("sale_report", $pageTitle, 'success', compact('pageTitle', 'view', 'sales'));
     }
 
-    public function purchaseReport() {
+    public function purchaseReport()
+    {
         $pageTitle = 'Purchase Report';
         $view      = "Template::user.reports.purchase";
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
         $baseQuery = Purchase::with("warehouse", "supplier")
-            ->where('user_id', auth()->id())
+            ->whereIn('user_id', $userIds)
             ->withSum('supplierPayments', 'amount')
             ->searchable(["invoice_number"])
             ->dateFilter('purchase_date')
@@ -93,13 +115,20 @@ trait ReportOperation {
         return responseManager("purchase_report", $pageTitle, 'success', compact('pageTitle', 'view', 'purchases'));
     }
 
-    public function stockReport() {
-        $pageTitle  = 'Stock Report';
-        $view       = "Template::user.reports.stock";
-        $user       = auth()->user();
-        $warehouses = Warehouse::where('user_id', $user->id)->orderBy('name')->get();
-        $brands     = Brand::where('user_id', $user->id)->orderBy('name')->get();
-        $categories = Category::where('user_id', $user->id)->orderBy('name')->get();
+    public function stockReport()
+    {
+        $pageTitle = 'Stock Report';
+        $view      = "Template::user.reports.stock";
+        // $user       = auth()->user();
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $warehouses = Warehouse::whereIn('user_id', $userIds)->orderBy('name')->get();
+        $brands     = Brand::whereIn('user_id', $userIds)->orderBy('name')->get();
+        $categories = Category::whereIn('user_id', $userIds)->orderBy('name')->get();
 
         $selectWarehouse = request()->warehouse_id ? Warehouse::where('id', request()->warehouse_id)->firstOrFailWithApi('Warehouse') : $warehouses->first();
 
@@ -122,11 +151,17 @@ trait ReportOperation {
         return responseManager("stock_report", $pageTitle, 'success', compact('pageTitle', 'view', 'products', 'warehouses', 'brands', 'categories', 'selectWarehouse'));
     }
 
-    public function expenseReport() {
+    public function expenseReport()
+    {
         $pageTitle = 'Expense Report';
         $view      = "Template::user.reports.expense";
+        $user      = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
         $baseQuery = Expense::with("category")
-            ->where('user_id', auth()->id())
+            ->whereIn('user_id', $userIds)
             ->searchable(["category:name"])
             ->dateFilter('expense_date')
             ->filter(['category_id']);
@@ -136,7 +171,8 @@ trait ReportOperation {
         return responseManager("expense_report", $pageTitle, 'success', compact('pageTitle', 'view', 'expenses'));
     }
 
-    public function transaction(Request $request) {
+    public function transaction(Request $request)
+    {
         $pageTitle = 'Transaction History';
         $baseQuery = Transaction::searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
 

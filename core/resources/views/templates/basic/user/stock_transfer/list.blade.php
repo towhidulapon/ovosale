@@ -35,7 +35,7 @@
                                         <td>{{ __(@$transfer->toWarehouse->name) }}</td>
                                         <td>
                                             <div>
-                                                <span class="d-block">{{ __(@$transfer->admin->username) }}</span>
+                                                <span class="d-block">{{ __(@$transfer->user->username) }}</span>
                                                 <span>{{ __(@$transfer->reference_no) }}</span>
                                             </div>
                                         </td>

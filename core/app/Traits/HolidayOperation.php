@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Company;
 use App\Models\Holiday;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -11,20 +12,24 @@ trait HolidayOperation
 {
     public function list()
     {
-        $baseQuery = Holiday::whereHas('company', function($q){
-            $q->where('user_id', auth()->id());
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Holiday::whereHas('company', function ($q) use ($userIds) {
+            $q->where('user_id', $userIds);
         })->searchable(['title', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Holiday';
         $view      = "Template::user.hrm.holiday.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Holiday", "A4 landscape");
         }
-        $holidays = $baseQuery->paginate(getPaginate());
-        $companies   = Company::active()->where('user_id', auth()->id())->orderBy('name')->get();
+        $holidays  = $baseQuery->paginate(getPaginate());
+        $companies = Company::active()->whereIn('user_id', $userIds)->orderBy('name')->get();
 
         return responseManager("holiday", $pageTitle, 'success', compact('holidays', 'view', 'pageTitle', 'companies'));
     }
-
 
     public function save(Request $request, $id = 0)
     {
@@ -64,14 +69,14 @@ trait HolidayOperation
         $holiday->save();
 
         // Notify Employee
-        if($request->notify){
+        if ($request->notify) {
             $employees = @$holiday->company->employees;
             foreach ($employees as $employee) {
                 notify($employee, 'HOLIDAY', [
                     'title'      => $holiday->title,
                     'start_date' => $holiday->start_date,
                     'end_date'   => $holiday->end_date,
-                    'days'       => $holiday->days
+                    'days'       => $holiday->days,
                 ]);
             }
         }
@@ -81,5 +86,3 @@ trait HolidayOperation
     }
 
 }
-
-

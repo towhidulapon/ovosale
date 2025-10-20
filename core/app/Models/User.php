@@ -175,6 +175,11 @@ class User extends Authenticatable
         return $query->where('balance', '>', 0);
     }
 
+    public function scopeIsParent($query)
+    {
+        return $query->where('parent_id', '=', 0);
+    }
+
     public function deviceTokens()
     {
         return $this->hasMany(DeviceToken::class);
@@ -205,4 +210,6 @@ class User extends Authenticatable
         }
         return true;
     }
+
+
 }

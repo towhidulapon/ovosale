@@ -13,6 +13,7 @@
                                     <th>@lang('No of Warehouse')</th>
                                     <th>@lang('Subscribed Date')</th>
                                     <th>@lang('End Date')</th>
+                                    <th>@lang('Status')</th>
                                 </tr>
                             </x-user.ui.table.header>
                             <x-user.ui.table.body>
@@ -24,12 +25,16 @@
                                         <td>{{ showFrequency($purchasedPlan->subscriptionPlan->frequency) }}</td>
                                         <td>{{ $purchasedPlan->subscriptionPlan->warehouse_number }}</td>
                                         <td>
-                                            {{ showDateTime($purchasedPlan->created_at) }}
+                                            {{ showDateTime($purchasedPlan->created_at) }} <br>
+                                            {{ diffForHumans(showDateTime($purchasedPlan->created_at)) }}
                                         </td>
                                         <td>
-                                            {{ showDateTime(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }}
+                                            {{ showDateTime(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }} <br>
+                                            {{ diffForHumans(subscriptionEndDate($purchasedPlan->created_at, $purchasedPlan->subscriptionPlan->frequency)) }}
                                         </td>
-
+                                        <td>
+                                            @php echo $purchasedPlan->statusBadge; @endphp
+                                        </td>
                                     </tr>
                                 @empty
                                     <x-user.ui.table.empty_message />

@@ -4,13 +4,19 @@ namespace App\Traits;
 
 use App\Constants\Status;
 use App\Models\PaymentType;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait PaymentTypeOperation
 {
     public function list()
     {
-        $baseQuery = PaymentType::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = PaymentType::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Payment Type';
         $view      = "Template::user.payment_type.list";
 
@@ -38,12 +44,12 @@ trait PaymentTypeOperation
                 $paymentType->slug = slug($request->name);
             }
         } else {
-            $paymentType       = new PaymentType();
-            $message           = "Payment type saved successfully";
-            $remark            = "payment-type-added";
+            $paymentType          = new PaymentType();
+            $message              = "Payment type saved successfully";
+            $remark               = "payment-type-added";
             $paymentType->user_id = auth()->id();
-            $paymentType->name = $request->name;
-            $paymentType->slug = slug($request->name);
+            $paymentType->name    = $request->name;
+            $paymentType->slug    = slug($request->name);
         }
 
         $paymentType->save();

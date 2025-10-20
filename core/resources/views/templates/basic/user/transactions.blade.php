@@ -1,13 +1,13 @@
 @extends($activeTemplate . 'layouts.master')
-@section('content')
+@section('panel')
     <div class="py-5 ">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-12">
-                    <div class="show-filter mb-3 text-end">
+                    {{-- <div class="show-filter mb-3 text-end">
                         <button type="button" class="btn btn--base showFilterBtn "><i class="las la-filter"></i>
                             @lang('Filter')</button>
-                    </div>
+                    </div> --}}
                     <div class="card responsive-filter-card mb-4">
                         <div class="card-body">
                             <form>

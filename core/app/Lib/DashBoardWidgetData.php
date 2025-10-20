@@ -11,7 +11,7 @@ class DashBoardWidgetData
 {
     /**
      * Retrieves all widget data by calling the corresponding methods
-     * 
+     *
      * @return array Combined array of widget data from various sources.
      */
     public static function getWidgetData(): array
@@ -21,7 +21,9 @@ class DashBoardWidgetData
 
         // Loop through all methods in the class, excluding the 'getWidget' method itself
         foreach (get_class_methods(self::class) as $methodName) {
-            if ($methodName == 'getWidgetData') continue;
+            if ($methodName == 'getWidgetData') {
+                continue;
+            }
 
             // Merge the results from each method into the widget array
             $widget = array_merge($widget, self::$methodName());
@@ -33,12 +35,21 @@ class DashBoardWidgetData
 
     /**
      * Fetches sales data for various periods such as today, yesterday, this week, this month, and all-time sales.
-     * 
+     *
      * @return array Sales data, including total sales for each period.
      */
     public static function salesWidgetData(): array
     {
-        return Sale::selectRaw("
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        return Sale::whereIn('user_id', $userIds)->selectRaw("
             COALESCE(SUM(CASE WHEN sale_date = ? THEN total END), 0) as today_sale,
             COALESCE(SUM(CASE WHEN sale_date = ? THEN total END), 0) as yesterday_sale,
             COALESCE(SUM(CASE WHEN sale_date >= ? THEN total END), 0) as this_week_sale,
@@ -48,18 +59,27 @@ class DashBoardWidgetData
             now()->format("Y-m-d"),
             now()->subDay()->format("Y-m-d"),
             now()->startOfWeek()->format("Y-m-d"),
-            now()->startOfMonth()->format("Y-m-d")
+            now()->startOfMonth()->format("Y-m-d"),
         ])->first()->toArray();
     }
 
     /**
      * Fetches purchase data for various periods such as today, this week, this month, and all-time purchases.
-     * 
+     *
      * @return array Purchase data, including total purchases for each period.
      */
     public static function purchaseWidgetData(): array
     {
-        return Purchase::selectRaw("
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        return Purchase::whereIn('user_id', $userIds)->selectRaw("
             COALESCE(SUM(CASE WHEN purchase_date = ? THEN total END), 0) as today_purchase,
             COALESCE(SUM(CASE WHEN purchase_date >= ? THEN total END), 0) as this_week_purchase,
             COALESCE(SUM(CASE WHEN purchase_date >= ? THEN total END), 0) as this_month_purchase,
@@ -67,18 +87,27 @@ class DashBoardWidgetData
         ", [
             now()->format("Y-m-d"),
             now()->startOfWeek()->format("Y-m-d"),
-            now()->startOfMonth()->format("Y-m-d")
+            now()->startOfMonth()->format("Y-m-d"),
         ])->first()->toArray();
     }
 
     /**
      * Fetches expense data for various periods such as today, this week, this month, and all-time expenses.
-     * 
+     *
      * @return array Expense data, including total expenses for each period.
      */
     public static function expenseWidgetData(): array
     {
-        return Expense::selectRaw("
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        return Expense::whereIn('user_id', $userIds)->selectRaw("
             COALESCE(SUM(CASE WHEN expense_date = ? THEN amount END), 0) as today_expense,
             COALESCE(SUM(CASE WHEN expense_date >= ? THEN amount END), 0) as this_week_expense,
             COALESCE(SUM(CASE WHEN expense_date >= ? THEN amount END), 0) as this_month_expense,
@@ -86,14 +115,14 @@ class DashBoardWidgetData
         ", [
             now()->format("Y-m-d"),
             now()->startOfWeek()->format("Y-m-d"),
-            now()->startOfMonth()->format("Y-m-d")
+            now()->startOfMonth()->format("Y-m-d"),
         ])->first()->toArray();
     }
 
     /**
-     * Fetches user data, including the total number of users, active users, email unverified users, 
+     * Fetches user data, including the total number of users, active users, email unverified users,
      * and mobile unverified users.
-     * 
+     *
      * @return array User data, including user counts for various statuses.
      */
     public static function userWidgetData(): array

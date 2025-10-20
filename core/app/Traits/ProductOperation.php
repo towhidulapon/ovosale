@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\Tax;
 use App\Models\Unit;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,18 @@ trait ProductOperation
     {
         $pageTitle = "Manage Product";
         $view      = "Template::user.product.list";
-        $baseQuery = Product::where('user_id', auth()->id())->orderBy('id', 'desc')
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Product::whereIn('user_id', $userIds)
+            ->orderBy('id', 'desc')
             ->trashFilter()
             ->with(['details:id,product_id,final_price', 'category:id,name', 'brand:id,name'])
             ->searchable(['product_code', 'name', "details:sku", 'category:name', 'brand:name', 'unit:name']);
@@ -68,7 +80,7 @@ trait ProductOperation
         $searchQuery = ProductDetail::whereHas('product', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('sku', request()->search);
-        $exactMatch  = true;
+        $exactMatch = true;
 
         if (!(clone $searchQuery)->count()) {
             $searchQuery->orWhereHas('product', function ($q) use ($search) {
@@ -76,7 +88,7 @@ trait ProductOperation
                     ->orWhere('product_code', "like", $search)
                     ->orWhere('name', "like", $search);
             });
-            $exactMatch  = false;
+            $exactMatch = false;
         }
 
         if (request()->warehouse_id) {
@@ -91,13 +103,12 @@ trait ProductOperation
             'variant',
         ])->take(20)->get();
 
-
         $products  = formattedProductDetails($productDetails);
         $message[] = "product search results";
 
         return jsonResponse('product_search', 'success', $message, [
             'products'    => $products,
-            'exact_match' => $exactMatch
+            'exact_match' => $exactMatch,
         ]);
     }
 
@@ -106,7 +117,7 @@ trait ProductOperation
         $code      = $this->getProductCode();
         $message[] = "Auto generate product code";
         return jsonResponse('code', 'success', $message, [
-            'code' => $code
+            'code' => $code,
         ]);
     }
 
@@ -125,7 +136,7 @@ trait ProductOperation
     {
 
         $validator = $this->validation($request);
-        $user = auth()->user();
+        $user      = auth()->user();
 
         if ($validator->fails()) {
             return jsonResponse('validation_error', 'error', $validator->errors()->all());
@@ -161,7 +172,7 @@ trait ProductOperation
             $productDetails = [];
 
             foreach ($request->product_detail as $k => $detail) {
-                $sku = $this->generateProductSku($detail, $product, $k + 1);
+                $sku              = $this->generateProductSku($detail, $product, $k + 1);
                 $productDetails[] = array_merge(makeProductDetails($detail), [
                     'product_id'     => $product->id,
                     'variant_id'     => $detail['variant_id'] ?? 0,
@@ -227,7 +238,7 @@ trait ProductOperation
                     if (!$productDetail) {
                         throw new Exception("The product is not found");
                     }
-                    $productDetail->update(array_merge($makeProductDetails, ['alert_quantity' => $detail['alert_quantity'],]));
+                    $productDetail->update(array_merge($makeProductDetails, ['alert_quantity' => $detail['alert_quantity']]));
                 } else {
                     $productDetails[] = array_merge($makeProductDetails, [
                         'product_id'     => $product->id,
@@ -258,15 +269,15 @@ trait ProductOperation
         $isRequired = $id ? 'nullable' : 'required';
 
         $validator = Validator::make($request->all(), [
-            'name'         => 'required|unique:products,name,' . $id,
-            'user_id'      => "required|integer",
-            'brand_id'     => "required|integer|exists:brands,id",
-            'unit_id'      => "required|integer|exists:units,id",
-            'category_id'  => "required|integer|exists:categories,id",
-            'product_code' => "nullable|unique:products,product_code," . $id,
-            "product_type" => [$isRequired, Rule::in(Status::PRODUCT_TYPE_STATIC, Status::PRODUCT_TYPE_VARIABLE)],
-            'image'        => "nullable|image",
-            'description'  => "nullable|string",
+            'name'                            => 'required|unique:products,name,' . $id,
+            'user_id'                         => "required|integer",
+            'brand_id'                        => "required|integer|exists:brands,id",
+            'unit_id'                         => "required|integer|exists:units,id",
+            'category_id'                     => "required|integer|exists:categories,id",
+            'product_code'                    => "nullable|unique:products,product_code," . $id,
+            "product_type"                    => [$isRequired, Rule::in(Status::PRODUCT_TYPE_STATIC, Status::PRODUCT_TYPE_VARIABLE)],
+            'image'                           => "nullable|image",
+            'description'                     => "nullable|string",
 
             'product_detail'                  => 'required|array|min:1',
             "product_detail.*.id"             => "nullable|exists:product_details,id",
@@ -281,10 +292,10 @@ trait ProductOperation
             "product_detail.*.discount_value" => "nullable|numeric|gt:0",
             "product_detail.*.alert_quantity" => "required|numeric|gte:0",
 
-            "product_detail.*.variant_id"   => "nullable|exists:variants,id",
-            "product_detail.*.attribute_id" => "nullable|exists:attributes,id",
+            "product_detail.*.variant_id"     => "nullable|exists:variants,id",
+            "product_detail.*.attribute_id"   => "nullable|exists:attributes,id",
         ], [
-            'product_detail.*.alert_quantity.required' => "All the alert quantity field is required"
+            'product_detail.*.alert_quantity.required' => "All the alert quantity field is required",
         ]);
 
         return $validator;
@@ -292,18 +303,25 @@ trait ProductOperation
 
     private function basicDataForProductOperation()
     {
+        $user     = getParentUser();
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
         return
             [
-                'categories' => Category::active()->get(),
-                'brands'     => Brand::active()->get(),
-                'units'      => Unit::active()->get(),
-                'taxes'      => Tax::active()->get(),
-                'attributes' => Attribute::active()->with('variants', function ($q) {
-                    $q->active();
-                })->get()
-            ];
+            'categories' => Category::whereIn('user_id', $userIds)->active()->get(),
+            'brands'     => Brand::whereIn('user_id', $userIds)->active()->get(),
+            'units'      => Unit::whereIn('user_id', $userIds)->active()->get(),
+            'taxes'      => Tax::whereIn('user_id', $userIds)->active()->get(),
+            'attributes' => Attribute::whereIn('user_id', $userIds)->active()->with('variants', function ($q) {
+                $q->active();
+            })->get(),
+        ];
     }
-
 
     private function generateProductSku($requestProductDetail, $product, $k)
     {
@@ -311,7 +329,10 @@ trait ProductOperation
             return $requestProductDetail['sku'];
         };
 
-        if ($product->product_type == Status::PRODUCT_TYPE_STATIC) return $product->product_code;
+        if ($product->product_type == Status::PRODUCT_TYPE_STATIC) {
+            return $product->product_code;
+        }
+
         return $product->product_code . "-" . $k;
     }
 }

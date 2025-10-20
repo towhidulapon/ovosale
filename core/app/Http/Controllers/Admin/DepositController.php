@@ -13,7 +13,7 @@ class DepositController extends Controller
 {
     public function pending()
     {
-        $pageTitle = 'Pending Deposits';
+        $pageTitle = 'Pending Payments';
         $baseQuery = $this->baseQuery('pending');
 
         if (request()->export) {
@@ -24,7 +24,7 @@ class DepositController extends Controller
     }
     public function approved()
     {
-        $pageTitle = 'Approved Deposits';
+        $pageTitle = 'Approved Payments';
         $baseQuery = $this->baseQuery('approved');
         if (request()->export) {
             return $this->callExportData($baseQuery);
@@ -36,7 +36,7 @@ class DepositController extends Controller
 
     public function successful()
     {
-        $pageTitle = 'Successful Deposits';
+        $pageTitle = 'Successful Payments';
         $baseQuery = $this->baseQuery('successful');
 
         if (request()->export) {
@@ -48,7 +48,7 @@ class DepositController extends Controller
 
     public function rejected()
     {
-        $pageTitle = 'Rejected Deposits';
+        $pageTitle = 'Rejected Payments';
         $baseQuery = $this->baseQuery('rejected');
 
         if (request()->export) {
@@ -60,7 +60,7 @@ class DepositController extends Controller
 
     public function initiated()
     {
-        $pageTitle = 'Initiated Deposits';
+        $pageTitle = 'Initiated Payments';
         $baseQuery = $this->baseQuery('initiated');
 
         if (request()->export) {

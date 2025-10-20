@@ -4,12 +4,20 @@ namespace App\Traits;
 
 use App\Models\Company;
 use App\Models\Shift;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-trait ShiftOperation {
-    public function list() {
-        $baseQuery = Shift::whereHas('company', function ($q) {
-            $q->where('user_id', auth()->id());
+trait ShiftOperation
+{
+    public function list()
+    {
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Shift::whereHas('company', function ($q) use ($userIds) {
+            $q->whereIn('user_id', $userIds);
         })
             ->searchable(['name', 'company:name'])
             ->with('company')
@@ -21,17 +29,17 @@ trait ShiftOperation {
         if (request()->export) {
             return exportData($baseQuery, request()->export, "Shift", "A4 landscape");
         }
-        $shifts = $baseQuery->paginate(getPaginate());
-        $companies   = Company::active()->get();
+        $shifts    = $baseQuery->paginate(getPaginate());
+        $companies = Company::whereIn('user_id', $userIds)->active()->get();
         return responseManager("shift", $pageTitle, 'success', compact('shifts', 'view', 'pageTitle', 'companies'));
     }
 
-
-    public function save(Request $request, $id = 0) {
+    public function save(Request $request, $id = 0)
+    {
         $request->validate(
             [
-                'name'                => 'required|unique:shifts,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:255',
-                'company_id'          => 'required|exists:companies,id',
+                'name'       => 'required|unique:shifts,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:255',
+                'company_id' => 'required|exists:companies,id',
             ],
             [
                 'company_id.required' => 'Please select the company',
@@ -39,27 +47,28 @@ trait ShiftOperation {
         );
 
         if ($id) {
-            $shift    = Shift::where('id', $id)->whereHas('company', function ($q) {
+            $shift = Shift::where('id', $id)->whereHas('company', function ($q) {
                 $q->where('user_id', auth()->id());
             })
                 ->firstOrFailWithApi('shift');
-            $message  = "Shift updated successfully";
-            $remark   = "shift-updated";
+            $message = "Shift updated successfully";
+            $remark  = "shift-updated";
         } else {
-            $shift    = new Shift();
-            $message  = "Shift saved successfully";
-            $remark   = "shift-added";
+            $shift   = new Shift();
+            $message = "Shift saved successfully";
+            $remark  = "shift-added";
         }
 
-        $shift->name          = $request->name;
-        $shift->company_id    = $request->company_id;
+        $shift->name       = $request->name;
+        $shift->company_id = $request->company_id;
         $shift->save();
 
         // adminActivity($remark, get_class($shift), $shift->id);
         return responseManager("shift", $message, 'success', compact('shift'));
     }
 
-    public function status($id) {
+    public function status($id)
+    {
         return Shift::changeStatus($id);
     }
 }

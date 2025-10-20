@@ -47,7 +47,7 @@
                                             </div>
                                         </td>
                                         <td> @php echo $sale->statusBadge @endphp </td>
-                                        <td> {{ __(@$sale->admin->username) }} </td>
+                                        <td> {{ __(@$sale->user->username) }} </td>
                                         <td class="dropdown">
                                             @if (request()->trash)
                                                 <button type="button" class="btn btn-outline--success confirmationBtn"

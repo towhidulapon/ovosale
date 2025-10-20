@@ -3,13 +3,19 @@
 namespace App\Traits;
 
 use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait CustomerOperation
 {
     public function list()
     {
-        $baseQuery = Customer::where('user_id', auth()->id())->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Customer::where('user_id', $userIds)->searchable(['name', 'email'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Customer';
         $view      = "Template::user.customer.list";
 
@@ -44,9 +50,9 @@ trait CustomerOperation
             $customer = new Customer();
             $message  = "Customer saved successfully";
             $remark   = "customer-added";
+            $customer->user_id  = auth()->id();
         }
 
-        $customer->user_id  = auth()->id();
         $customer->name     = $request->name;
         $customer->email    = $request->email;
         $customer->mobile   = $request->mobile;
@@ -61,7 +67,7 @@ trait CustomerOperation
         // adminActivity($remark, get_class($customer), $customer->id);
         if (request()->from == 'pos') {
             return jsonResponse('success', 'success', (array) $message, [
-                'customer' => $customer
+                'customer' => $customer,
             ]);
         }
 

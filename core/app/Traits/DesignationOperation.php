@@ -4,12 +4,20 @@ namespace App\Traits;
 
 use App\Models\Company;
 use App\Models\Designation;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-trait DesignationOperation {
-    public function list() {
-        $baseQuery = Designation::whereHas('company', function ($q) {
-            $q->where('user_id', auth()->id());
+trait DesignationOperation
+{
+    public function list()
+    {
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Designation::whereHas('company', function ($q)use ($userIds) {
+            $q->whereIn('user_id', $userIds);
         })->searchable(['name', 'company:name', 'department:name'])->with('company', 'department')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Designation';
         $view      = "Template::user.hrm.designation.list";
@@ -19,8 +27,8 @@ trait DesignationOperation {
         }
 
         $designations = $baseQuery->paginate(getPaginate());
-        $companies    = Company::whereHas('company', function ($q) {
-            $q->where('user_id', auth()->id());
+        $companies    = Company::whereHas('departments', function ($q) use ($userIds) {
+            $q->whereIn('user_id', $userIds);
         })
             ->with('departments')
             ->active()
@@ -29,8 +37,8 @@ trait DesignationOperation {
         return responseManager("designation", $pageTitle, 'success', compact('designations', 'view', 'pageTitle', 'companies'));
     }
 
-
-    public function save(Request $request, $id = 0) {
+    public function save(Request $request, $id = 0)
+    {
         $request->validate(
             [
                 'name'          => 'required|unique:designations,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:40',
@@ -45,12 +53,12 @@ trait DesignationOperation {
 
         if ($id) {
             $designation = Designation::where('id', $id)->firstOrFailWithApi('designation');
-            $message  = "Designation updated successfully";
-            $remark   = "designation-updated";
+            $message     = "Designation updated successfully";
+            $remark      = "designation-updated";
         } else {
             $designation = new Designation();
-            $message  = "Designation saved successfully";
-            $remark   = "designation-added";
+            $message     = "Designation saved successfully";
+            $remark      = "designation-added";
         }
 
         $designation->name          = $request->name;
@@ -62,7 +70,8 @@ trait DesignationOperation {
         return responseManager("designation", $message, 'success', compact('designation'));
     }
 
-    public function status($id) {
+    public function status($id)
+    {
         return Designation::changeStatus($id);
     }
 }

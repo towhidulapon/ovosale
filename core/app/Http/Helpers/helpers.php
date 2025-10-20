@@ -17,6 +17,7 @@ use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Tax;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Notify\Notify;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -766,10 +767,19 @@ function saleAndPurchaseDataForGraph($maxDate, $dataFormat = "Y-m-d")
     $sales    = [];
     $purchase = [];
 
+    $user = getParentUser();
+
+    $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+    $userIds  = array_merge([$user->id], $staffIds);
+
+    if (!in_array($user->id, $userIds)) {
+        $userIds[] = $user->id;
+    }
+
     for ($i = 0; $i < $maxDate; $i++) {
         $date = $today->copy()->subDays($i)->format('Y-m-d');
-        array_push($sales, getAmount((clone $saleQuery)->where('user_id', auth()->id())->whereDate('sale_date', $date)->sum('total')));
-        array_push($purchase, getAmount((clone $purchaseQuery)->where('user_id', auth()->id())->whereDate('purchase_date', $date)->sum('total')));
+        array_push($sales, getAmount((clone $saleQuery)->whereIn('user_id', $userIds)->whereDate('sale_date', $date)->sum('total')));
+        array_push($purchase, getAmount((clone $purchaseQuery)->whereIn('user_id', $userIds)->whereDate('purchase_date', $date)->sum('total')));
 
         $formattedDate = now()->parse($date)->format($dataFormat);
         array_push($dates, $formattedDate);

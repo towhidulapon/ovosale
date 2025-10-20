@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 @section('panel')
-    <x-admin.ui.widget.group.dashboard.demo_five />
+    <x-admin.ui.widget.group.dashboard.demo_five :widget="$widget" />
     <x-admin.ui.widget.group.dashboard.users :widget="$widget" />
 
     <div class="row gy-4 mb-4">

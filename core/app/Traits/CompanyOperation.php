@@ -3,13 +3,23 @@
 namespace App\Traits;
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait CompanyOperation
 {
     public function list()
     {
-        $baseQuery = Company::where('user_id', auth()->id())->searchable(['name', 'email', 'mobile'])->orderBy('id', getOrderBy())->trashFilter();
+        $user = getPArentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Company::whereIn('user_id', $userIds)->searchable(['name', 'email', 'mobile'])->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Company';
         $view      = "Template::user.hrm.company.list";
 
@@ -40,9 +50,9 @@ trait CompanyOperation
             $company = new Company();
             $message  = "Company saved successfully";
             $remark   = "company-added";
+            $company->user_id = auth()->id();
         }
 
-        $company->user_id = auth()->id();
         $company->name    = $request->name;
         $company->email   = $request->email;
         $company->mobile  = $request->mobile;

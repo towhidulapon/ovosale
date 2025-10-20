@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\PaymentAccount;
 use App\Models\PaymentType;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,9 +12,15 @@ trait PaymentAccountOperation
 {
     public function list()
     {
-        $baseQuery = PaymentAccount::whereHas('paymentType', function ($q) {
-            $q->where('user_id', auth()->id());
-        })->searchable(['account_name','account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = PaymentAccount::whereHas('paymentType', function ($q) use ($userIds) {
+            $q->where('user_id', $userIds);
+        })->searchable(['account_name', 'account_number'])->orderBy('id', getOrderBy())->with('paymentType')->trashFilter();
         $pageTitle = 'Manage Payment Account';
         $view      = "Template::user.payment_account.list";
 
@@ -67,7 +74,6 @@ trait PaymentAccountOperation
         return responseManager("payment_account", $message, 'success', compact('paymentAccount'));
     }
 
-
     public function adjustBalance(Request $request, $id)
     {
 
@@ -76,7 +82,6 @@ trait PaymentAccountOperation
             'note'     => 'required',
             'amount'   => 'required|numeric|gt:0',
         ]);
-
 
         $paymentAccount = PaymentAccount::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('Payment Account');
 
@@ -99,18 +104,15 @@ trait PaymentAccountOperation
         return responseManager("payment_account", $message, 'success');
     }
 
-
     public function transferBalance(Request $request, $id)
     {
         $request->validate([
-            'to_account_id'   => 'required|exists:payment_accounts,id',
-            'amount'          => 'required|numeric|gt:0',
+            'to_account_id' => 'required|exists:payment_accounts,id',
+            'amount'        => 'required|numeric|gt:0',
         ]);
-
 
         $fromAccount = PaymentAccount::where('user_id', auth()->id())->where('id', $id)->firstOrFailWithApi('Payment Account');
         $toAccount   = PaymentAccount::where('user_id', auth()->id())->where('id', $request->to_account_id)->firstOrFailWithApi('Payment Account');
-
 
         if ($fromAccount->id == $toAccount->id) {
             return responseManager("payment_account", "Cannot transfer to the same account.", 'error');

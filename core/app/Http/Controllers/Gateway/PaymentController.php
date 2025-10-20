@@ -55,6 +55,12 @@ class PaymentController extends Controller {
         $payable = $amount + $charge;
         $finalAmount = $payable * $gate->rate;
 
+        if($planPurchaseId){
+            $successUrl = urlPath('user.home');
+        }else{
+            $successUrl = urlPath('user.deposit.history');
+        }
+
         $data = new Deposit();
         $data->user_id = auth()->user()->id;
         $data->subscription_plan_id = $planPurchaseId;
@@ -67,7 +73,7 @@ class PaymentController extends Controller {
         $data->btc_amount = 0;
         $data->btc_wallet = "";
         $data->trx = getTrx();
-        $data->success_url = urlPath('user.deposit.history');
+        $data->success_url = $successUrl;
         $data->failed_url = urlPath('user.deposit.history');
         $data->save();
 
@@ -179,7 +185,11 @@ class PaymentController extends Controller {
         $data = Deposit::with('gateway')->where('status', Status::PAYMENT_INITIATE)->where('trx', $track)->first();
         abort_if(!$data, 404);
         if ($data->method_code > 999) {
-            $pageTitle = 'Confirm Deposit';
+            if($data->subscription_plan_id){
+                $pageTitle = 'Confirm Payment';
+            }else{
+                $pageTitle = 'Deposit Confirm';
+            }
             $method = $data->gatewayCurrency();
             $gateway = $method->method;
             return view('Template::user.payment.manual', compact('data', 'pageTitle', 'method', 'gateway'));
@@ -214,7 +224,7 @@ class PaymentController extends Controller {
 
         if ($data->subscription_plan_id) {
             $starPurchaseStar         = PlanPurchase::where('user_id', auth()->id())->find($data->subscription_plan_id);
-            $starPurchaseStar->status = Status::PENDING;
+            $starPurchaseStar->status = Status::PLAN_PENDING;
             $starPurchaseStar->save();
 
             notify($data->user, 'PLAN_PURCHASE_REQUEST', [

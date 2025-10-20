@@ -5,11 +5,12 @@ namespace App\Traits;
 use App\Models\ProductStock;
 use App\Models\StockTransfer;
 use App\Models\StockTransferDetail;
+use App\Models\User;
 use App\Models\Warehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 trait StockTransferOperation
 {
@@ -21,27 +22,35 @@ trait StockTransferOperation
 
     public function add()
     {
-        $pageTitle  = "Stock Transfer";
-        $view       = "Template::user.stock_transfer.add";
-        $warehouses = Warehouse::where('user_id', auth()->id())->active()->get();
+        $pageTitle = "Stock Transfer";
+        $view      = "Template::user.stock_transfer.add";
+        $user      = getParentUser();
+        $staffIds  = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds   = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $warehouses = Warehouse::whereIn('user_id', $userIds)->active()->get();
         return responseManager("add_stock_transfer", $pageTitle, 'success', compact('pageTitle', 'view', 'warehouses'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'transfer_date'                       => 'required|date',
-            'warehouse_id'                        => 'required|exists:warehouses,id|different:to_warehouse_id',
-            'to_warehouse_id'                     => 'required|exists:warehouses,id',
-            'stock_transfer'                      => 'required|array|min:1',
-            "stock_transfer.*.product_id"         => "required|exists:product_stocks,product_id",
-            "stock_transfer.*.product_detail_id"  => "nullable|exists:product_stocks,product_details_id",
-            "stock_transfer.*.quantity"           => "required|numeric|gt:0",
+            'transfer_date'                      => 'required|date',
+            'warehouse_id'                       => 'required|exists:warehouses,id|different:to_warehouse_id',
+            'to_warehouse_id'                    => 'required|exists:warehouses,id',
+            'stock_transfer'                     => 'required|array|min:1',
+            "stock_transfer.*.product_id"        => "required|exists:product_stocks,product_id",
+            "stock_transfer.*.product_detail_id" => "nullable|exists:product_stocks,product_details_id",
+            "stock_transfer.*.quantity"          => "required|numeric|gt:0",
         ], [
-            'stock_transfer.required'             => "At least one product is required for transfer.",
-            'stock_transfer.min'                  => "At least one product is required for transfer.",
-            'stock_transfer.*.quantity.numeric'   => "Quantity must be a valid number.",
-            'stock_transfer.*.quantity.gt'        => "Quantity must be greater than 0.",
+            'stock_transfer.required'           => "At least one product is required for transfer.",
+            'stock_transfer.min'                => "At least one product is required for transfer.",
+            'stock_transfer.*.quantity.numeric' => "Quantity must be a valid number.",
+            'stock_transfer.*.quantity.gt'      => "Quantity must be greater than 0.",
         ]);
 
         if ($validator->fails()) {
@@ -63,7 +72,7 @@ trait StockTransferOperation
         try {
             DB::beginTransaction();
 
-            $transfer = new StockTransfer();
+            $transfer                  = new StockTransfer();
             $transfer->invoice_number  = $this->invoiceNumber($transferId);
             $transfer->transfer_date   = $request->transfer_date;
             $transfer->warehouse_id    = $request->warehouse_id;
@@ -124,12 +133,19 @@ trait StockTransferOperation
         }
     }
 
-
     public function list()
     {
         $pageTitle = "Stock Transfer List";
         $view      = "Template::user.stock_transfer.list";
-        $transfers = StockTransfer::where('user_id', auth()->id())->with(['toWarehouse', 'fromWarehouse'])
+        $user      = getParentUser();
+        $staffIds  = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds   = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $transfers = StockTransfer::whereIn('user_id', $userIds)->with(['toWarehouse', 'fromWarehouse'])
             ->searchable(['reference_no', 'invoice_number'])
             ->withCount('stockTransferDetails as total_items')
             ->orderBy('id', getOrderBy())
@@ -138,36 +154,34 @@ trait StockTransferOperation
         return responseManager("stock_transfers", $pageTitle, 'success', compact('transfers', 'view', 'pageTitle'));
     }
 
-
     public function edit($id)
     {
         $pageTitle = "Edit Stock Transfer";
         $transfer  = StockTransfer::where('user_id', auth()->id())->where("id", $id)->where("user_id", auth()->id())
             ->with(['toWarehouse', 'fromWarehouse', 'stockTransferDetails', 'stockTransferDetails.product'])
             ->firstOrFailWithApi("stock_transfer");
-        $view      = "Template::user.stock_transfer.edit";
+        $view       = "Template::user.stock_transfer.edit";
         $warehouses = Warehouse::active()->get();
 
         return responseManager("edit_stock_transfer", $pageTitle, 'success', compact('pageTitle', 'view', 'transfer', 'warehouses'));
     }
 
-
     public function update(Request $request, $id)
     {
 
         $validator = Validator::make($request->all(), [
-            'transfer_date'                       => 'required|date',
-            'warehouse_id'                        => 'required|exists:warehouses,id|different:to_warehouse_id',
-            'to_warehouse_id'                     => 'required|exists:warehouses,id',
-            'stock_transfer'                      => 'required|array|min:1',
-            "stock_transfer.*.product_id"         => "required|exists:product_stocks,product_id",
-            "stock_transfer.*.product_detail_id"  => "nullable|exists:product_stocks,product_details_id",
-            "stock_transfer.*.quantity"           => "required|numeric|gt:0",
+            'transfer_date'                      => 'required|date',
+            'warehouse_id'                       => 'required|exists:warehouses,id|different:to_warehouse_id',
+            'to_warehouse_id'                    => 'required|exists:warehouses,id',
+            'stock_transfer'                     => 'required|array|min:1',
+            "stock_transfer.*.product_id"        => "required|exists:product_stocks,product_id",
+            "stock_transfer.*.product_detail_id" => "nullable|exists:product_stocks,product_details_id",
+            "stock_transfer.*.quantity"          => "required|numeric|gt:0",
         ], [
-            'stock_transfer.required'             => "At least one product is required for transfer.",
-            'stock_transfer.min'                  => "At least one product is required for transfer.",
-            'stock_transfer.*.quantity.numeric'   => "Quantity must be a valid number.",
-            'stock_transfer.*.quantity.gt'        => "Quantity must be greater than 0.",
+            'stock_transfer.required'           => "At least one product is required for transfer.",
+            'stock_transfer.min'                => "At least one product is required for transfer.",
+            'stock_transfer.*.quantity.numeric' => "Quantity must be a valid number.",
+            'stock_transfer.*.quantity.gt'      => "Quantity must be greater than 0.",
         ]);
 
         if ($validator->fails()) {
@@ -238,7 +252,7 @@ trait StockTransferOperation
                     ->first();
 
                 if (!$destinationStock) {
-                    $destinationStock = new ProductStock();
+                    $destinationStock                     = new ProductStock();
                     $destinationStock->product_id         = $value['product_id'];
                     $destinationStock->product_details_id = $value['product_details_id'];
                     $destinationStock->warehouse_id       = $request->to_warehouse_id;
@@ -256,7 +270,7 @@ trait StockTransferOperation
                 if ($transferDetail) {
                     $transferDetail->quantity = $value['quantity'];
                 } else {
-                    $transferDetail = new StockTransferDetail();
+                    $transferDetail                     = new StockTransferDetail();
                     $transferDetail->stock_transfer_id  = $transfer->id;
                     $transferDetail->product_id         = $value['product_id'];
                     $transferDetail->product_details_id = $value['product_details_id'];
@@ -276,7 +290,6 @@ trait StockTransferOperation
         }
     }
 
-
     public function view($id)
     {
         $pageTitle = "Stock Transfer Invoice";
@@ -288,7 +301,6 @@ trait StockTransferOperation
         return responseManager("view_stock_transfer", $pageTitle, 'success', compact('transfer', 'view', 'pageTitle'));
     }
 
-
     public function pdf($id)
     {
         $pageTitle = "Stock Transfer Invoice";
@@ -296,8 +308,8 @@ trait StockTransferOperation
             ->with(['toWarehouse', 'fromWarehouse', 'stockTransferDetails'])
             ->firstOrFailWithApi("stock_transfer");
 
-        $pdf       = Pdf::loadView('Template::user.stock_transfer.pdf', compact('transfer', 'pageTitle'));
-        $fileName  = "Stock Transfer Invoice - " . $transfer->invoice_number . ".pdf";
+        $pdf      = Pdf::loadView('Template::user.stock_transfer.pdf', compact('transfer', 'pageTitle'));
+        $fileName = "Stock Transfer Invoice - " . $transfer->invoice_number . ".pdf";
         return $pdf->stream($fileName);
     }
 }

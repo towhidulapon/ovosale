@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Category;
+use App\Models\User;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,18 @@ trait CategoryOperation
 {
     public function list()
     {
-        $baseQuery = Category::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy());
+
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Category::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy());
+
         $pageTitle = 'Manage Category';
         $view      = "Template::user.category.list";
 
@@ -30,20 +42,23 @@ trait CategoryOperation
     {
         $request->validate([
             'name'  => 'required|string|max:40|unique:categories,name,' . $id,
-            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
+            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
 
-        $user = auth()->user();
-        // dd($user->id);
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
 
         if ($id) {
-            $category = Category::where('id', $id)->where('user_id', $user->id)->firstOrFailWithApi('category');
+            $category = Category::where('id', $id)->whereIn('user_id', $userIds)->firstOrFailWithApi('category');
             $message  = "Category updated successfully";
             $remark   = "category-updated";
         } else {
-            $category = new Category();
-            $message  = "Category saved successfully";
-            $remark   = "category-insert";
+            $category          = new Category();
+            $message           = "Category saved successfully";
+            $remark            = "category-insert";
+            $category->user_id = $user->id;
         }
         $category->name = $request->name;
         if ($request->hasFile('image')) {
@@ -55,7 +70,6 @@ trait CategoryOperation
                 return responseManager('exception', $message);
             }
         }
-        $category->user_id  = $user->id;
         $category->save();
         // adminActivity($remark, get_class($category), $category->id);
         return responseManager("category", $message, 'success', compact('category'));

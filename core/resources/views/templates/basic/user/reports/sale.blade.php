@@ -27,7 +27,7 @@
                                             <div>
                                                 <span class="d-block">
                                                     <a
-                                                        href="{{ route('admin.sale.view', $sale->id) }}">{{ __($sale->invoice_number) }}</a>
+                                                        href="{{ route('user.sale.view', $sale->id) }}">{{ __($sale->invoice_number) }}</a>
                                                 </span>
                                                 <span>{{ __($sale->sale_details_count) }} @lang('Items') </span>
                                             </div>

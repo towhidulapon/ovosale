@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Brand;
+use App\Models\User;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,18 @@ trait BrandOperation
 {
     public function list()
     {
-        $baseQuery = Brand::where('user_id', auth()->id())->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+
+        $user = getPArentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        if (!in_array($user->id, $userIds)) {
+            $userIds[] = $user->id;
+        }
+
+        $baseQuery = Brand::whereIn('user_id', $userIds)->searchable(['name'])->trashFilter()->orderBy('id', getOrderBy());
+
         $pageTitle = 'Manage Brand';
         $view      = "Template::user.brand.list";
 
@@ -27,24 +39,28 @@ trait BrandOperation
     {
         $request->validate([
             'name'  => 'required|string|max:40|unique:brands,name,' . $id,
-            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
+            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
 
-        $user = auth()->user();
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
 
         if ($id) {
-            $brand   = Brand::where('id', $id)->where('user_id', $user->id)->firstOrFailWithApi('brand');
+            $brand   = Brand::where('id', $id)->whereIn('user_id', $userIds)->firstOrFailWithApi('brand');
             $message = "Brand updated successfully";
             $remark  = "brand-updated";
         } else {
-            $brand   = new Brand();
-            $message = "Brand saved successfully";
-            $remark  = "brand-insert";
+            $brand          = new Brand();
+            $message        = "Brand saved successfully";
+            $remark         = "brand-insert";
+            $brand->user_id = $user->id;
         }
 
         if ($request->hasFile('image')) {
             try {
-                $old             = $brand->image;
+                $old          = $brand->image;
                 $brand->image = fileUploader($request->image, getFilePath('brand'), getFileSize('brand'), $old);
             } catch (\Exception $exp) {
                 $message = 'Couldn\'t upload your image';
@@ -52,7 +68,6 @@ trait BrandOperation
             }
         }
 
-        $brand->user_id = $user->id;
         $brand->name = $request->name;
         $brand->save();
 

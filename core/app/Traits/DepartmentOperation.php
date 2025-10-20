@@ -4,14 +4,20 @@ namespace App\Traits;
 
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait DepartmentOperation
 {
     public function list()
     {
-        $baseQuery = Department::whereHas('company', function($q){
-            $q->where('user_id', auth()->id());
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Department::whereHas('company', function ($q) use ($userIds) {
+            $q->where('user_id', $userIds);
         })->searchable(['name', 'company:name'])->with('company')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Department';
         $view      = "Template::user.hrm.department.list";
@@ -20,9 +26,8 @@ trait DepartmentOperation
         }
         $departments = $baseQuery->paginate(getPaginate());
         $companies   = Company::active()->orderBy('name')->get();
-        return responseManager("department", $pageTitle, 'success', compact('departments', 'view', 'pageTitle','companies'));
+        return responseManager("department", $pageTitle, 'success', compact('departments', 'view', 'pageTitle', 'companies'));
     }
-
 
     public function save(Request $request, $id = 0)
     {
@@ -30,9 +35,9 @@ trait DepartmentOperation
             'name'       => 'required|unique:departments,name,' . $id . ',id,company_id,' . $request->company_id . '|string|max:40',
             'company_id' => 'required|exists:companies,id',
         ],
-        [
-            'company_id.required' => 'Please select the company',
-        ]);
+            [
+                'company_id.required' => 'Please select the company',
+            ]);
 
         if ($id) {
             $department = Department::where('id', $id)->firstOrFailWithApi('department');

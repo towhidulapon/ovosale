@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
-use App\Models\Deposit;
-use App\Models\SupportTicket;
+use App\Models\PlanPurchase;
+use App\Models\SubscriptionPlan;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserLogin;
-use App\Models\Withdrawal;
 use App\Rules\FileTypeValidate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,14 +21,19 @@ class AdminController extends Controller
     public function dashboard()
     {
 
-        $userQuery     = User::query();
-        $trxQuery      = Transaction::query();
+        $userQuery         = User::where('parent_id', 0);
+        $trxQuery          = Transaction::query();
+        $purchasePlanQuery = PlanPurchase::query();
+        $planQuery         = SubscriptionPlan::query();
 
         $widget['total_users']             = (clone $userQuery)->count();
         $widget['active_users']            = (clone $userQuery)->active()->count();
         $widget['email_unverified_users']  = (clone $userQuery)->emailUnverified()->count();
         $widget['mobile_unverified_users'] = (clone $userQuery)->mobileUnverified()->count();
 
+        $widget['total_plans']     = (clone $planQuery)->count();
+        $widget['total_purchases'] = (clone $purchasePlanQuery)->count();
+        $widget['active_plans']    = (clone $purchasePlanQuery)->active()->count();
 
         $widget['total_trx']       = (clone $trxQuery)->count();
         $widget['total_trx_plus']  = (clone $trxQuery)->where('trx_type', "+")->count();
@@ -38,7 +42,6 @@ class AdminController extends Controller
 
         $pageTitle = 'Dashboard';
         $admin     = auth('admin')->user();
-
 
         $userLogin = UserLogin::selectRaw('browser, COUNT(*) as total')
             ->groupBy('browser')
@@ -60,7 +63,7 @@ class AdminController extends Controller
         $request->validate([
             'name'  => 'required|max:40',
             'email' => 'required|email',
-            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])]
+            'image' => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
 
         $user = auth('admin')->user();
@@ -114,12 +117,12 @@ class AdminController extends Controller
         $today             = Carbon::today();
         $timePeriodDetails = $this->timePeriodDetails($today);
 
-        $timePeriod        = (object) $timePeriodDetails[$request->time_period ?? 'daily'];
-        $carbonMethod      = $timePeriod->carbon_method;
-        $starDate          = $today->copy()->$carbonMethod($timePeriod->take);
-        $endDate           = $today->copy();
+        $timePeriod   = (object) $timePeriodDetails[$request->time_period ?? 'daily'];
+        $carbonMethod = $timePeriod->carbon_method;
+        $starDate     = $today->copy()->$carbonMethod($timePeriod->take);
+        $endDate      = $today->copy();
 
-        $plusTransactions   = Transaction::where('trx_type', '+')
+        $plusTransactions = Transaction::where('trx_type', '+')
             ->whereDate('created_at', '>=', $starDate)
             ->whereDate('created_at', '<=', $endDate)
             ->selectRaw('DATE_FORMAT(created_at, "' . $timePeriod->sql_date_format . '") as date,SUM(amount) as amount')
@@ -127,7 +130,7 @@ class AdminController extends Controller
             ->groupBy('date')
             ->get();
 
-        $minusTransactions  = Transaction::where('trx_type', '-')
+        $minusTransactions = Transaction::where('trx_type', '-')
             ->whereDate('created_at', '>=', $starDate)
             ->whereDate('created_at', '<=', $endDate)
             ->selectRaw('DATE_FORMAT(created_at, "' . $timePeriod->sql_date_format . '") as date,SUM(amount) as amount')
@@ -138,7 +141,7 @@ class AdminController extends Controller
         $data = [];
 
         for ($i = 0; $i < $timePeriod->take; $i++) {
-            $date       = $today->copy()->$carbonMethod($i)->format($timePeriod->php_date_format);
+            $date             = $today->copy()->$carbonMethod($i)->format($timePeriod->php_date_format);
             $plusTransaction  = $plusTransactions->where('date', $date)->first();
             $minusTransaction = $minusTransactions->where('date', $date)->first();
 
@@ -147,7 +150,7 @@ class AdminController extends Controller
 
             $data[$date] = [
                 'plus_amount'  => $plusAmount,
-                'minus_amount' => $minusAmount
+                'minus_amount' => $minusAmount,
             ];
         }
 
@@ -162,7 +165,6 @@ class AdminController extends Controller
         $pageTitle       = 'All Notifications';
         return view('admin.notifications', compact('pageTitle', 'notifications', 'hasUnread', 'hasNotification'));
     }
-
 
     public function notificationRead($id)
     {
@@ -180,7 +182,7 @@ class AdminController extends Controller
     public function readAllNotification()
     {
         AdminNotification::where('is_read', Status::NO)->update([
-            'is_read' => Status::YES
+            'is_read' => Status::YES,
         ]);
         $notify[] = ['success', 'Notifications read successfully'];
         return back()->withNotify($notify);
@@ -211,8 +213,8 @@ class AdminController extends Controller
             $endDateDateForCustom = $today->copy();
         }
 
-        return  [
-            'daily'   => [
+        return [
+            'daily'      => [
                 'sql_date_format' => "%d %b,%Y",
                 'php_date_format' => "d M,Y",
                 'take'            => 15,
@@ -220,7 +222,7 @@ class AdminController extends Controller
                 'start_date'      => $today->copy()->subDays(15),
                 'end_date'        => $today->copy(),
             ],
-            'monthly' => [
+            'monthly'    => [
                 'sql_date_format' => "%b,%Y",
                 'php_date_format' => "M,Y",
                 'take'            => 12,
@@ -228,7 +230,7 @@ class AdminController extends Controller
                 'start_date'      => $today->copy()->subMonths(12),
                 'end_date'        => $today->copy(),
             ],
-            'yearly'  => [
+            'yearly'     => [
                 'sql_date_format' => '%Y',
                 'php_date_format' => 'Y',
                 'take'            => 12,
@@ -236,7 +238,7 @@ class AdminController extends Controller
                 'start_date'      => $today->copy()->subYears(12),
                 'end_date'        => $today->copy(),
             ],
-            'date_range'   => [
+            'date_range' => [
                 'sql_date_format' => "%d %b,%Y",
                 'php_date_format' => "d M,Y",
                 'take'            => (int) Carbon::parse($startDateForCustom)->diffInDays(Carbon::parse($endDateDateForCustom)),

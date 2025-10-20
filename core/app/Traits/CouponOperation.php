@@ -4,13 +4,18 @@ namespace App\Traits;
 
 use App\Constants\Status;
 use App\Models\Coupon;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 trait CouponOperation
 {
     public function list()
     {
-        $coupons   = Coupon::where('user_id', auth()->id())->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter()->paginate(getPaginate());
+        $user     = getParentUser();
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $coupons   = Coupon::whereIn('user_id', $userIds)->searchable(['name'])->orderBy('id', getOrderBy())->trashFilter()->paginate(getPaginate());
         $pageTitle = 'Manage Coupon';
         $view      = "Template::user.coupon.list";
 
@@ -38,9 +43,9 @@ trait CouponOperation
             $coupon  = new Coupon();
             $message = "Coupon saved successfully";
             $remark  = "coupon-added";
+            $coupon->user_id            = auth()->user()->id;
         }
 
-        $coupon->user_id            = auth()->user()->id;
         $coupon->name               = $request->coupon_name;
         $coupon->code               = $request->coupon_code;
         $coupon->start_from         = $request->start_from;

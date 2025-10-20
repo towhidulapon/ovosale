@@ -10,10 +10,9 @@ use App\Models\NotificationLog;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserLogin;
-use App\Models\Withdrawal;
+use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Rules\FileTypeValidate;
 
 class ManageUsersController extends Controller
 {
@@ -106,7 +105,6 @@ class ManageUsersController extends Controller
         return view('admin.users.list', compact('pageTitle', 'users', 'widget'));
     }
 
-
     public function mobileUnverifiedUsers()
     {
         $pageTitle = 'Mobile Unverified Users';
@@ -133,6 +131,17 @@ class ManageUsersController extends Controller
         return view('admin.users.list', compact('pageTitle', 'users', 'widget'));
     }
 
+    public function allStaff()
+    {
+        $pageTitle = 'All Staff';
+        extract($this->userData('staff'));
+        if (request()->export) {
+            return $this->callExportData($baseQuery);
+        }
+        $users = $baseQuery->paginate(getPaginate());
+        return view('admin.users.list', compact('pageTitle', 'users'));
+    }
+
     public function usersWithBalance()
     {
         $pageTitle = 'Users with Balance';
@@ -148,18 +157,26 @@ class ManageUsersController extends Controller
 
     protected function userData($scope = 'query')
     {
-        $baseQuery  = User::$scope()->searchable(['email', 'username', 'firstname', 'lastname'])->dateFilter()->filter(['status'])->orderBy('id', getOrderBy());
+        if ($scope != 'staff') {
 
-        $countQuery = User::query();
-        $widget['all']   = (clone $countQuery)->count();
-        $widget['today'] = (clone $countQuery)->whereDate('created_at', now())->count();
-        $widget['week']  = (clone $countQuery)->whereDate('created_at', ">=", now()->subDays(7))->count();
-        $widget['month'] = (clone $countQuery)->whereDate('created_at', ">=", now()->subDays(30))->count();
+            $baseQuery = User::$scope()->searchable(['email', 'username', 'firstname', 'lastname'])->isParent()->dateFilter()->filter(['status'])->orderBy('id', getOrderBy());
 
-        return [
-            'baseQuery' => $baseQuery,
-            'widget'    => $widget
-        ];
+            $countQuery      = User::where('is_staff', 0);
+            $widget['all']   = (clone $countQuery)->count();
+            $widget['today'] = (clone $countQuery)->whereDate('created_at', now())->count();
+            $widget['week']  = (clone $countQuery)->whereDate('created_at', ">=", now()->subDays(7))->count();
+            $widget['month'] = (clone $countQuery)->whereDate('created_at', ">=", now()->subDays(30))->count();
+
+            return [
+                'baseQuery' => $baseQuery,
+                'widget'    => $widget,
+            ];
+        } else {
+            $baseQuery = User::searchable(['email', 'username', 'firstname', 'lastname'])->staff()->dateFilter()->filter(['status'])->orderBy('id', getOrderBy());
+            return [
+                'baseQuery' => $baseQuery,
+            ];
+        }
     }
 
     public function detail($id)
@@ -168,7 +185,7 @@ class ManageUsersController extends Controller
         $pageTitle = 'User Detail - ' . $user->username;
         $loginLogs = UserLogin::where('user_id', $user->id)->take(6)->get();
 
-        $widget['total_deposit']     = Deposit::where('user_id', $user->id)->successful()->sum('amount');
+        $widget['total_deposit'] = Deposit::where('user_id', $user->id)->successful()->sum('amount');
         // $widget['total_withdraw']    = Withdrawal::where('user_id', $user->id)->approved()->sum('amount');
         $widget['total_transaction'] = Transaction::where('user_id', $user->id)->sum('amount');
         $countries                   = json_decode(file_get_contents(resource_path('views/partials/country.json')));
@@ -198,7 +215,7 @@ class ManageUsersController extends Controller
     public function kycReject(Request $request, $id)
     {
         $request->validate([
-            'reason' => 'required'
+            'reason' => 'required',
         ]);
 
         $user                       = User::findOrFail($id);
@@ -207,19 +224,18 @@ class ManageUsersController extends Controller
         $user->save();
 
         notify($user, 'KYC_REJECT', [
-            'reason' => $request->reason
+            'reason' => $request->reason,
         ]);
 
         $notify[] = ['success', 'KYC rejected successfully'];
         return to_route('admin.users.kyc.pending')->withNotify($notify);
     }
 
-
     public function update(Request $request, $id)
     {
         $user         = User::findOrFail($id);
         $countryData  = json_decode(file_get_contents(resource_path('views/partials/country.json')));
-        $countryArray = (array)$countryData;
+        $countryArray = (array) $countryData;
         $countries    = implode(',', array_keys($countryArray));
 
         $countryCode = $request->country;
@@ -289,7 +305,6 @@ class ManageUsersController extends Controller
         $amount = $request->amount;
         $trx    = getTrx();
 
-
         $transaction = new Transaction();
 
         if ($request->act == 'add') {
@@ -328,7 +343,7 @@ class ManageUsersController extends Controller
             'trx'          => $trx,
             'amount'       => showAmount($amount, currencyFormat: false),
             'remark'       => $request->remark,
-            'post_balance' => showAmount($user->balance, currencyFormat: false)
+            'post_balance' => showAmount($user->balance, currencyFormat: false),
         ]);
         $notify[] = ['success', $message];
         return back()->withNotify($notify);
@@ -345,7 +360,7 @@ class ManageUsersController extends Controller
         $user = User::findOrFail($id);
         if ($user->status == Status::USER_ACTIVE) {
             $request->validate([
-                'reason' => 'required|string|max:255'
+                'reason' => 'required|string|max:255',
             ]);
             $user->status     = Status::USER_BAN;
             $user->ban_reason = $request->reason;
@@ -429,7 +444,6 @@ class ManageUsersController extends Controller
         return (new UserNotificationSender())->notificationToAll($request);
     }
 
-
     public function countBySegment($methodName)
     {
 
@@ -444,7 +458,7 @@ class ManageUsersController extends Controller
         return response()->json([
             'success' => true,
             'users'   => $users,
-            'more'    => $users->hasMorePages()
+            'more'    => $users->hasMorePages(),
         ]);
     }
 
@@ -458,6 +472,6 @@ class ManageUsersController extends Controller
 
     private function callExportData($baseQuery)
     {
-       return exportData($baseQuery, request()->export, "user", "A4 landscape");
+        return exportData($baseQuery, request()->export, "user", "A4 landscape");
     }
 }

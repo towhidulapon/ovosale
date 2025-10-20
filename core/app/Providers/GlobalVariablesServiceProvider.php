@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Constants\Status;
 use App\Models\AdminNotification;
+use App\Models\Deposit;
 use App\Models\Language;
+use App\Models\PlanPurchase;
 use App\Models\SupportTicket;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -53,9 +55,13 @@ class GlobalVariablesServiceProvider extends ServiceProvider
         view()->composer(['admin.partials.sidenav', 'admin.partials.topnav'], function ($view) {
             $view->with([
                 'menus'              => json_decode(file_get_contents(resource_path('views/admin/partials/menu.json'))),
+                'pendingPaymentsCount' => Deposit::pending()->count(),
+                'pendingPlansCount' => PlanPurchase::whereIn('status', [Status::PLAN_PENDING])->count(),
+                'trialPlansCount' => PlanPurchase::whereIn('status', [Status::PLAN_ON_TRIAL])->count(),
                 'pendingTicketCount' => SupportTicket::whereIn('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
             ]);
         });
+
 
         view()->composer('admin.partials.sidenav', function ($view) {
             $view->with([

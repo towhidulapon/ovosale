@@ -5,8 +5,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\NotificationLog;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Traits\ReportOperation;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -34,7 +35,12 @@ class ReportController extends Controller
     public function transaction(Request $request)
     {
         $pageTitle = 'Transaction History';
-        $baseQuery = Transaction::where('user_id', auth()->id())->searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
+        $user      = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = Transaction::whereIn('user_id', $userIds)->searchable(['trx'])->filter(['trx_type', 'remark', 'payment_account_id'])->dateFilter()->orderBy('id', getOrderBy());
 
         if (request()->payment_type) {
             $baseQuery->whereHas('paymentAccount', function ($q) {

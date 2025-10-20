@@ -23,7 +23,7 @@
                                         <td>{{ __(@$expense->category->name) }}</td>
                                         <td>{{ __(@$expense->reference_no ?? 'N/A') }}</td>
                                         <td>{{ showAmount(@$expense->amount) }}</td>
-                                        <td>{{ __(@$expense->admin->name) }}</td>
+                                        <td>{{ __(@$expense->user->username) }}</td>
                                     </tr>
                                 @empty
                                     <x-user.ui.table.empty_message />

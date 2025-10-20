@@ -5,28 +5,36 @@ namespace App\Traits;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-trait LeaveRequestOperation {
-    public function list() {
-        $baseQuery = LeaveRequest::where('user_id', auth()->id())->searchable(['employee:name', 'leaveType:name'])->with('employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
+trait LeaveRequestOperation
+{
+    public function list()
+    {
+        $user = getParentUser();
+
+        $staffIds = User::where('parent_id', $user->id)->pluck('id')->toArray();
+        $userIds  = array_merge([$user->id], $staffIds);
+
+        $baseQuery = LeaveRequest::whereIn('user_id', $userIds)->searchable(['employee:name', 'leaveType:name'])->with('employee', 'leaveType')->orderBy('id', getOrderBy())->trashFilter();
         $pageTitle = 'Manage Leave Request';
         $view      = "Template::user.hrm.leave.request.list";
         if (request()->export) {
             return exportData($baseQuery, request()->export, "LeaveRequest", "A4 landscape");
         }
-        $requests    = $baseQuery->paginate(getPaginate());
-        $employees   = Employee::whereHas('company', function ($q) {
-            $q->where('user_id', auth()->id());
+        $requests  = $baseQuery->paginate(getPaginate());
+        $employees = Employee::whereHas('company', function ($q) use ($userIds) {
+            $q->where('user_id', $userIds);
         })->active()->get();
-        $types       = LeaveType::where('user_id', auth()->id())->active()->get();
+        $types = LeaveType::whereIn('user_id', $userIds)->active()->get();
 
         return responseManager("leave_request", $pageTitle, 'success', compact('requests', 'view', 'pageTitle', 'employees', 'types'));
     }
 
-
-    public function save(Request $request, $id = 0) {
+    public function save(Request $request, $id = 0)
+    {
 
         $request->validate(
             [
@@ -44,12 +52,14 @@ trait LeaveRequestOperation {
         );
         if ($id) {
             $leaveRequest = LeaveRequest::where('id', $id)->firstOrFailWithApi('LeaveRequest');
-            $message  = "Leave request updated successfully";
-            $remark   = "leave-request-updated";
+            $message      = "Leave request updated successfully";
+            $remark       = "leave-request-updated";
         } else {
-            $leaveRequest = new LeaveRequest();
-            $message  = "Leave request saved successfully";
-            $remark   = "leave-request-added";
+            $leaveRequest          = new LeaveRequest();
+            $message               = "Leave request saved successfully";
+            $remark                = "leave-request-added";
+            $leaveRequest->user_id = auth()->id();
+
         }
         if ($request->hasFile('attachment')) {
             try {
@@ -66,7 +76,6 @@ trait LeaveRequestOperation {
         $end   = Carbon::parse($request->end_date);
         $days  = $start->diffInDays($end) + 1;
 
-        $leaveRequest->user_id       = auth()->id();
         $leaveRequest->employee_id   = $request->employee_id;
         $leaveRequest->leave_type_id = $request->leave_type_id;
         $leaveRequest->start_date    = $request->start_date;
@@ -80,7 +89,8 @@ trait LeaveRequestOperation {
         return responseManager("leave_request", $message, 'success', compact('leaveRequest'));
     }
 
-    public function status($id) {
+    public function status($id)
+    {
         return LeaveRequest::changeStatus($id);
     }
 }
